@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#191E33"
+    tools:mActivity=".GuideActivity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/x120"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/x234"
+        android:scaleType="centerInside"
+        android:src="@drawable/guide_check_logo" />
+
+    <EditText
+        android:id="@+id/guide_check_edit"
+        android:layout_width="@dimen/x560"
+        android:layout_height="@dimen/x74"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/x514"
+        android:background="@android:color/transparent"
+        android:digits="@string/rule_text"
+        android:gravity="center"
+        android:hint="请输入验证码"
+        android:maxLength="50"
+        android:singleLine="true"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#70FFFFFF"
+        android:textSize="@dimen/text_size_36" />
+
+    <View
+        android:layout_width="@dimen/x560"
+        android:layout_height="@dimen/x2"
+        android:layout_below="@+id/guide_check_edit"
+        android:layout_centerHorizontal="true"
+        android:background="#4C96FF" />
+
+    <TextView
+        android:id="@+id/guide_check_text"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/x64"
+        android:layout_below="@+id/guide_check_edit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/x22"
+        android:background="@drawable/guide_check_text_background"
+        android:gravity="center"
+        android:paddingLeft="@dimen/x20"
+        android:paddingRight="@dimen/x20"
+        android:textColor="#C2C2C2"
+        android:textSize="@dimen/text_size_32"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/guide_check_btn"
+        android:layout_width="@dimen/x560"
+        android:layout_height="@dimen/x80"
+        android:layout_below="@+id/guide_check_edit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/x144"
+        android:background="@drawable/guide_check_btn_background"
+        android:gravity="center"
+        android:onClick="onClick"
+        android:text="继续"
+        android:textColor="#FFFFFF"
+        android:textSize="@dimen/x36" />
+</RelativeLayout>

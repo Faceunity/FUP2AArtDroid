@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:mActivity=".MainActivity">
+
+    <ImageView
+        android:id="@+id/take_photo_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/take_photo_mask" />
+
+    <TextView
+        android:id="@+id/take_photo_point"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/x366"
+        android:gravity="center"
+        android:text="请将脸部对准虚线框"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_size_32" />
+
+    <ImageButton
+        android:id="@+id/take_photo_back"
+        android:layout_width="@dimen/x72"
+        android:layout_height="@dimen/x72"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/x30"
+        android:layout_marginTop="@dimen/x48"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/x10"
+        android:scaleType="centerInside"
+        android:src="@drawable/layout_back" />
+
+    <ImageButton
+        android:id="@+id/take_photo_change_camera"
+        android:layout_width="@dimen/x72"
+        android:layout_height="@dimen/x72"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/x106"
+        android:layout_marginBottom="@dimen/x172"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/x10"
+        android:scaleType="centerInside"
+        android:src="@drawable/switch_camera" />
+
+    <ImageButton
+        android:id="@+id/take_photo_select"
+        android:layout_width="@dimen/x72"
+        android:layout_height="@dimen/x72"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="@dimen/x108"
+        android:layout_marginBottom="@dimen/x172"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/x10"
+        android:scaleType="centerInside"
+        android:src="@drawable/take_photo_select" />
+
+    <ImageButton
+        android:id="@+id/take_photo_btn"
+        android:layout_width="@dimen/x196"
+        android:layout_height="@dimen/x196"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/x120"
+        android:background="@android:color/transparent"
+        android:scaleType="centerInside"
+        android:src="@drawable/take_photo_btn" />
+
+</RelativeLayout>

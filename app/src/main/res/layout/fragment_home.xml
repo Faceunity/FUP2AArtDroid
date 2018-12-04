@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/main_version_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/x41"
+        android:layout_marginTop="@dimen/x39"
+        android:gravity="left"
+        android:lineSpacingExtra="@dimen/x9"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_size_24" />
+
+    <CheckBox
+        android:id="@+id/main_track_image_btn"
+        android:layout_width="@dimen/x136"
+        android:layout_height="@dimen/x140"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/x10"
+        android:layout_marginBottom="@dimen/x146"
+        android:background="@drawable/main_track_image_btn"
+        android:button="@null" />
+
+    <LinearLayout
+        android:id="@+id/main_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x116"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorWhite"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/main_avatar_image_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/x56"
+                android:layout_height="@dimen/x56"
+                android:background="@drawable/main_avatar_image_btn"
+                android:button="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x28"
+                android:layout_marginTop="@dimen/x4"
+                android:gravity="center"
+                android:text="模型"
+                android:textColor="@color/main_image_btn_text_color"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_edit_image_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/x56"
+                android:layout_height="@dimen/x56"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/main_edit_image_btn" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x28"
+                android:layout_marginTop="@dimen/x4"
+                android:gravity="center"
+                android:text="形象"
+                android:textColor="@color/main_image_btn_text_color"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/main_ar_filter_image_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/x56"
+                android:layout_height="@dimen/x56"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:src="@drawable/main_ar_filter_image_btn" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x28"
+                android:layout_marginTop="@dimen/x4"
+                android:gravity="center"
+                android:text="AR滤镜"
+                android:textColor="@color/main_image_btn_text_color"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_edit_bottom_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        android:paddingTop="@dimen/x14" />
+
+    <View
+        android:id="@+id/main_guide_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/guide_img"
+        android:elevation="@dimen/x50"
+        android:visibility="gone" />
+</RelativeLayout>

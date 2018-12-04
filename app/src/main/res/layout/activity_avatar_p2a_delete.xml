@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/delete_avatar_p2a_background"
+    tools:mActivity=".AvatarP2ADeleteActivity">
+
+    <TextView
+        android:id="@+id/avatar_p2a_delete_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x128"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorWhite"
+        android:gravity="center_horizontal|bottom"
+        android:paddingBottom="@dimen/x20"
+        android:text="删除模型"
+        android:textColor="#666666"
+        android:textSize="@dimen/text_size_34" />
+
+    <ImageButton
+        android:id="@+id/avatar_p2a_delete_back"
+        android:layout_width="@dimen/x88"
+        android:layout_height="@dimen/x88"
+        android:layout_alignBottom="@+id/avatar_p2a_delete_title"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/x16"
+        android:background="@android:color/transparent"
+        android:scaleType="centerInside"
+        android:src="@drawable/delete_avatar_p2a_back" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/avatar_p2a_delete_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/avatar_p2a_delete_bottom_delete"
+        android:layout_below="@+id/avatar_p2a_delete_title"
+        android:layout_centerHorizontal="true"
+        android:padding="@dimen/x12" />
+
+    <TextView
+        android:id="@+id/avatar_p2a_delete_mid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="暂未有历史模型"
+        android:textColor="#373737"
+        android:textSize="@dimen/text_size_34" />
+
+    <Button
+        android:id="@+id/avatar_p2a_delete_bottom_delete"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x88"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorWhite"
+        android:gravity="center"
+        android:text="删除"
+        android:textColor="@color/color999999"
+        android:textSize="@dimen/text_size_32" />
+</RelativeLayout>

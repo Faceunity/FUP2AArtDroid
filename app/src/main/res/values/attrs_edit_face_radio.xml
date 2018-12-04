@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="EditFaceRadio">
+        <attr name="checked" format="boolean"/>
+        <attr name="drawable_normal" format="reference"/>
+        <attr name="drawable_checked" format="reference"/>
+    </declare-styleable>
+</resources>
