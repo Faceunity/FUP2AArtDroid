@@ -104,13 +104,13 @@ int colorIndexCnt = fuItemGetParamd(1,'color_index');
 设置角色包括头和身体的肤色
 ```C
 fuItemSetParamdv(1,'skin_color', [255,0,0]);
-// 得到默认嘴唇颜色index
+// 得到默认皮肤颜色index
 int skin_color_index = fuItemGetParamd(1,'skin_color_index');
 ```
 
 ------
 
-## 可配置颜色
+## 其他可配置颜色设置
 ```C
 //所有输入颜色值为SRGB，0-255
 
