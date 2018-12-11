@@ -13,12 +13,13 @@ import java.util.regex.Pattern;
  */
 
 public abstract class Constant {
+    public static final int NANO_IN_ONE_MILLI_SECOND = 1000000;
 
     public static final String APP_NAME = "FUP2AArtDemo";
     public static boolean is_debug = false;
     public static final int is_q = 1;
 
-    public static String web_url = "https://api2.faceunity.com:2339/api";
+    public static String web_url_create = "https://api2.faceunity.com:2339/api/upload/image";
     public static String web_url_check = "";
 
     public static final String filePath = Environment.getExternalStoragePublicDirectory("")

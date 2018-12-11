@@ -51,14 +51,14 @@ public abstract class P2AClientWrapper {
         int hasGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAS_GLASSES);
         avatarP2A.setGlassesIndex(hasGrasses > 0 ? 1 : 0);
 
-        double[] lipColor = chengeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_LIP_COLOR));
-        avatarP2A.setLipColorServerValues(lipColor);
+        double[] lipColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_LIP_COLOR));
+        avatarP2A.setLipColorServerValues(lipColor.length < 3 ? new double[]{0, 0, 0} : lipColor);
 
-        double[] skinColor = chengeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_SKIN_COLOR));
-        avatarP2A.setSkinColorServerValues(skinColor);
+        double[] skinColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_SKIN_COLOR));
+        avatarP2A.setSkinColorServerValues(skinColor.length < 3 ? new double[]{0, 0, 0} : skinColor);
     }
 
-    private static double[] chengeFloat2Double(float[] color) {
+    private static double[] changeFloat2Double(float[] color) {
         double[] c = new double[color.length];
         for (int i = 0; i < color.length; i++) {
             c[i] = color[i];

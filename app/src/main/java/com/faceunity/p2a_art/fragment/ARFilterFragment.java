@@ -61,9 +61,11 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (checkedId == 0) {
                     mARFilterAdapter.selectStatus(ARFilterAdapter.STATUS_HEAD);
+                    scrollToPosition(mRecyclerView, mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD]);
                     setShowBottomLayout(true);
                 } else if (checkedId == 1) {
                     mARFilterAdapter.selectStatus(ARFilterAdapter.STATUS_FILTER);
+                    scrollToPosition(mRecyclerView, mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_FILTER]);
                     setShowBottomLayout(true);
                 } else {
                     setShowBottomLayout(false);

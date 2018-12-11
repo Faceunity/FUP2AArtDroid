@@ -29,7 +29,7 @@ import java.util.List;
 public class EditFaceColorItemFragment extends EditFaceBaseFragment {
     public static final String TAG = EditFaceColorItemFragment.class.getSimpleName();
     private static final List<Integer> noHatBoy = Arrays.asList(9, 10, 11);
-    private static final List<Integer> noHatGirl = Arrays.asList(4, 11);
+    private static final List<Integer> noHatGirl = Arrays.asList(4, 12);
 
     private RecyclerView mItemRecycler;
     private ItemAdapter mItemAdapter;

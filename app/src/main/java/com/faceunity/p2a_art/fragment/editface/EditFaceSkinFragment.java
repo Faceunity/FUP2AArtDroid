@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,16 +83,16 @@ public class EditFaceSkinFragment extends EditFaceBaseFragment {
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 if (!fromUser) return;
                 if (colorControllerListener != null) {
-                    colorControllerListener.colorValuesChangeListener(mSelectPos + (mValues = 1.0f * value / 100));
+                    colorControllerListener.colorValuesChangeListener(mSelectPos + (mValues = 1.0f * (value >= 100 ? 99 : value) / 100));
                 }
             }
         });
 
         mDefaultValues = mAvatarP2A.getSkinColorValue() < 0 ? mFUP2ARenderer.fuItemGetParamSkinColorIndex() : mAvatarP2A.getSkinColorValue();
-        Log.e(TAG,"mFUP2ARenderer.fuItemGetParamSkinColorIndex() "+ mFUP2ARenderer.fuItemGetParamSkinColorIndex());
         mSelectPos = (int) mDefaultValues;
         mValues = mDefaultValues - mSelectPos;
         mColorAdapter.setSelectPosition(mSelectPos + 1);
+        mColorSeekBar.setProgress((int) (100 * mValues));
         scrollToPosition(mColorRecycler, mSelectPos + 1);
         return view;
     }

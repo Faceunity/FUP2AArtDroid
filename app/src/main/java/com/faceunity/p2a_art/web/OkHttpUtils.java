@@ -22,9 +22,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -74,12 +72,6 @@ public class OkHttpUtils {
                 .connectTimeout(60000L, TimeUnit.MILLISECONDS)
                 .writeTimeout(60000L, TimeUnit.MILLISECONDS)
                 .readTimeout(60000L, TimeUnit.MILLISECONDS);
-        builder.hostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
         OkHttpClient okHttpClient;
         if (sslSocketFactory != null) {
             okHttpClient = builder.sslSocketFactory(sslSocketFactory).build();
@@ -197,8 +189,8 @@ public class OkHttpUtils {
      * @param isQ        是否是Q版
      * @param callback
      */
-    public static void createAvatarRequest(final String uploadFile, int gender, int isQ, final Callback callback) {
-        String url = Constant.web_url + "/upload/image";
+    public static void createAvatarRequest(final String uploadFile, int gender, int isQ, final Callback callback, ProgressRequestBody.UploadProgressListener uploadProgressListener) {
+        String url = Constant.web_url_create;
         Log.i(TAG, "createAvatarRequest url " + url);
         Log.i(TAG, "createAvatarRequest uploadFile " + uploadFile);
         Bitmap bitmap = BitmapUtil.loadBitmap(uploadFile);
@@ -211,6 +203,9 @@ public class OkHttpUtils {
                 .addFormDataPart("is_q", String.valueOf(isQ))
                 .addFormDataPart("input", "filename", RequestBody.create(MediaType.parse("image/png"), reallyUploadFile))
                 .build();
+        if (uploadProgressListener != null) {
+            requestBody = new ProgressRequestBody(requestBody, uploadProgressListener);
+        }
         getInstance().getOkHttpClient().newCall(new Request.Builder().url(url).post(requestBody).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

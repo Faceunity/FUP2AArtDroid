@@ -41,7 +41,6 @@ public class FUP2ARenderer {
     /**
      * 目录assets下的 *.bundle为程序的数据文件。
      * 其中 v3.bundle：人脸识别数据文件，缺少该文件会导致系统初始化失败；
-     * face_beautification.bundle：美颜和美型相关的数据文件；
      * anim_model.bundle：优化表情跟踪功能所需要加载的动画数据文件；适用于使用Animoji和avatar功能的用户，如果不是，可不加载
      * fxaa.bundle：3D绘制抗锯齿数据文件。加载后，会使得3D绘制效果更加平滑。
      * controller.bundle：controller数据文件，用于控制和显示avatar。
@@ -50,7 +49,6 @@ public class FUP2ARenderer {
      */
     public static final String BUNDLE_v3 = "v3.bundle";
     public static final String BUNDLE_anim_model = "anim_model.bundle";
-    public static final String BUNDLE_face_beautification = "face_beautification.bundle";
     public static final String BUNDLE_fxaa = "fxaa.bundle";
     public static final String BUNDLE_controller = "controller.bundle";
     public static final String BUNDLE_default_bg = "default_bg.bundle";
@@ -820,7 +818,7 @@ public class FUP2ARenderer {
                     int oldHairItem = hairARItem;
                     int oldGlassItem = glassARItem;
                     int oldBeardItem = beardARItem;
-                    int oldHatItem = hatItem;
+                    int oldHatItem = hatARItem;
                     headARItem = avatarP2A.getHeadFile().equals(headARFile) ? oldHeadItem : loadItem(headARFile = avatarP2A.getHeadFile());
                     hairARItem = avatarP2A.getHairFile().equals(hairARFile) ? oldHairItem : loadItem(hairARFile = avatarP2A.getHairFile());
                     glassARItem = avatarP2A.getGlassesFile().equals(glassARFile) ? oldGlassItem : loadItem(glassARFile = avatarP2A.getGlassesFile());

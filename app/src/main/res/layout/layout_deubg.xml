@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/main_debug_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/x150"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/main_debug_info_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/x9"
+            android:gravity="left"
+            android:lineSpacingExtra="@dimen/x9"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_skin_color_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_info_text"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/x9"
+            android:gravity="left"
+            android:lineSpacingExtra="@dimen/x9"
+            android:text="肤色(上server,下当前):"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_skin_color_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_skin_color_text"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/x9"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_skin_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_skin_color_server"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_lip_color_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_skin_color"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/x9"
+            android:gravity="left"
+            android:lineSpacingExtra="@dimen/x9"
+            android:text="唇色(上server,下当前):"
+            android:textColor="@color/colorWhite"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_lip_color_server"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_lip_color_text"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/x9"
+            android:textSize="@dimen/text_size_28" />
+
+        <TextView
+            android:id="@+id/main_debug_lip_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/main_debug_lip_color_server"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/text_size_28" />
+    </RelativeLayout>
+
+    <HorizontalScrollView
+        android:id="@+id/main_debug_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@color/colorWhite"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="vertical"
+            android:padding="@dimen/x20">
+
+            <ToggleButton
+                android:id="@+id/main_debug_bottom_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:enabled="false"
+                android:textOff="面部细节\n关"
+                android:textOn="面部细节\n开" />
+
+            <ToggleButton
+                android:id="@+id/main_debug_bottom_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textOff="debug\n关"
+                android:textOn="debug\n开" />
+
+            <Spinner
+                android:id="@+id/main_debug_bottom_web"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <ToggleButton
+                android:id="@+id/main_debug_bottom_create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:textOff="批量生成\n关"
+                android:textOn="批量生成\n开" />
+
+            <ToggleButton
+                android:id="@+id/main_debug_bottom_deform"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:textOff="deform\n关"
+                android:textOn="deform\n开" />
+
+            <Button
+                android:id="@+id/main_debug_bottom_clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="清除数据" />
+
+            <Spinner
+                android:id="@+id/main_debug_bottom_count_ratio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </HorizontalScrollView>
+</RelativeLayout>

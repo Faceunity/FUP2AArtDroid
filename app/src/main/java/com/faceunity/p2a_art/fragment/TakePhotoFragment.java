@@ -37,6 +37,7 @@ import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.LightSensorUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
 import com.faceunity.p2a_art.web.OkHttpUtils;
+import com.faceunity.p2a_art.web.ProgressRequestBody;
 
 import java.io.File;
 import java.io.IOException;
@@ -213,20 +214,20 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         });
     }
 
-    private long createAvatarTime;
+    private long uploadDataTime;
+    private long downloadDataTime;
     private long serverDataTime;
     private long headDataTime;
-    private long clientDataTime;
     private long allTime;
 
     private void createAvatar(final String dir, final int gender, final int style) {
-        createAvatarTime = System.nanoTime();
+        final long createAvatarTime = System.nanoTime();
         OkHttpUtils.createAvatarRequest(dir + AvatarP2A.FILE_NAME_CLIENT_DATA_ORIGIN_PHOTO, gender, style, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 if (!call.isCanceled()) {
                     Log.e(TAG, "response onFailure " + call.toString() + "\n IOException：\n" + e.toString());
-                    onFailureCreate("onFailure");
+                    onFailureCreate("onNetFailure");
                     mCreateAvatarDialog.dismiss();
                 }
                 FileUtil.deleteDirAndFile(new File(dir));
@@ -234,10 +235,17 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.e(TAG, "response message " + response.message());
+                Log.i(TAG, "response message " + response.message() + " code " + response.code());
                 if (response.isSuccessful()) {
+                    long onResponseTime = System.nanoTime();
                     byte[] bytes = response.body().bytes();
+                    long downloadTime = System.nanoTime();
+                    downloadDataTime = (downloadTime - onResponseTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
+                    serverDataTime = (downloadTime - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
                     final AvatarP2A avatarP2A = handleP2AConvert(bytes, dir, gender, style);
+                    long completeTime = System.nanoTime();
+                    headDataTime = (completeTime - downloadTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
+                    allTime = (completeTime - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
                     if (avatarP2A != null) {
                         mDBHelper.insertHistory(avatarP2A);
                         mActivity.updateAvatarP2As();
@@ -248,14 +256,22 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK) {
                             mCameraRenderer.changeCamera();
                         }
-                        allTime = (System.nanoTime() - createAvatarTime) / 1000000;
                         return;
+                    } else {
+                        onFailureCreate("onFileFailure");
                     }
                 } else {
-                    onFailureCreate(response.code() == 500 ? response.body().string() : "onResponse");
+                    onFailureCreate(response.code() == 500 ? response.body().string() : "onNetFailure");
                 }
                 FileUtil.deleteDirAndFile(new File(dir));
                 mCreateAvatarDialog.dismiss();
+            }
+        }, new ProgressRequestBody.UploadProgressListener() {
+            @Override
+            public void onUploadRequestProgress(long byteWritten, long contentLength) {
+                if (byteWritten == contentLength) {
+                    uploadDataTime = (System.nanoTime() - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
+                }
             }
         });
     }
@@ -263,8 +279,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     private volatile int isCreateIndex = 2;
 
     public AvatarP2A handleP2AConvert(final byte[] objData, final String dir, final int gender, final int style) {
-        long time = System.nanoTime();
-        serverDataTime = (time - createAvatarTime) / 1000000;
         try {
             final AvatarP2A avatarP2A = P2AClientWrapper.initializeAvatarP2A(dir, gender, style);
             if (isCancel) return null;
@@ -304,7 +318,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 }
             });
             P2AClientWrapper.createHead(objData, avatarP2A.getHeadFile());
-            headDataTime = (System.nanoTime() - time) / 1000000;
             synchronized (avatarP2A) {
                 if (--isCreateIndex == 0)
                     avatarP2A.notify();
@@ -312,7 +325,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     avatarP2A.wait();
             }
             if (isCancel) return null;
-            clientDataTime = (System.nanoTime() - time) / 1000000;
             return avatarP2A;
         } catch (IOException e) {
             e.printStackTrace();
@@ -369,10 +381,10 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     case "10":
                         toast = "FOV错误";
                         break;
-                    case "onResponse":
+                    case "onFileFailure":
                         toast = "本地解析错误";
                         break;
-                    case "onFailure":
+                    case "onNetFailure":
                         toast = "网络访问错误";
                         break;
                     default:
@@ -458,8 +470,8 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         try {
             Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugP2AClientWrapper");
             if (aClass != null) {
-                Method handleP2AConvertDebug = aClass.getMethod("handleP2AConvertDebug", new Class[]{String.class, byte[].class, Long.class, Long.class, Long.class, Long.class});
-                handleP2AConvertDebug.invoke(null, new Object[]{dir, objData, serverDataTime, headDataTime, clientDataTime, allTime});
+                Method handleP2AConvertDebug = aClass.getMethod("handleP2AConvertDebug", new Class[]{String.class, byte[].class, Long.class, Long.class, Long.class, Long.class, Long.class});
+                handleP2AConvertDebug.invoke(null, new Object[]{dir, objData, uploadDataTime, downloadDataTime, serverDataTime, headDataTime, allTime});
             }
         } catch (Throwable t) {
             t.printStackTrace();

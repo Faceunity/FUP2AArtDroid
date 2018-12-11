@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.core.AvatarP2A;
@@ -248,6 +249,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String Common = ",";
 
     private String change(double[] doubles) {
+        if (doubles == null || doubles.length == 0) return "0,0,0";
         int i = 0;
         StringBuilder builder = new StringBuilder(String.valueOf(doubles[i]));
         while (++i < doubles.length) {
@@ -257,6 +259,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private double[] change(String str) {
+        if (TextUtils.isEmpty(str)) return new double[]{0, 0, 0};
         String[] values = str.split(Common);
         double[] r = new double[values.length];
         for (int i = 0; i < values.length; i++) {

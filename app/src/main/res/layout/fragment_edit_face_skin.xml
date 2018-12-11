@@ -19,7 +19,7 @@
         app:dsb_indicatorColor="#4C96FF"
         app:dsb_indicatorElevation="0dp"
         app:dsb_indicatorPopupEnabled="true"
-        app:dsb_max="100"
+        app:dsb_max="99"
         app:dsb_min="0"
         app:dsb_progressColor="#4C96FF"
         app:dsb_rippleColor="@color/colorWhite"
