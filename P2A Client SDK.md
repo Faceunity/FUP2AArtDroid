@@ -1,4 +1,4 @@
-# P2A 对接说明文档-Android
+# P2A Client SDK--Android
 
 本文主要介绍了如何快速跑通我们的FUP2A工程 、如何创建和编辑风格化形象、如何绘制风格化形象、SDK的分类及相关资源说明等。工程中会使用到两个库文件:FUP2AClient SDK、Nama SDK，其中FUP2AClient SDK 用来做风格化形象的生成，Nama SDK 用来做风格化形象的绘制。
 
@@ -35,20 +35,27 @@
 本工程主要包括以下功能：
 
 - 形象生成：上传照片到服务端对人脸进行检测，利用服务端返回的数据生成风格化形象；
-- 形象编辑：支持美型，以及对肤色、唇色、瞳色、发型、胡子、眼镜、帽子、衣服的个性化编辑；
 - 形象绘制：实现风格化形象的实时绘制。
+- 形象驱动：通过人脸驱动风格化形象。
+- 形象编辑：形象编辑：支持美型，以及对肤色、唇色、瞳色、发型、胡子、眼镜、帽子、衣服的个性化编辑；
 
 ## 形象生成
 
-首先上传照片到服务端做人脸检测，并得到服务端返回的数据，然后使用服务端返回的数据调用FUP2AClient SDK来创建头和头发道具。
+首先上传照片到服务端做人脸检测，并得到服务端返回的数据，然后使用服务端返回的数据调用FUP2AClient SDK来创建头和头发道具。另外当对风格化形象进行美型后，也需要重新生成形象的头道具。主要流程如下：
+
+- 上传照片
+- 初始化 FUP2AClient SDK 
+- 使用 FUP2AClient SDK 生成头道具
+- 使用 FUP2AClient SDK 生成头发道具
+- 使用 FUP2AClient SDK 重新生成头道具
 
 ### 上传照片
 
 用户上传照片到服务端，服务端对该图片做人脸检测，并返回检测后的人脸数据： server.bundle。server.bundle 包含用户的发型、肤色、眼镜、唇色、脸型等详细信息。
 
-### 生成头和头发道具
+### 初始化 FUP2AClient SDK 
 
-使用 server.bundle 调用 FUP2AClient SDK 相关接口前，需要先进行初始化，且只需要初始化一次。
+调用 FUP2AClient SDK 相关接口前，需要先进行初始化，且只需要初始化一次。
 
 初始化接口说明如下：
 
@@ -63,7 +70,9 @@
         public static boolean setupData(byte[] p2aClientBin);
 ```
 
-然后使用 server.bundle 调用 FUP2AClient SDK 相关接口便可以生成头和头发道具，相关API接口说明如下：
+### 生成头道具
+
+使用 server.bundle 调用 FUP2AClient SDK 相关接口便可以生成头道具，相关API接口说明如下：
 
 ```java
         /**
@@ -74,7 +83,15 @@
          * @return 生成的头部模型数据
          */
         public static byte[] createAvatarHeadWithData(byte[] serverData);
+```
 
+注：该接口支持异步并行调用。
+
+### 生成头发道具
+
+使用 server.bundle 与预置的 hair.bundle，调用 FUP2AClient SDK 相关接口，生成与头道具大小相匹配的头发道具，相关API接口说明如下：
+
+```java
         /**
          * 生成 hair.Bundle
          * - 根据服务端传回的数据流和预置的头发模型 生成和此头部模型匹配的头发模型
@@ -86,21 +103,11 @@
         public static byte[] createAvatarHairWithServerData(byte[] serverData, byte[] hairData);
 ```
 
-注：这两个接口都支持异步并行调用。
+注：该接口支持异步并行调用。
 
-## 形象编辑
+### 重新生成头道具
 
-形象编辑功能包括：美型，以及对肤色、唇色、瞳色、发型、胡子、眼镜、帽子、衣服的个性化编辑。
-
-* 通过修改 controller.bundle 的相关参数，可以实现美型、及对肤色、唇色、瞳色、发色、胡子颜色、眼镜颜色、帽子颜色的修改。
-
-* 通过加载并绑定相关道具到 controller.bundle 道具上，可以对发型、胡子、眼镜、帽子、衣服的样式进行修改。
-
-在保存形象时，仅有美型需要调用 FUP2AClient 的接口生成新的头道具，而其他参数值及道具（发型、胡子、眼镜、帽子、衣服）信息需要客户端缓存。
-
-### 美型保存
-
-保存美型修改时，需要调用 FUP2AClient 的 deformAvatarHeadWithHeadData 接口生成新的头道具，API接口说明如下：
+对风格化形象进行美型后，重新生成形象的头道具。需要调用 FUP2AClient SDK 的 deformAvatarHeadWithHeadData 接口生成新的头道具，API接口说明如下：
 
 API接口说明如下：
 
@@ -118,9 +125,42 @@ API接口说明如下：
 
 注：该接口支持异步并行调用。
 
+## 形象绘制
+
+使用 FUP2AClient SDK 生成的风格化形象，目前支持通过 Nama SDK 进行绘制，后续将支持使用其他绘制引擎进行绘制，如 Unity 3D。使用 Nama SDK 进行绘制，主要流程如下：
+
+- 初始化 Nama SDK
+- 道具加载与绑定
+- 道具绘制
+- 道具的解绑与销毁
+
+### 初始化 Nama SDK
+
+使用 Nama SDK 前，需要先对 Nama SDK 进行初始化。初始化接口说明如下：
+
+**fuSetup   初始化接口：**
+
+```java
+public static native int fuSetup(byte[] v3data, byte[] ardata, byte[] authdata);
+```
+
+接口说明：
+
+初始化系统环境，加载系统数据，并进行网络鉴权。必须在调用SDK其他接口前执行，否则会引发崩溃。app启动后只需要setup一次faceunity即可，其中 authpack.A() 密钥数组声明在 authpack.java 中。
+
+参数说明：
+
+`v3data` v3.bundle 文件路径
+
+`ardata` 已废弃，传 null 即可
+
+`authdata` 密钥数组，必须配置好密钥，SDK才能正常工作
+
+------
+
 ### 道具加载与绑定
 
-首先加载controller道具，然后再加载道具分类中的其他道具，并将这些道具绑定到 controller 道具上（背景道具除外）。道具的加载与绑定相关API如下：
+加载风格化形象相关道具时，需要先加载controller道具，然后再加载道具分类中的其他道具，并将这些道具绑定到 controller 道具上（背景道具除外）。道具的加载与绑定相关API如下：
 
 ---
 
@@ -164,6 +204,44 @@ public static native int fuBindItems(int item_src, int[] items);
 `int ` 被绑定到目标道具上的普通道具个数
 
 ---
+
+### 道具绘制
+
+在绘制风格化形象道具时，首先将 controller 道具及背景道具句柄存储到的一个 int 数组中，然后把该 int 数组作为参数传入 renderItems 进行绘制即可。相关接口相关API如下：
+
+**fuAvatarToTexture 视频处理接口（依据fuTrackFace获取到的人脸信息来绘制画面）：**
+
+```
+public static native int fuAvatarToTexture(float[] landmarks, float[] expression, float[] rotation, float[] rmode, int flags, int w, int h, int frame_id, int[] items, int isTracking);
+```
+
+接口说明：
+
+依据fuTrackFace获取到的人脸信息来绘制画面
+
+参数说明：
+
+`landmarks ` 2D人脸特征点，返回值为75个二维坐标，长度75*2
+
+`expression `  表情系数，长度46
+
+`rotation ` 人脸三维旋转，返回值为旋转四元数，长度4
+
+`rmode ` 人脸朝向，0-3分别对应手机四种朝向，长度1
+
+`flags `  flags，可以指定返回纹理ID的道具镜像等
+
+`w ` 图像宽度
+
+`h ` 图像高度
+
+`frame_id ` 当前处理的视频帧序数，每次处理完对其进行加 1 操作，不加 1 将无法驱动道具中的特效动画
+
+`items ` 包含多个道具句柄的 int 数组，包括普通道具、美颜道具、手势道具等
+
+`isTracking ` 是否识别到人脸，可直接传入`fuIsTracking`方法获取到的值
+
+------
 
 ### 道具的解绑与销毁
 
@@ -209,83 +287,104 @@ public static native void fuDestroyItem(int item);
 
 ---
 
-## 形象绘制
+## 形象驱动
 
-### 检测人脸与渲染绘制
+形象驱动是指使用 Nama SDK 进行人脸检测，再使用检测到人脸信息驱动风格化形象的功能。流程为：先对人脸进行检测，将获取到人脸信息传入 renderItems 接口即可，相关API说明如下：
 
-绑定完道具需要使用检测人脸与绘制接口去绘制得到结果纹理。检测人脸与渲染绘制相关API如下：
-
----
-
-**fuAvatarToTexture 视频处理接口（依据fuTrackFace获取到的人脸信息来绘制画面）：**
+**fuTrackFace   人脸信息跟踪接口：**
 
 ```
-public static native int fuAvatarToTexture(float[] landmarks, float[] expression, float[] rotation, float[] rmode, int flags, int w, int h, int frame_id, int[] items, int isTracking);
+public static native void fuTrackFace(byte[] img, int flags, int w, int h);
 ```
 
 接口说明：
 
-依据fuTrackFace获取到的人脸信息来绘制画面
+该接口只对人脸进行检测
 
 参数说明：
 
-`landmarks ` 2D人脸特征点，返回值为75个二维坐标，长度75*2
+`img ` 图像数据byte[]
 
-`expression `  表情系数，长度46
+`flags ` 输入图像格式：`FU_FORMAT_RGBA_BUFFER` 、 `FU_FORMAT_NV21_BUFFER` 、 `FU_FORMAT_NV12_BUFFER` 、 `FU_FORMAT_I420_BUFFER`
 
-`rotation ` 人脸三维旋转，返回值为旋转四元数，长度4
+`w ` 图像数据的宽度
 
-`rmode ` 人脸朝向，0-3分别对应手机四种朝向，长度1
+`h ` 图像数据的高度
 
-`flags `  flags，可以指定返回纹理ID的道具镜像等
+返回值：
 
-`w ` 图像宽度
+`int ` 检测到的人脸个数，返回 0 代表没有检测到人脸
 
-`h ` 图像高度
+------
 
-`frame_id ` 当前处理的视频帧序数，每次处理完对其进行加 1 操作，不加 1 将无法驱动道具中的特效动画
-
-`items ` 包含多个道具句柄的 int 数组，包括普通道具、美颜道具、手势道具等
-
-`isTracking ` 是否识别到人脸，可直接传入`fuIsTracking`方法获取到的值
-
----
-
-**fuAvatarToTexture 视频处理接口（依据fuTrackFace获取到的人脸信息来绘制画面）：**
+**fuGetFaceInfo 获取人脸信息接口：**
 
 ```
-public static native int fuAvatarToTexture(float[] landmarks, float[] expression, float[] rotation, float[] rmode, int flags, int w, int h, int frame_id, int[] items, int isTracking);
+public static native int fuGetFaceInfo(int face_id, String name, float[] value);
 ```
 
 接口说明：
 
-依据fuTrackFace获取到的人脸信息来绘制画面
+- 在程序中需要先运行过视频处理接口或 **人脸信息跟踪接口** 后才能使用该接口来获取人脸信息；
+- 该接口能获取到的人脸信息与我司颁发的证书有关，普通证书无法通过该接口获取到人脸信息；
+- 什么证书能获取到人脸信息？能获取到哪些人脸信息？请看下方：
+
+```java
+	landmarks: 2D人脸特征点，返回值为75个二维坐标，长度75*2
+	证书要求: LANDMARK证书、AVATAR证书
+
+	landmarks_ar: 3D人脸特征点，返回值为75个三维坐标，长度75*3
+	证书要求: AVATAR证书
+
+	rotation: 人脸三维旋转，返回值为旋转四元数，长度4
+	证书要求: LANDMARK证书、AVATAR证书
+
+	translation: 人脸三维位移，返回值一个三维向量，长度3
+	证书要求: LANDMARK证书、AVATAR证书
+
+	eye_rotation: 眼球旋转，返回值为旋转四元数,长度4
+	证书要求: LANDMARK证书、AVATAR证书
+
+	rotation_raw: 人脸三维旋转（不考虑屏幕方向），返回值为旋转四元数，长度4
+	证书要求: LANDMARK证书、AVATAR证书
+
+	expression: 表情系数，长度46
+	证书要求: AVATAR证书
+
+	projection_matrix: 投影矩阵，长度16
+	证书要求: AVATAR证书
+
+	face_rect: 人脸矩形框，返回值为(xmin,ymin,xmax,ymax)，长度4
+	证书要求: LANDMARK证书、AVATAR证书
+
+	rotation_mode: 人脸朝向，0-3分别对应手机四种朝向，长度1
+	证书要求: LANDMARK证书、AVATAR证书
+```
 
 参数说明：
 
-`landmarks ` 2D人脸特征点，返回值为75个二维坐标，长度75*2
+`face_id ` 被检测的人脸 ID ，未开启多人检测时传 0 ，表示检测第一个人的人脸信息；当开启多人检测时，其取值范围为 [0 ~ maxFaces-1] ，取其中第几个值就代表检测第几个人的人脸信息
 
-`expression `  表情系数，长度46
+`name ` 人脸信息参数名： "landmarks" , "eye_rotation" , "translation" , "rotation" ....
 
-`rotation ` 人脸三维旋转，返回值为旋转四元数，长度4
+`value ` 作为容器使用的 float 数组指针，获取到的人脸信息会被直接写入该 float 数组。
 
-`rmode ` 人脸朝向，0-3分别对应手机四种朝向，长度1
+返回值
 
-`flags `  flags，可以指定返回纹理ID的道具镜像等
+`int ` 返回 1 代表获取成功，返回 0 代表获取失败
 
-`w ` 图像宽度
+------
 
-`h ` 图像高度
+## 形象编辑
 
-`frame_id ` 当前处理的视频帧序数，每次处理完对其进行加 1 操作，不加 1 将无法驱动道具中的特效动画
+形象编辑功能包括：美型，以及对肤色、唇色、瞳色、发型、胡子、眼镜、帽子、衣服的个性化编辑。
 
-`items ` 包含多个道具句柄的 int 数组，包括普通道具、美颜道具、手势道具等
+- 通过修改 controller.bundle 的相关参数，可以实现美型、及对肤色、唇色、瞳色、发色、胡子颜色、眼镜颜色、帽子颜色的修改。详情请参考[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
+- 通过加载并绑定相关道具到 controller.bundle 道具上，可以对发型、胡子、眼镜、帽子、衣服的样式进行修改。详情请参考[道具加载与绑定](#道具加载与绑定)。
 
-`isTracking ` 是否识别到人脸，可直接传入`fuIsTracking`方法获取到的值
+在保存形象时，仅有美型功能需要使用 FUP2AClient SDK 的接口生成新的头道具，而其他参数值及道具（发型、胡子、眼镜、帽子、衣服）信息需要客户端缓存。
 
----
-
-### FUP2ARenderer 相关使用封装
+## FUP2ARenderer 相关代码示例
 
 FUP2ARenderer 是在Demo中实现风格化形象的渲染与切换、位置控制等等功能的具体实现类。
 
