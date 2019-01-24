@@ -3,9 +3,12 @@ package com.faceunity.p2a_art.core;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.faceunity.p2a.FUP2AClient;
 import com.faceunity.p2a_art.constant.AvatarConstant;
+import com.faceunity.p2a_art.entity.AvatarP2A;
+import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.utils.FileUtil;
 
 import java.io.IOException;
@@ -19,7 +22,7 @@ public abstract class P2AClientWrapper {
 
     public static void setupData(Context context) {
         try {
-            InputStream clientBin = context.getAssets().open("p2a_client.bin");
+            InputStream clientBin = context.getAssets().open("p2a_client_q.bin");
             byte[] clientBinData = new byte[clientBin.available()];
             clientBin.read(clientBinData);
             clientBin.close();
@@ -32,24 +35,26 @@ public abstract class P2AClientWrapper {
     public static AvatarP2A initializeAvatarP2A(@NonNull String dir, int gender, int style) {
         if (TextUtils.isEmpty(dir)) return null;
         AvatarP2A avatarP2A = new AvatarP2A(style, dir, gender);
-        String[] hairBundles = AvatarConstant.hairBundle(gender, style);
+        BundleRes[] hairBundles = AvatarConstant.hairBundleRes(gender);
         String[] hairPaths = new String[hairBundles.length];
         for (int i = 0; i < hairBundles.length; i++) {
-            hairPaths[i] = TextUtils.isEmpty(hairBundles[i]) ? "" : dir + hairBundles[i];
+            hairPaths[i] = TextUtils.isEmpty(hairBundles[i].path) ? "" : dir + hairBundles[i].path;
         }
         avatarP2A.setHairFileList(hairPaths);
         return avatarP2A;
     }
 
     public static void initializeAvatarP2AData(@NonNull byte[] objData, @NonNull AvatarP2A avatarP2A) {
-        int hairIndex = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAIR);
-        avatarP2A.setHairIndex(AvatarConstant.getDefaultIndex(AvatarConstant.hairIndex(avatarP2A.getGender(), avatarP2A.getStyle()), hairIndex));
+        int hairLabel = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAIR);
+        avatarP2A.setHairIndex(AvatarConstant.getDefaultIndex(AvatarConstant.hairBundleRes(avatarP2A.getGender()), hairLabel));
 
-        int beardIndex = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_BEARD);
-        avatarP2A.setBeardIndex(AvatarConstant.getDefaultIndex(AvatarConstant.beardIndex(avatarP2A.getStyle()), beardIndex));
+        int beardLabel = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_BEARD);
+        avatarP2A.setBeardIndex(AvatarConstant.getDefaultIndex(AvatarConstant.beardBundleRes(), beardLabel));
 
         int hasGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAS_GLASSES);
         avatarP2A.setGlassesIndex(hasGrasses > 0 ? 1 : 0);
+
+        Log.i(TAG, "initializeAvatarP2AData hairLabel " + hairLabel + " beardLabel " + beardLabel + " hasGrasses " + hasGrasses);
 
         double[] lipColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_LIP_COLOR));
         avatarP2A.setLipColorServerValues(lipColor.length < 3 ? new double[]{0, 0, 0} : lipColor);

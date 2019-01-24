@@ -19,9 +19,11 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.constant.AvatarConstant;
-import com.faceunity.p2a_art.core.AvatarP2A;
+import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.core.AvatarARHandle;
+import com.faceunity.p2a_art.core.P2AARCore;
+import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
 import com.faceunity.p2a_art.ui.BottomTitleGroup;
 import com.faceunity.p2a_art.utils.DateUtil;
@@ -38,9 +40,13 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
 
     private BottomTitleGroup mBottomTitleGroup;
     private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLinearLayoutManager;
     private ARFilterAdapter mARFilterAdapter;
 
     private ImageButton mTakePicBtn;
+
+    private P2AARCore mP2AARCore;
+    private AvatarARHandle mAvatarARHandle;
 
     @Nullable
     @Override
@@ -50,7 +56,7 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
         view.findViewById(R.id.ar_filter_camera).setOnClickListener(this);
 
         mRecyclerView = view.findViewById(R.id.ar_filter_bottom_recycler);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.HORIZONTAL, false));
+        mRecyclerView.setLayoutManager(mLinearLayoutManager = new LinearLayoutManager(mActivity, LinearLayoutManager.HORIZONTAL, false));
         mRecyclerView.setAdapter(mARFilterAdapter = new ARFilterAdapter());
         ((SimpleItemAnimator) mRecyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
 
@@ -61,11 +67,11 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (checkedId == 0) {
                     mARFilterAdapter.selectStatus(ARFilterAdapter.STATUS_HEAD);
-                    scrollToPosition(mRecyclerView, mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD]);
+                    scrollToPosition(mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD]);
                     setShowBottomLayout(true);
                 } else if (checkedId == 1) {
                     mARFilterAdapter.selectStatus(ARFilterAdapter.STATUS_FILTER);
-                    scrollToPosition(mRecyclerView, mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_FILTER]);
+                    scrollToPosition(mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_FILTER]);
                     setShowBottomLayout(true);
                 } else {
                     setShowBottomLayout(false);
@@ -76,7 +82,7 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
         mTakePicBtn = view.findViewById(R.id.ar_filter_take_pic);
         mTakePicBtn.setOnClickListener(this);
         mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD] = mActivity.getShowIndex() + 1;
-        scrollToPosition(mRecyclerView, mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD]);
+        scrollToPosition(mARFilterAdapter.selectPos[ARFilterAdapter.STATUS_HEAD]);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +91,12 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                 mBottomTitleGroup.clearCheck();
             }
         });
+
+        mP2AARCore = new P2AARCore(mActivity, mFUP2ARenderer);
+        mP2ACore.unBind();
+        mFUP2ARenderer.setFUCore(mP2AARCore);
+        mAvatarARHandle = mP2AARCore.createAvatarARHandle();
+        mAvatarARHandle.setARAvatar(mActivity.getShowAvatarP2A());
         return view;
     }
 
@@ -118,8 +130,11 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
     }
 
     @Override
-    public void backToHome() {
-        super.backToHome();
+    public void onBackPressed() {
+        super.onBackPressed();
+        mP2AARCore.release();
+        mP2ACore.bind();
+        mFUP2ARenderer.setFUCore(mP2ACore);
     }
 
     class ARFilterAdapter extends RecyclerView.Adapter<ARFilterAdapter.ARFilterHolder> {
@@ -160,22 +175,24 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                     holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mFUP2ARenderer.loadARAvatar(AvatarP2A);
+                            mAvatarARHandle.setARAvatar(AvatarP2A);
                             notifySelectItemChanged(position);
+                            scrollToPosition(position);
                         }
                     });
                     break;
                 case STATUS_FILTER:
                     if (position > 0) {
-                        holder.mItemImg.setImageResource(AvatarConstant.filterRes()[position]);
+                        holder.mItemImg.setImageResource(AvatarConstant.filterBundleRes()[position].resId);
                     } else {
                         holder.mItemImg.setImageResource(selectPos[selectStatus] == position ? R.drawable.main_bottom_item_none_checked : R.drawable.main_bottom_item_none_normal);
                     }
                     holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mFUP2ARenderer.loadEffect(AvatarConstant.filterBundle()[position]);
+                            mAvatarARHandle.setFilter(AvatarConstant.filterBundleRes()[position].path);
                             notifySelectItemChanged(position);
+                            scrollToPosition(position);
                         }
                     });
                     break;
@@ -194,7 +211,7 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                 case STATUS_HEAD:
                     return mAvatarP2AS.size() + 1;
                 case STATUS_FILTER:
-                    return AvatarConstant.filterBundle().length;
+                    return AvatarConstant.filterBundleRes().length;
             }
             return 0;
         }
@@ -241,13 +258,16 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
         mBottomLayoutAnimator.start();
     }
 
-    public void scrollToPosition(final RecyclerView recyclerView, final int pos) {
-        recyclerView.post(new Runnable() {
+    public void scrollToPosition(final int pos) {
+        mRecyclerView.post(new Runnable() {
             @Override
             public void run() {
                 int screenWidth = getResources().getDisplayMetrics().widthPixels;
-                int itemWidth = getResources().getDimensionPixelSize(R.dimen.x140);
-                recyclerView.smoothScrollBy(pos * itemWidth + itemWidth / 2 - screenWidth / 2, 0);
+                int first = mLinearLayoutManager.findFirstVisibleItemPosition();
+                int itemW = getResources().getDimensionPixelSize(R.dimen.x140);
+                int dx = pos * itemW + itemW / 2 - screenWidth / 2
+                        + (first > -1 ? (-first * itemW + mLinearLayoutManager.findViewByPosition(first).getLeft()) : 0);
+                mRecyclerView.smoothScrollBy(dx, 0);
             }
         });
     }

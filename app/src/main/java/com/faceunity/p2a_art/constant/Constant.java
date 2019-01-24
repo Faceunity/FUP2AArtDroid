@@ -28,6 +28,8 @@ public abstract class Constant {
     public static final String DICMFilePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getPath();
     public static final String photoFilePath;
     public static final String cameraFilePath;
+    public static final String TestFilePath = filePath + "BundleTest" + File.separator;
+    public static final String TmpPath = filePath + "tmp" + File.separator;
 
     static {
         if (Build.FINGERPRINT.contains("Flyme")

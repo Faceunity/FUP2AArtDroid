@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,10 +10,22 @@
     <android.opengl.GLSurfaceView
         android:id="@+id/main_gl_surface"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"/>
+
+    <View
+        android:id="@+id/group_photo_round"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/main_gl_surface"
+        android:layout_alignTop="@+id/main_gl_surface"
+        android:layout_alignRight="@+id/main_gl_surface"
+        android:layout_alignBottom="@+id/main_gl_surface"
+        android:background="@drawable/group_photo_round"
+        android:visibility="gone"/>
 
     <FrameLayout
         android:id="@+id/main_fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-</FrameLayout>
+</RelativeLayout>

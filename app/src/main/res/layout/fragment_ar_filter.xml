@@ -1,35 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/ar_filter_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:mActivity=".MainActivity">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/ar_filter_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:mActivity=".MainActivity">
 
     <ImageButton
         android:id="@+id/ar_filter_back"
-        android:layout_width="@dimen/x106"
-        android:layout_height="@dimen/x106"
+        android:layout_width="@dimen/x108"
+        android:layout_height="@dimen/x108"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/x2"
         android:background="@android:color/transparent"
-        android:padding="@dimen/x10"
+        android:padding="@dimen/x20"
         android:scaleType="centerInside"
-        android:src="@drawable/ar_filter_back" />
+        android:src="@drawable/ar_filter_back"/>
 
     <ImageButton
         android:id="@+id/ar_filter_camera"
-        android:layout_width="@dimen/x106"
-        android:layout_height="@dimen/x106"
+        android:layout_width="@dimen/x108"
+        android:layout_height="@dimen/x108"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/x2"
         android:background="@android:color/transparent"
-        android:padding="@dimen/x10"
+        android:padding="@dimen/x20"
         android:scaleType="centerInside"
-        android:src="@drawable/ar_filter_switch_camera" />
+        android:src="@drawable/ar_filter_switch_camera"/>
 
     <ImageButton
         android:id="@+id/ar_filter_take_pic"
@@ -40,7 +38,7 @@
         android:layout_marginBottom="@dimen/x30"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/ar_filter_take_photo" />
+        android:src="@drawable/ar_filter_take_photo"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/ar_filter_bottom_recycler"
@@ -50,13 +48,13 @@
         android:layout_marginBottom="@dimen/x2"
         android:background="#88FFFFFF"
         android:overScrollMode="never"
-        android:scrollbars="none" />
+        android:scrollbars="none"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/x2"
         android:layout_above="@+id/ar_filter_bottom_title"
-        android:background="#E5E5E5" />
+        android:background="#E5E5E5"/>
 
     <com.faceunity.p2a_art.ui.BottomTitleGroup
         android:id="@+id/ar_filter_bottom_title"
@@ -66,5 +64,5 @@
         android:background="#88FFFFFF"
         app:padding="@dimen/x100"
         app:text_color="@color/bottom_title_text_color"
-        app:text_size="@dimen/text_size_28" />
+        app:text_size="@dimen/text_size_28"/>
 </RelativeLayout>

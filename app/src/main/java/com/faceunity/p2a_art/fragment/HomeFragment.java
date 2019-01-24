@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -26,8 +27,9 @@ import com.faceunity.p2a_art.BuildConfig;
 import com.faceunity.p2a_art.MainActivity;
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.Constant;
-import com.faceunity.p2a_art.core.AvatarP2A;
+import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
+import com.faceunity.p2a_art.entity.AvatarP2A;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -36,8 +38,7 @@ import java.lang.reflect.Method;
  * Created by tujh on 2018/8/22.
  */
 public class HomeFragment extends BaseFragment
-        implements View.OnClickListener,
-        FUP2ARenderer.OnLoadBodyListener {
+        implements View.OnClickListener {
     public static final String TAG = HomeFragment.class.getSimpleName();
 
     private View mGuideView;
@@ -45,7 +46,9 @@ public class HomeFragment extends BaseFragment
 
     private CheckBox mTrackBtn;
 
+    private static final int spanCount = 5;
     private RecyclerView mEditRecycler;
+    private GridLayoutManager mGridLayoutManager;
     private EditAdapter mEditAdapter;
 
     @Nullable
@@ -70,25 +73,19 @@ public class HomeFragment extends BaseFragment
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 mVersionText.setVisibility(isChecked ? View.GONE : View.VISIBLE);
 
-                mActivity.getShowAvatarP2A().setExpressionIndex(isChecked ? 0 : 1);
-                mFUP2ARenderer.loadAvatar(mActivity.getShowAvatarP2A());
-                mFUP2ARenderer.setNeedTrackFace(isChecked);
+                mP2ACore.setNeedTrackFace(isChecked);
+                mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
                 mCameraRenderer.setShowCamera(isChecked);
-
-                if (isChecked) {
-                    mFUP2ARenderer.enterTrackMode();
-                } else {
-                    mFUP2ARenderer.quitTrackMode();
-                }
             }
         });
 
         view.findViewById(R.id.main_avatar_image_btn).setOnClickListener(this);
         view.findViewById(R.id.main_edit_image_btn).setOnClickListener(this);
         view.findViewById(R.id.main_ar_filter_image_btn).setOnClickListener(this);
+        view.findViewById(R.id.main_group_photo_image_btn).setOnClickListener(this);
 
         mEditRecycler = view.findViewById(R.id.main_edit_bottom_recycler);
-        mEditRecycler.setLayoutManager(new GridLayoutManager(mActivity, 5, GridLayoutManager.VERTICAL, false));
+        mEditRecycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(mActivity, spanCount, GridLayoutManager.VERTICAL, false));
         mEditRecycler.setAdapter(mEditAdapter = new EditAdapter());
         ((SimpleItemAnimator) mEditRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
     }
@@ -112,8 +109,8 @@ public class HomeFragment extends BaseFragment
                 }
                 Log.e(TAG, "initDebug " + debugLayout);
                 if (debugLayout != null) {
-                    Method initData = aClass.getMethod("initData", new Class[]{MainActivity.class, FUP2ARenderer.class, View.class});
-                    initData.invoke(debugLayout, new Object[]{mActivity, mFUP2ARenderer, mVersionText});
+                    Method initData = aClass.getMethod("initData", new Class[]{MainActivity.class, FUP2ARenderer.class, AvatarHandle.class, View.class});
+                    initData.invoke(debugLayout, new Object[]{mActivity, mFUP2ARenderer, mAvatarHandle, mVersionText});
                     parent.addView(debugLayout, 0);
                 }
             }
@@ -122,8 +119,7 @@ public class HomeFragment extends BaseFragment
         }
     }
 
-    @Override
-    public void onLoadBodyCompleteListener() {
+    public void checkGuide() {
         if (mGuideView.getVisibility() == View.VISIBLE) {
             mGuideView.post(new Runnable() {
                 @Override
@@ -144,9 +140,10 @@ public class HomeFragment extends BaseFragment
                 mActivity.showBaseFragment(EditFaceFragment.TAG);
                 break;
             case R.id.main_ar_filter_image_btn:
-                setShowEditLayout(false);
-                mTrackBtn.setChecked(false);
                 mActivity.showBaseFragment(ARFilterFragment.TAG);
+                break;
+            case R.id.main_group_photo_image_btn:
+                mActivity.showBaseFragment(GroupPhotoFragment.TAG);
                 break;
         }
     }
@@ -154,8 +151,10 @@ public class HomeFragment extends BaseFragment
     private boolean isShowEditLayout = false;
     private ValueAnimator mBottomLayoutAnimator;
 
-    public void hideEditLayoutCheckBoxId() {
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
         setShowEditLayout(false);
+        return true;
     }
 
     public void setCheckGroupNoId() {
@@ -190,6 +189,9 @@ public class HomeFragment extends BaseFragment
             }
         });
         mBottomLayoutAnimator.start();
+
+        if (isShow) mAvatarHandle.resetAll();
+        else mAvatarHandle.resetAllMin();
     }
 
     class EditAdapter extends RecyclerView.Adapter<EditAdapter.EditHolder> {
@@ -234,11 +236,26 @@ public class HomeFragment extends BaseFragment
                 holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mFUP2ARenderer.loadAvatar(avatarP2A);
+                        mAvatarHandle.setAvatar(avatarP2A);
                         notifySelectItemChanged(position);
+                        scrollToPosition(position);
                     }
                 });
             }
+        }
+
+        public void scrollToPosition(final int pos) {
+            mEditRecycler.post(new Runnable() {
+                @Override
+                public void run() {
+                    final int itemW = getResources().getDimensionPixelOffset(R.dimen.x140);
+                    final int first = mGridLayoutManager.findFirstVisibleItemPosition();
+                    if (first < 0) return;
+                    int dy = (int) ((0.5 + pos / spanCount) * itemW - mEditRecycler.getHeight() / 2
+                            - (first / spanCount * itemW - mGridLayoutManager.findViewByPosition(first).getTop()));
+                    mEditRecycler.smoothScrollBy(0, dy);
+                }
+            });
         }
 
         public void notifySelectItemChanged(int position) {

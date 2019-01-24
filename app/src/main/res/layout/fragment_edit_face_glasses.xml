@@ -1,52 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:animateLayoutChanges="true"
-    android:background="@color/colorWhite"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/x2">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_gravity="bottom"
+              android:animateLayoutChanges="true"
+              android:background="@color/edit_face_bottom_background"
+              android:orientation="vertical"
+              android:paddingTop="@dimen/x8">
 
     <TextView
         android:id="@+id/glasses_frame_text"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/x54"
+        android:layout_height="@dimen/x34"
         android:layout_marginLeft="@dimen/x30"
         android:gravity="center"
-        android:paddingTop="@dimen/x14"
         android:text="镜框"
         android:textColor="#666666"
-        android:textSize="@dimen/text_size_28" />
+        android:textSize="@dimen/text_size_24"/>
 
-    <android.support.v7.widget.RecyclerView
+    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/glasses_frame_color_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x102"
-        android:scrollbars="none" />
+        android:layout_height="@dimen/x92"
+        android:layout_marginBottom="@dimen/x10"
+        android:scrollbars="none"/>
 
     <TextView
         android:id="@+id/glasses_text"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/x54"
+        android:layout_height="@dimen/x34"
         android:layout_marginLeft="@dimen/x30"
         android:gravity="center"
-        android:paddingTop="@dimen/x14"
         android:text="镜片"
         android:textColor="#666666"
-        android:textSize="@dimen/text_size_28" />
+        android:textSize="@dimen/text_size_24"/>
 
-    <android.support.v7.widget.RecyclerView
+    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/glasses_color_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x102"
-        android:scrollbars="none" />
+        android:layout_height="@dimen/x92"
+        android:layout_marginBottom="@dimen/x10"
+        android:scrollbars="none"/>
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/glasses_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x200"
-        android:scrollbars="none" />
+        android:layout_height="@dimen/x192"
+        android:background="@color/colorWhite"
+        android:scrollbars="none"/>
 </LinearLayout>

@@ -79,7 +79,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private int mCameraTextureId;
 
     private int mFuTextureId;
-    private final float[] mtxAvatar = {0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F};
+    private static final float[] mtxAvatar = {0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F};
     private final float[] mtx = {0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F};
     private float[] mvp = new float[16];
 
@@ -325,6 +325,15 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         releaseCamera();
         openCamera(mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT);
         isChangeCamera = false;
+    }
+
+    public void updateMTX() {
+        if (mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_BACK)
+            System.arraycopy(mtxAvatar, 0, mtx, 0, mtx.length);
+    }
+
+    public int getCameraOrientation() {
+        return mCameraOrientation;
     }
 
     public int getCurrentCameraType() {

@@ -13,4 +13,5 @@
     <color name="color4C96FF">#4C96FF</color>
     <color name="color666666">#666666</color>
     <color name="main_image_btn_text_color">#000000</color>
+    <color name="edit_face_bottom_background">#F7F7F7</color>
 </resources>

@@ -5,9 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.opengl.GLES20;
-import android.os.AsyncTask;
 
-import com.faceunity.p2a_art.core.AvatarP2A;
+import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.gles.ProgramTexture2d;
 import com.faceunity.p2a_art.gles.core.GlUtil;
 
@@ -44,7 +43,7 @@ public abstract class BitmapUtil {
         new ProgramTexture2d().drawFrame(textureId, mtx, mvp);
         GLES20.glReadPixels(0, 0, texWidth, texHeight, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, intBuffer);
         GLES20.glFinish();
-        AsyncTask.execute(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 final int bitmapSource[] = new int[texWidth * texHeight];
@@ -66,7 +65,7 @@ public abstract class BitmapUtil {
                     listener.onReadBitmapListener(shotCaptureBitmap);
                 }
             }
-        });
+        }).start();
         GLES20.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);

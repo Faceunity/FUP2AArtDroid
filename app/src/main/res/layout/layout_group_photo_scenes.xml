@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <ImageButton
+        android:id="@+id/group_photo_scenes_back"
+        android:layout_width="@dimen/x88"
+        android:layout_height="@dimen/x88"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/x16"
+        android:background="@android:color/transparent"
+        android:scaleType="centerInside"
+        android:src="@drawable/group_photo_scenes_back" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/x88"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="合影"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/text_size_34" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x2"
+        android:layout_below="@+id/group_photo_scenes_back"
+        android:background="#E5E5E5" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/group_photo_scenes_back">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="left"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/group_photo_scenes_single_text"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x44"
+                android:layout_marginLeft="@dimen/x28"
+                android:layout_marginTop="@dimen/x30"
+                android:gravity="center"
+                android:text="单人场景"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_32" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_photo_scenes_single_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x320"
+                android:layout_marginTop="@dimen/x20"
+                android:layout_marginBottom="@dimen/x40"
+                android:paddingLeft="@dimen/x20"
+                android:paddingRight="@dimen/x20" />
+
+            <TextView
+                android:id="@+id/group_photo_scenes_multiple_text"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x44"
+                android:layout_marginLeft="@dimen/x28"
+                android:layout_marginTop="@dimen/x30"
+                android:gravity="center"
+                android:text="多人场景"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_32" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_photo_scenes_multiple_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x320"
+                android:layout_marginTop="@dimen/x20"
+                android:layout_marginBottom="@dimen/x40"
+                android:paddingLeft="@dimen/x20"
+                android:paddingRight="@dimen/x20" />
+
+            <TextView
+                android:id="@+id/group_photo_animation_text"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x44"
+                android:layout_marginLeft="@dimen/x28"
+                android:layout_marginTop="@dimen/x40"
+                android:gravity="center"
+                android:text="动画场景"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/text_size_32" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_photo_animation_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/x320"
+                android:layout_marginTop="@dimen/x20"
+                android:layout_marginBottom="@dimen/x40"
+                android:paddingLeft="@dimen/x20"
+                android:paddingRight="@dimen/x20" />
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</RelativeLayout>

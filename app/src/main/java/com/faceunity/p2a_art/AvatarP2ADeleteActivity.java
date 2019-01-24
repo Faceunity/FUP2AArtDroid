@@ -16,9 +16,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.faceunity.p2a_art.core.AvatarP2A;
+import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.ui.NormalDialog;
-import com.faceunity.p2a_art.constant.DBHelper;
+import com.faceunity.p2a_art.entity.DBHelper;
 import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.FullScreenUtils;
 

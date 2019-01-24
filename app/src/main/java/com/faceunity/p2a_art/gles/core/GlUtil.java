@@ -16,9 +16,13 @@
 
 package com.faceunity.p2a_art.gles.core;
 
-import android.opengl.GLES11Ext;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -30,7 +34,7 @@ import java.nio.FloatBuffer;
  * Some OpenGL utility functions.
  */
 public abstract class GlUtil {
-    public static final String TAG = "Grafika";
+    public static final String TAG = GlUtil.class.getSimpleName();
 
     /**
      * Identity matrix for general use.  Don't modify or life will get weird.
@@ -165,6 +169,38 @@ public abstract class GlUtil {
     }
 
     /**
+     * Creates a texture from bitmap.
+     *
+     * @param bmp bitmap data
+     * @return Handle to texture.
+     */
+    public static int createImageTexture(Bitmap bmp) {
+        int[] textureHandles = new int[1];
+        int textureHandle;
+
+        GLES20.glGenTextures(1, textureHandles, 0);
+        textureHandle = textureHandles[0];
+        GlUtil.checkGlError("glGenTextures");
+
+        // Bind the texture handle to the 2D texture target.
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle);
+
+        // Configure min/mag filtering, i.e. what scaling method do we use if what we're rendering
+        // is smaller or larger than the source image.
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
+                GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
+                GLES20.GL_LINEAR);
+        GlUtil.checkGlError("loadImageTexture");
+
+        // Load the data from the buffer into the texture handle.
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, /*level*/ 0, bmp, 0);
+        GlUtil.checkGlError("loadImageTexture");
+
+        return textureHandle;
+    }
+
+    /**
      * Allocates a direct float buffer, and populates it with the float array data.
      */
     public static FloatBuffer createFloatBuffer(float[] coords) {
@@ -175,6 +211,14 @@ public abstract class GlUtil {
         fb.put(coords);
         fb.position(0);
         return fb;
+    }
+
+    public static float[] changeMVPMatrixCrop(float viewWidth, float viewHeight, float textureWidth, float textureHeight) {
+        float scale = viewWidth * textureHeight / viewHeight / textureWidth;
+        float[] mvp = new float[16];
+        Matrix.setIdentityM(mvp, 0);
+        Matrix.scaleM(mvp, 0, scale > 1 ? 1F : (1F / scale), scale > 1 ? scale : 1F, 1F);
+        return mvp;
     }
 
     /**
@@ -194,6 +238,36 @@ public abstract class GlUtil {
             if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
                 Log.i(TAG, "iversion: " + majorVersion + "." + minorVersion);
             }
+        }
+    }
+
+
+    /**
+     * Creates a texture object suitable for use with this program.
+     * <p>
+     * On exit, the texture will be bound.
+     */
+    public static int createTextureObject(int textureTarget) {
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+        GlUtil.checkGlError("glGenTextures");
+
+        int texId = textures[0];
+        GLES20.glBindTexture(textureTarget, texId);
+        GlUtil.checkGlError("glBindTexture " + texId);
+
+        GLES20.glTexParameterf(textureTarget, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameterf(textureTarget, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(textureTarget, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(textureTarget, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GlUtil.checkGlError("glTexParameter");
+
+        return texId;
+    }
+
+    public static void deleteTextureId(int[] textureId) {
+        if (textureId != null && textureId.length > 0) {
+            GLES20.glDeleteTextures(textureId.length, textureId, 0);
         }
     }
 
@@ -226,33 +300,6 @@ public abstract class GlUtil {
         }
     }
 
-    /**
-     * Creates a texture object suitable for use with this program.
-     * <p>
-     * On exit, the texture will be bound.
-     */
-    public static int createTextureObject(int textureTarget) {
-        int[] textures = new int[1];
-        GLES20.glGenTextures(1, textures, 0);
-        GlUtil.checkGlError("glGenTextures");
-
-        int texId = textures[0];
-        GLES20.glBindTexture(textureTarget, texId);
-        GlUtil.checkGlError("glBindTexture " + texId);
-
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_NEAREST);
-        GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_S,
-                GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_WRAP_T,
-                GLES20.GL_CLAMP_TO_EDGE);
-        GlUtil.checkGlError("glTexParameter");
-
-        return texId;
-    }
-
     public static float[] changeMVPMatrix(float[] mvpMatrix, float viewWidth, float viewHeight, float textureWidth, float textureHeight) {
         float scale = viewWidth * textureHeight / viewHeight / textureWidth;
         if (scale == 1) {
@@ -265,5 +312,22 @@ public abstract class GlUtil {
             Matrix.multiplyMM(mvp, 0, tmp, 0, mvpMatrix, 0);
             return mvp;
         }
+    }
+
+    public static float[] changeMVPMatrixInside(float viewWidth, float viewHeight, float textureWidth, float textureHeight) {
+        float scale = viewWidth * textureHeight / viewHeight / textureWidth;
+        float[] mvp = new float[16];
+        Matrix.setIdentityM(mvp, 0);
+        Matrix.scaleM(mvp, 0, scale > 1 ? (1F / scale) : 1F, scale > 1 ? 1F : scale, 1F);
+        return mvp;
+    }
+
+    public static int getSupportGLVersion(Context context) {
+        final ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        final ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+        int version = configurationInfo.reqGlEsVersion >= 0x30000 ? 3 : 2;
+        String glEsVersion = configurationInfo.getGlEsVersion();
+        Log.e(TAG, "reqGlEsVersion: " + Integer.toHexString(configurationInfo.reqGlEsVersion) + ", glEsVersion:" + glEsVersion);
+        return version;
     }
 }

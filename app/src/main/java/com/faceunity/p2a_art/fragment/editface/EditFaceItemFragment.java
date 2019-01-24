@@ -3,29 +3,28 @@ package com.faceunity.p2a_art.fragment.editface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SimpleItemAnimator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
-import com.faceunity.p2a_art.fragment.EditFaceFragment;
+import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.fragment.editface.core.EditFaceBaseFragment;
-import com.faceunity.p2a_art.fragment.editface.core.ItemAdapter;
+import com.faceunity.p2a_art.fragment.editface.core.ItemChangeListener;
+import com.faceunity.p2a_art.fragment.editface.core.item.ItemAdapter;
+import com.faceunity.p2a_art.fragment.editface.core.item.ItemSelectView;
 
 /**
  * Created by tujh on 2018/8/22.
  */
 public class EditFaceItemFragment extends EditFaceBaseFragment {
-    public static final String TAG = EditFaceItemFragment.class.getSimpleName();
+    public static final String TAG = EditFaceColorItemFragment.class.getSimpleName();
 
-    private RecyclerView mClothesRecycler;
-    private ItemAdapter mItemAdapter;
+    private ItemSelectView mItemRecycler;
 
+    private BundleRes[] itemList;
     private int mDefaultSelectItem;
+    private ItemChangeListener mItemChangeListener;
 
     @Nullable
     @Override
@@ -33,37 +32,21 @@ public class EditFaceItemFragment extends EditFaceBaseFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_edit_face_item, container, false);
 
-        switch (mEditFaceBaseFragmentId) {
-            case EditFaceFragment.TITLE_CLOTHES_INDEX:
-                mItemAdapter = new ItemAdapter(getContext(), AvatarConstant.clothesRes(mAvatarP2A.getGender(), mAvatarP2A.getStyle()));
-                mItemAdapter.setSelectPosition(mDefaultSelectItem = mAvatarP2A.getClothesIndex());
-                break;
-        }
-
-        mClothesRecycler = view.findViewById(R.id.item_recycler);
-        mClothesRecycler.setLayoutManager(new GridLayoutManager(getContext(), 4, GridLayoutManager.VERTICAL, false));
-        mClothesRecycler.setAdapter(mItemAdapter);
-        ((SimpleItemAnimator) mClothesRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
-        mItemAdapter.setItemSelectListener(new ItemAdapter.ItemSelectListener() {
+        mItemRecycler = view.findViewById(R.id.item_recycler);
+        mItemRecycler.init(itemList, mDefaultSelectItem);
+        mItemRecycler.setItemControllerListener(new ItemAdapter.ItemSelectListener() {
             @Override
             public boolean itemSelectListener(int position) {
-                if (itemControllerListener != null) {
-                    itemControllerListener.itemSelectListener(position);
-                }
+                mItemChangeListener.itemChangeListener(mEditFaceBaseFragmentId, position);
                 return true;
             }
         });
-        mItemAdapter.setSelectPosition(mDefaultSelectItem = mAvatarP2A.getClothesIndex());
         return view;
     }
 
-    @Override
-    public void resetDefaultDeformParam() {
-        mAvatarP2A.setClothesIndex(mDefaultSelectItem);
-    }
-
-    @Override
-    public boolean isChangeDeformParam() {
-        return mDefaultSelectItem != mAvatarP2A.getClothesIndex();
+    public void initData(BundleRes[] itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
+        this.itemList = itemList;
+        this.mDefaultSelectItem = defaultSelectItem;
+        this.mItemChangeListener = itemSelectListener;
     }
 }

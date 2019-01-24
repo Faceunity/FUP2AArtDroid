@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:animateLayoutChanges="true"
-    android:background="@color/colorWhite"
-    android:gravity="bottom"
-    android:orientation="vertical">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_gravity="bottom"
+              android:animateLayoutChanges="true"
+              android:gravity="bottom"
+              android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/shape_seek_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x70"
+        android:layout_height="@dimen/x120"
+        android:background="@color/edit_face_bottom_background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingTop="@dimen/x36"
         android:visibility="gone">
 
         <TextView
@@ -24,7 +23,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/x30"
             android:gravity="center"
-            android:text="" />
+            android:text=""/>
 
         <com.faceunity.p2a_art.ui.seekbar.DiscreteSeekBar
             android:id="@+id/shape_seek_bar"
@@ -44,91 +43,54 @@
             app:dsb_trackBaseHeight="@dimen/x16"
             app:dsb_trackColor="#EEEEEE"
             app:dsb_trackHeight="@dimen/x6"
-            app:dsb_value="0" />
+            app:dsb_value="0"/>
     </LinearLayout>
 
-    <com.faceunity.p2a_art.ui.EditFaceShapeScrollView
-        android:id="@+id/edit_face_shape_scroll_layout"
+    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+        android:id="@+id/shape_color_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x176"
+        android:layout_height="@dimen/x120"
+        android:background="@color/edit_face_bottom_background"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingBottom="@dimen/x14"
-        android:scrollbars="none">
+        android:visibility="gone"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x170"
+        android:background="@color/colorWhite"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/edit_face_shape_reset"
+            android:layout_width="@dimen/x90"
+            android:layout_height="@dimen/x90"
+            android:layout_marginLeft="@dimen/x20"
+            android:layout_marginRight="@dimen/x20"
+            android:scaleType="centerInside"
+            android:src="@drawable/edit_face_shape_reset"/>
+
+        <View
+            android:layout_width="@dimen/x2"
+            android:layout_height="@dimen/x46"
+            android:background="#EEEEEE"/>
+
+        <HorizontalScrollView
+            android:id="@+id/edit_face_radio_shape_scroll"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/edit_face_shape_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/edit_face_shape_reset"
-                    android:layout_width="@dimen/x90"
-                    android:layout_height="@dimen/x90"
-                    android:layout_marginLeft="@dimen/x20"
-                    android:layout_marginRight="@dimen/x20"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_face_shape_reset" />
-
-                <ImageView
-                    android:id="@+id/edit_face_shape_face"
-                    android:layout_width="@dimen/x90"
-                    android:layout_height="@dimen/x90"
-                    android:layout_marginLeft="@dimen/x20"
-                    android:layout_marginRight="@dimen/x20"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_face_shape_face" />
-
-                <ImageView
-                    android:id="@+id/edit_face_shape_eye"
-                    android:layout_width="@dimen/x90"
-                    android:layout_height="@dimen/x90"
-                    android:layout_marginLeft="@dimen/x20"
-                    android:layout_marginRight="@dimen/x20"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_face_shape_eye" />
-
-                <ImageView
-                    android:id="@+id/edit_face_shape_mouth"
-                    android:layout_width="@dimen/x90"
-                    android:layout_height="@dimen/x90"
-                    android:layout_marginLeft="@dimen/x20"
-                    android:layout_marginRight="@dimen/x20"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_face_shape_mouth" />
-
-                <ImageView
-                    android:id="@+id/edit_face_shape_nose"
-                    android:layout_width="@dimen/x90"
-                    android:layout_height="@dimen/x90"
-                    android:layout_marginLeft="@dimen/x20"
-                    android:layout_marginRight="@dimen/x20"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_face_shape_nose" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/edit_face_shape_back"
-                android:layout_width="@dimen/x90"
-                android:layout_height="@dimen/x90"
-                android:layout_marginLeft="@dimen/x20"
-                android:layout_marginRight="@dimen/x20"
-                android:scaleType="centerInside"
-                android:src="@drawable/edit_face_shape_back" />
+            android:orientation="horizontal"
+            android:scrollbars="none">
 
             <com.faceunity.p2a_art.ui.EditFaceRadioGroup
                 android:id="@+id/edit_face_radio_shape"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:orientation="horizontal" />
-        </LinearLayout>
-    </com.faceunity.p2a_art.ui.EditFaceShapeScrollView>
+                android:orientation="horizontal"/>
+        </HorizontalScrollView>
+
+    </LinearLayout>
 </LinearLayout>

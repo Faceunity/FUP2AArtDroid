@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -80,7 +79,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void needStartFUMainActivity(final String codeStr) {
-        AsyncTask.execute(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpUtils.createAvatarRequest(GuideActivity.this, codeStr, new Callback() {
@@ -120,7 +119,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
             }
-        });
+        }).start();
     }
 
     private void showCheckText(final String info) {

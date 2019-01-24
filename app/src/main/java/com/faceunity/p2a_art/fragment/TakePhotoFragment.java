@@ -3,13 +3,11 @@ package com.faceunity.p2a_art.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,10 +22,11 @@ import android.widget.TextView;
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.constant.Constant;
-import com.faceunity.p2a_art.constant.DBHelper;
-import com.faceunity.p2a_art.core.AvatarP2A;
-import com.faceunity.p2a_art.core.FUP2ARenderer;
+import com.faceunity.p2a_art.core.NamaCore;
 import com.faceunity.p2a_art.core.P2AClientWrapper;
+import com.faceunity.p2a_art.entity.AvatarP2A;
+import com.faceunity.p2a_art.entity.BundleRes;
+import com.faceunity.p2a_art.entity.DBHelper;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
 import com.faceunity.p2a_art.ui.CreateAvatarDialog;
 import com.faceunity.p2a_art.ui.NormalDialog;
@@ -36,6 +35,7 @@ import com.faceunity.p2a_art.utils.FaceCheckUtil;
 import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.LightSensorUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
+import com.faceunity.p2a_art.web.CreateFailureToast;
 import com.faceunity.p2a_art.web.OkHttpUtils;
 import com.faceunity.p2a_art.web.ProgressRequestBody;
 
@@ -50,7 +50,7 @@ import okhttp3.Response;
 /**
  * Created by tujh on 2018/10/26.
  */
-public class TakePhotoFragment extends BaseFragment implements View.OnClickListener, FUP2ARenderer.OnLoadBodyListener {
+public class TakePhotoFragment extends BaseFragment implements View.OnClickListener {
     public static final String TAG = TakePhotoFragment.class.getSimpleName();
 
     private TextView mTakePhotoPoint;
@@ -60,6 +60,8 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     private NormalDialog mCancelDialog;
 
     private DBHelper mDBHelper;
+
+    private NamaCore mNamaCore;
 
     @Nullable
     @Override
@@ -75,6 +77,16 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         view.findViewById(R.id.take_photo_btn).setOnClickListener(this);
 
         LightSensorUtil.registerLightSensor(mSensorManager, mSensorEventListener);
+
+        mNamaCore = new NamaCore(getContext(), mFUP2ARenderer) {
+            @Override
+            public int onDrawFrame(byte[] img, int tex, int w, int h) {
+                int fu = super.onDrawFrame(img, tex, w, h);
+                checkPic();
+                return fu;
+            }
+        };
+        mFUP2ARenderer.setFUCore(mNamaCore);
         return view;
     }
 
@@ -107,21 +119,19 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 }
             }
         }
-        mCameraRenderer.setNeedStopDrawFrame(false);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.take_photo_back:
-                backToHome();
+                onBackPressed();
                 break;
             case R.id.take_photo_change_camera:
                 mCameraRenderer.changeCamera();
                 break;
             case R.id.take_photo_select:
                 if (mCameraRenderer.isNeedStopDrawFrame()) return;
-                mCameraRenderer.setNeedStopDrawFrame(true);
                 Intent intent2 = new Intent();
                 intent2.addCategory(Intent.CATEGORY_OPENABLE);
                 intent2.setType("image/*");
@@ -137,6 +147,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     mCameraRenderer.takePic(new CameraRenderer.TakePhotoCallBack() {
                         @Override
                         public void takePhotoCallBack(final Bitmap bmp) {
+                            mCameraRenderer.setNeedStopDrawFrame(false);
                             String dir = BitmapUtil.saveBitmap(bmp, isTracking == 1 ? faceRect : null);
                             createAvatar(bmp, dir);
                         }
@@ -154,14 +165,25 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public void onLoadBodyCompleteListener() {
+    public void onBackPressed() {
+        mFUP2ARenderer.setFUCore(mP2ACore);
+        mNamaCore.release();
         if (mCreateAvatarDialog != null) {
-            mCreateAvatarDialog.dismiss();
-            backToHome();
+            mCameraRenderer.updateMTX();
+            mFUP2ARenderer.queueNextEvent(new Runnable() {
+                @Override
+                public void run() {
+                    mActivity.showHomeFragment();
+                    mCreateAvatarDialog.dismiss();
+                }
+            });
+        } else {
+            mActivity.showHomeFragment();
         }
     }
 
     private void createAvatar(final Bitmap bitmap, final String dir) {
+        Log.e(TAG, "createAvatar");
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +226,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     @Override
                     public void dismissListener() {
                         mCreateAvatarDialog = null;
-                        mCameraRenderer.setNeedStopDrawFrame(false);
                         if (mCancelDialog != null) {
                             mCancelDialog.dismiss();
                         }
@@ -227,7 +248,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
             public void onFailure(Call call, IOException e) {
                 if (!call.isCanceled()) {
                     Log.e(TAG, "response onFailure " + call.toString() + "\n IOException：\n" + e.toString());
-                    onFailureCreate("onNetFailure");
+                    CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureNet);
                     mCreateAvatarDialog.dismiss();
                 }
                 FileUtil.deleteDirAndFile(new File(dir));
@@ -250,18 +271,18 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         mDBHelper.insertHistory(avatarP2A);
                         mActivity.updateAvatarP2As();
                         mActivity.setShowAvatarP2A(avatarP2A);
-                        mCameraRenderer.setNeedStopDrawFrame(false);
-                        mFUP2ARenderer.setShowAvatarMode(FUP2ARenderer.SHOW_AVATAR_MODE_P2A);
-                        mFUP2ARenderer.loadAvatar(avatarP2A);
-                        if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                            mCameraRenderer.changeCamera();
-                        }
+                        mAvatarHandle.setAvatar(avatarP2A, new Runnable() {
+                            @Override
+                            public void run() {
+                                onBackPressed();
+                            }
+                        });
                         return;
                     } else {
-                        onFailureCreate("onFileFailure");
+                        CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
                     }
                 } else {
-                    onFailureCreate(response.code() == 500 ? response.body().string() : "onNetFailure");
+                    CreateFailureToast.onCreateFailure(mActivity, response.code() == 500 ? response.body().string() : CreateFailureToast.CreateFailureNet);
                 }
                 FileUtil.deleteDirAndFile(new File(dir));
                 mCreateAvatarDialog.dismiss();
@@ -283,13 +304,13 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
             final AvatarP2A avatarP2A = P2AClientWrapper.initializeAvatarP2A(dir, gender, style);
             if (isCancel) return null;
             isCreateIndex = 2;
-            AsyncTask.execute(new Runnable() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String[] hairBundles = AvatarConstant.hairBundle(gender, style);
+                    BundleRes[] hairBundles = AvatarConstant.hairBundleRes(gender);
                     try {
                         P2AClientWrapper.initializeAvatarP2AData(objData, avatarP2A);
-                        P2AClientWrapper.createHair(mActivity, objData, hairBundles[avatarP2A.getHairIndex()], avatarP2A.getHairFile());
+                        P2AClientWrapper.createHair(mActivity, objData, hairBundles[avatarP2A.getHairIndex()].path, avatarP2A.getHairFile());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -306,7 +327,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     if (isCancel) return;
                     try {
                         for (int i = 0; i < hairBundles.length; i++) {
-                            String hairPath = hairBundles[i];
+                            String hairPath = hairBundles[i].path;
                             if (!TextUtils.isEmpty(hairPath) && i != avatarP2A.getHairIndex()) {
                                 P2AClientWrapper.createHair(mActivity, objData, hairPath, avatarP2A.getHairFileList()[i]);
                             }
@@ -316,7 +337,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         e.printStackTrace();
                     }
                 }
-            });
+            }).start();
             P2AClientWrapper.createHead(objData, avatarP2A.getHeadFile());
             synchronized (avatarP2A) {
                 if (--isCreateIndex == 0)
@@ -332,68 +353,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
             e.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * 错误码生成
-     *
-     * @param code
-     */
-    public void onFailureCreate(final String code) {
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                String toast = "";
-                switch (code) {
-                    case "server busy":
-                        toast = "服务器被占用";
-                        break;
-                    case "bad input":
-                        toast = "输入参数错误";
-                        break;
-                    case "1":
-                        toast = "无法加载输入图片";
-                        break;
-                    case "2":
-                        toast = "未检测到人脸";
-                        break;
-                    case "3":
-                        toast = "检测到多个人脸";
-                        break;
-                    case "4":
-                        toast = "检测不到头发";
-                        break;
-                    case "5":
-                        toast = "输入图片不符合要求";
-                        break;
-                    case "6":
-                        toast = "非正脸图片";
-                        break;
-                    case "7":
-                        toast = "非清晰人脸";
-                        break;
-                    case "8":
-                        toast = "未找到匹配发型";
-                        break;
-                    case "9":
-                        toast = "未知错误";
-                        break;
-                    case "10":
-                        toast = "FOV错误";
-                        break;
-                    case "onFileFailure":
-                        toast = "本地解析错误";
-                        break;
-                    case "onNetFailure":
-                        toast = "网络访问错误";
-                        break;
-                    default:
-                        toast = "未知错误";
-                        break;
-                }
-                ToastUtil.showCenterToast(mActivity, toast);
-            }
-        });
     }
 
     //*****************************人脸检测*********************************
@@ -418,19 +377,18 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     private float[] faceRect;
     private int mFrameId = 0;
 
-    public void checkPic() {
-        if (mFUP2ARenderer == null) return;
-        isTracking = mFUP2ARenderer.isTracking();
-        faceRect = mFUP2ARenderer.getFaceRectData();
+    private void checkPic() {
+        isTracking = mNamaCore.isTracking();
+        faceRect = mNamaCore.getFaceRectData();
         if (mFrameId++ % 15 > 0)
             return;
         if (isTracking != 1) {
             showCheckPic("请保持1个人输入");
-        } else if (FaceCheckUtil.checkRotation(mFUP2ARenderer.getRotationData())) {
+        } else if (FaceCheckUtil.checkRotation(mNamaCore.getRotationData())) {
             showCheckPic("请保持正面");
         } else if (FaceCheckUtil.checkFaceRect(faceRect, mCameraRenderer.getCameraWidth(), mCameraRenderer.getCameraHeight())) {
             showCheckPic("请将人脸对准虚线框");
-        } else if (FaceCheckUtil.checkExpression(mFUP2ARenderer.getExpressionData())) {
+        } else if (FaceCheckUtil.checkExpression(mNamaCore.getExpressionData())) {
             showCheckPic("请保持面部无夸张表情");
         } else if (mLight < 5) {
             showCheckPic("光线不充足");

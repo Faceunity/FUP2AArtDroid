@@ -11,14 +11,19 @@ import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
-import com.faceunity.p2a_art.constant.DBHelper;
-import com.faceunity.p2a_art.core.AvatarP2A;
+import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
+import com.faceunity.p2a_art.core.P2ACore;
+import com.faceunity.p2a_art.entity.AvatarP2A;
+import com.faceunity.p2a_art.entity.DBHelper;
 import com.faceunity.p2a_art.fragment.ARFilterFragment;
 import com.faceunity.p2a_art.fragment.BaseFragment;
 import com.faceunity.p2a_art.fragment.EditFaceFragment;
+import com.faceunity.p2a_art.fragment.GroupPhotoFragment;
 import com.faceunity.p2a_art.fragment.HomeFragment;
 import com.faceunity.p2a_art.fragment.TakePhotoFragment;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
@@ -28,13 +33,16 @@ import java.util.List;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnLoadBodyListener,
+public class MainActivity extends AppCompatActivity implements
         CameraRenderer.OnCameraRendererStatusListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private View mGroupPhotoRound;
     private GLSurfaceView mGLSurfaceView;
     private CameraRenderer mCameraRenderer;
     private FUP2ARenderer mFUP2ARenderer;
+    private P2ACore mP2ACore;
+    private AvatarHandle mAvatarHandle;
 
     private String mShowFragmentFlag;
     private HomeFragment mHomeFragment;
@@ -54,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        mGroupPhotoRound = findViewById(R.id.group_photo_round);
         mGLSurfaceView = findViewById(R.id.main_gl_surface);
         mGLSurfaceView.setEGLContextClientVersion(3);
         mCameraRenderer = new CameraRenderer(this, mGLSurfaceView);
@@ -66,7 +75,15 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
         mShowAvatarP2A = mAvatarP2As.get(mShowIndex = 0);
 
         mFUP2ARenderer = new FUP2ARenderer(this);
-        mFUP2ARenderer.setOnLoadBodyListener(this);
+        mP2ACore = new P2ACore(this, mFUP2ARenderer);
+        mFUP2ARenderer.setFUCore(mP2ACore);
+        mAvatarHandle = mP2ACore.createAvatarHandle();
+        mAvatarHandle.setAvatar(getShowAvatarP2A(), new Runnable() {
+            @Override
+            public void run() {
+                mHomeFragment.checkGuide();
+            }
+        });
 
         showHomeFragment();
 
@@ -78,8 +95,9 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 if (HomeFragment.TAG.equals(mShowFragmentFlag)) {
-                    mHomeFragment.hideEditLayoutCheckBoxId();
-                    return true;
+                    return mHomeFragment.onSingleTapUp(e);
+                } else if (mBaseFragment != null) {
+                    return mBaseFragment.onSingleTapUp(e);
                 }
                 return false;
             }
@@ -92,8 +110,8 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
                 }
                 float rotDelta = -distanceX / screenWidth;
                 float translateDelta = distanceY / screenHeight;
-                mFUP2ARenderer.setRotDelta(rotDelta);
-                mFUP2ARenderer.setTranslateDelta(translateDelta);
+                mAvatarHandle.setRotDelta(rotDelta);
+                mAvatarHandle.setTranslateDelta(translateDelta);
                 return distanceX != 0 || translateDelta != 0;
             }
         });
@@ -105,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
                     return false;
                 }
                 float scale = detector.getScaleFactor() - 1;
-                mFUP2ARenderer.setScaleDelta(scale);
+                mAvatarHandle.setScaleDelta(scale);
                 return scale != 0;
             }
         });
@@ -133,15 +151,25 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getPointerCount() == 2) {
-            mScaleGestureDetector.onTouchEvent(event);
-        } else if (event.getPointerCount() == 1)
-            mGestureDetector.onTouchEvent(event);
+        if (HomeFragment.TAG.equals(mShowFragmentFlag) || EditFaceFragment.TAG.equals(mShowFragmentFlag)) {
+            if (event.getPointerCount() == 2) {
+                mScaleGestureDetector.onTouchEvent(event);
+            } else if (event.getPointerCount() == 1)
+                mGestureDetector.onTouchEvent(event);
+        }
         return super.onTouchEvent(event);
     }
 
-    public FUP2ARenderer getFURenderer() {
+    public FUP2ARenderer getFUP2ARenderer() {
         return mFUP2ARenderer;
+    }
+
+    public P2ACore getP2ACore() {
+        return mP2ACore;
+    }
+
+    public AvatarHandle getAvatarHandle() {
+        return mAvatarHandle;
     }
 
     public CameraRenderer getCameraRenderer() {
@@ -152,13 +180,13 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         updateAvatarP2As();
-        mFUP2ARenderer.loadAvatar(getShowAvatarP2A());
+        mAvatarHandle.setAvatar(getShowAvatarP2A());
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mFUP2ARenderer.onSurfaceCreated();
-        mFUP2ARenderer.loadAvatar(getShowAvatarP2A());
+
     }
 
     @Override
@@ -167,19 +195,8 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
 
     @Override
     public int onDrawFrame(byte[] cameraNV21Byte, int cameraTextureId, int cameraWidth, int cameraHeight) {
-        if (cameraNV21Byte != null) {
-            int showMode = mFUP2ARenderer.getShowAvatarMode();
-            if (showMode == FUP2ARenderer.SHOW_AVATAR_MODE_P2A && mFUP2ARenderer.isNeedTrackFace()) {
-                mFUP2ARenderer.trackFace(cameraNV21Byte, cameraWidth, cameraHeight);
-                mCameraRenderer.refreshLandmarks(mFUP2ARenderer.getLandmarksData());
-            } else if (showMode == FUP2ARenderer.SHOW_AVATAR_MODE_AR || showMode == FUP2ARenderer.SHOW_AVATAR_MODE_NONE) {
-                if (mBaseFragment instanceof TakePhotoFragment) {
-                    ((TakePhotoFragment) mBaseFragment).checkPic();
-                }
-                return mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight);
-            }
-        }
-        return mFUP2ARenderer.onDrawFrameAvatar(cameraWidth, cameraHeight);
+        mCameraRenderer.refreshLandmarks(mP2ACore.getLandmarksData());
+        return mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight);
     }
 
     @Override
@@ -193,17 +210,9 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
     }
 
     @Override
-    public void onLoadBodyCompleteListener() {
-        if (HomeFragment.TAG.equals(mShowFragmentFlag))
-            mHomeFragment.onLoadBodyCompleteListener();
-        else if (mBaseFragment instanceof FUP2ARenderer.OnLoadBodyListener)
-            ((FUP2ARenderer.OnLoadBodyListener) mBaseFragment).onLoadBodyCompleteListener();
-    }
-
-    @Override
     public void onBackPressed() {
         if (mBaseFragment != null) {
-            mBaseFragment.backToHome();
+            mBaseFragment.onBackPressed();
             return;
         }
         super.onBackPressed();
@@ -211,6 +220,7 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
 
     public void showHomeFragment() {
         if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK) {
+            mCameraRenderer.updateMTX();
             mCameraRenderer.changeCamera();
         }
 
@@ -227,8 +237,7 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
         }
         mShowFragmentFlag = HomeFragment.TAG;
         transaction.commit();
-
-        mFUP2ARenderer.setShowAvatarMode(FUP2ARenderer.SHOW_AVATAR_MODE_P2A);
+        mAvatarHandle.resetAllMin();
     }
 
     public void showBaseFragment(String tag) {
@@ -239,13 +248,12 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
         if (mBaseFragment == null) {
             if (EditFaceFragment.TAG.equals(tag)) {
                 mBaseFragment = new EditFaceFragment();
-                mFUP2ARenderer.setShowAvatarMode(FUP2ARenderer.SHOW_AVATAR_MODE_FACE);
             } else if (ARFilterFragment.TAG.equals(tag)) {
                 mBaseFragment = new ARFilterFragment();
-                mFUP2ARenderer.setShowAvatarMode(FUP2ARenderer.SHOW_AVATAR_MODE_AR);
             } else if (TakePhotoFragment.TAG.equals(tag)) {
                 mBaseFragment = new TakePhotoFragment();
-                mFUP2ARenderer.setShowAvatarMode(FUP2ARenderer.SHOW_AVATAR_MODE_NONE);
+            } else if (GroupPhotoFragment.TAG.equals(tag)) {
+                mBaseFragment = new GroupPhotoFragment();
             }
             transaction.add(R.id.main_fragment_layout, mBaseFragment);
         } else {
@@ -282,5 +290,14 @@ public class MainActivity extends AppCompatActivity implements FUP2ARenderer.OnL
 
     public void setShowAvatarP2A(AvatarP2A showAvatarP2A) {
         mShowIndex = mAvatarP2As.indexOf(mShowAvatarP2A = showAvatarP2A);
+    }
+
+    public void setGLSurfaceViewSize(boolean isMin) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
+        params.width = isMin ? getResources().getDimensionPixelSize(R.dimen.x480) : RelativeLayout.LayoutParams.MATCH_PARENT;
+        params.height = isMin ? getResources().getDimensionPixelSize(R.dimen.x592) : RelativeLayout.LayoutParams.MATCH_PARENT;
+        params.topMargin = isMin ? getResources().getDimensionPixelSize(R.dimen.x158) : 0;
+        mGLSurfaceView.setLayoutParams(params);
+        mGroupPhotoRound.setVisibility(isMin ? View.VISIBLE : View.GONE);
     }
 }
