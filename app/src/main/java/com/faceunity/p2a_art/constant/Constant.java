@@ -16,11 +16,15 @@ public abstract class Constant {
     public static final int NANO_IN_ONE_MILLI_SECOND = 1000000;
 
     public static final String APP_NAME = "FUP2AArtDemo";
-    public static boolean is_debug = false;
+    public static final boolean is_debug;
     public static final int is_q = 1;
 
-    public static String web_url_create = "https://api2.faceunity.com:2339/api/upload/image";
-    public static String web_url_check = "";
+    public static final String web_url_get_token = "https://api2.faceunity.com:7070/token?company=faceunity";
+    public static final String p2a_client_version = "1.0.2";
+    public static final String web_url_create_upload_image = "https://api.faceunity.com/api/p2a/upload";
+    public static final String web_url_create_download = "https://api.faceunity.com/api/p2a/download";
+
+    public static final String web_url_check = "";
 
     public static final String filePath = Environment.getExternalStoragePublicDirectory("")
             + File.separator + "FaceUnity" + File.separator + APP_NAME + File.separator;
@@ -49,10 +53,11 @@ public abstract class Constant {
         FileUtil.createFile(cameraFilePath);
         FileUtil.createFile(photoFilePath);
 
+        boolean isDebug = false;
         try {
-            is_debug = null != Class.forName("com.faceunity.p2a_art.debug.DebugLayout");
+            isDebug = null != Class.forName("com.faceunity.p2a_art.debug.DebugLayout");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
+        is_debug = isDebug;
     }
 }

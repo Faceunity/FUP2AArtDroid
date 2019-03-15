@@ -20,13 +20,24 @@ import java.io.InputStream;
 public abstract class P2AClientWrapper {
     private static final String TAG = P2AClientWrapper.class.getSimpleName();
 
+    /**
+     * 数据初始化以及鉴权
+     */
     public static void setupData(Context context) {
         try {
             InputStream clientBin = context.getAssets().open("p2a_client_q.bin");
             byte[] clientBinData = new byte[clientBin.available()];
             clientBin.read(clientBinData);
             clientBin.close();
-            FUP2AClient.setupData(clientBinData);
+
+            InputStream clientCore = context.getAssets().open("p2a_client_core.bin");
+            byte[] clientCoreData = new byte[clientCore.available()];
+            clientCore.read(clientCoreData);
+            clientCore.close();
+            // 数据初始化
+            FUP2AClient.setupData(clientBinData, clientCoreData);
+            //鉴权
+            FUP2AClient.setupAuth(authpack.A());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,9 +63,12 @@ public abstract class P2AClientWrapper {
         avatarP2A.setBeardIndex(AvatarConstant.getDefaultIndex(AvatarConstant.beardBundleRes(), beardLabel));
 
         int hasGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAS_GLASSES);
-        avatarP2A.setGlassesIndex(hasGrasses > 0 ? 1 : 0);
+        int shapeGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_SHAPE_GLASSES);
+        int rimGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_RIM_GLASSES);
+        avatarP2A.setGlassesIndex(hasGrasses > 0 ? AvatarConstant.glassesIndex(avatarP2A.getGender(), shapeGrasses, rimGrasses) : 0);
 
-        Log.i(TAG, "initializeAvatarP2AData hairLabel " + hairLabel + " beardLabel " + beardLabel + " hasGrasses " + hasGrasses);
+        Log.i(TAG, "initializeAvatarP2AData hairLabel " + hairLabel + " beardLabel " + beardLabel
+                + " hasGrasses " + hasGrasses + " shapeGrasses " + shapeGrasses + " rimGrasses " + rimGrasses);
 
         double[] lipColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_LIP_COLOR));
         avatarP2A.setLipColorServerValues(lipColor.length < 3 ? new double[]{0, 0, 0} : lipColor);

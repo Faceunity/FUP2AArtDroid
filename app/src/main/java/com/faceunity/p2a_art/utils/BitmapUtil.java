@@ -4,17 +4,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.opengl.GLES20;
 
 import com.faceunity.p2a_art.entity.AvatarP2A;
-import com.faceunity.p2a_art.gles.ProgramTexture2d;
-import com.faceunity.p2a_art.gles.core.GlUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.IntBuffer;
-
-import javax.microedition.khronos.opengles.GL10;
 
 import static com.faceunity.p2a_art.constant.Constant.filePath;
 
@@ -22,114 +16,6 @@ import static com.faceunity.p2a_art.constant.Constant.filePath;
  * Created by tujh on 2018/6/28.
  */
 public abstract class BitmapUtil {
-    private static int[] sFBOId = new int[1];
-    private static int[] sFBOTextureId = new int[1];
-
-    /**
-     * 读取图片（glReadPixels）
-     *
-     * @param textureId
-     * @param texWidth
-     * @param texHeight
-     * @param listener
-     */
-    public static void glReadBitmap(int textureId, float[] mtx, float[] mvp, final int texWidth, final int texHeight, final OnReadBitmapListener listener) {
-        final IntBuffer intBuffer = IntBuffer.allocate(texWidth * texHeight);
-        GlUtil.createFBO(sFBOTextureId, sFBOId, texWidth, texHeight);
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, sFBOId[0]);
-        int viewport[] = new int[4];
-        GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewport, 0);
-        GLES20.glViewport(0, 0, texWidth, texHeight);
-        new ProgramTexture2d().drawFrame(textureId, mtx, mvp);
-        GLES20.glReadPixels(0, 0, texWidth, texHeight, GL10.GL_RGBA, GL10.GL_UNSIGNED_BYTE, intBuffer);
-        GLES20.glFinish();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final int bitmapSource[] = new int[texWidth * texHeight];
-                int offset1, offset2;
-                int[] data = intBuffer.array();
-                for (int i = 0; i < texHeight; i++) {
-                    offset1 = i * texWidth;
-                    offset2 = (texHeight - i - 1) * texWidth;
-                    for (int j = 0; j < texWidth; j++) {
-                        int texturePixel = data[offset1 + j];
-                        int blue = (texturePixel >> 16) & 0xff;
-                        int red = (texturePixel << 16) & 0x00ff0000;
-                        int pixel = (texturePixel & 0xff00ff00) | red | blue | 0xff000000;
-                        bitmapSource[offset2 + j] = pixel;
-                    }
-                }
-                final Bitmap shotCaptureBitmap = Bitmap.createBitmap(bitmapSource, texWidth, texHeight, Bitmap.Config.ARGB_8888).copy(Bitmap.Config.ARGB_8888, true);
-                if (listener != null) {
-                    listener.onReadBitmapListener(shotCaptureBitmap);
-                }
-            }
-        }).start();
-        GLES20.glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-    }
-
-    public interface OnReadBitmapListener {
-        void onReadBitmapListener(Bitmap bitmap);
-    }
-
-    /**
-     * bitmap 转 NV21 数据
-     *
-     * @param inputWidth
-     * @param inputHeight
-     * @param scaled
-     * @return
-     */
-    public static byte[] getNV21(int inputWidth, int inputHeight, Bitmap scaled) {
-        int[] argb = new int[inputWidth * inputHeight];
-        scaled.getPixels(argb, 0, inputWidth, 0, 0, inputWidth, inputHeight);
-        byte[] yuv = new byte[inputWidth * inputHeight * 3 / 2];
-        encodeYUV420SP(yuv, argb, inputWidth, inputHeight);
-        scaled.recycle();
-        return yuv;
-    }
-
-    /**
-     * ARGB 转 NV21 数据
-     *
-     * @param yuv420sp
-     * @param argb
-     * @param width
-     * @param height
-     */
-    public static void encodeYUV420SP(byte[] yuv420sp, int[] argb, int width, int height) {
-        final int frameSize = width * height;
-        int yIndex = 0;
-        int uvIndex = frameSize;
-        int a, R, G, B, Y, U, V;
-        int index = 0;
-        for (int j = 0; j < height; j++) {
-            for (int i = 0; i < width; i++) {
-                a = (argb[index] & 0xff000000) >> 24; // a is not used obviously
-                R = (argb[index] & 0xff0000) >> 16;
-                G = (argb[index] & 0xff00) >> 8;
-                B = (argb[index] & 0xff) >> 0;
-
-                // well known RGB to YUV algorithm
-                Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
-                U = ((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128;
-                V = ((112 * R - 94 * G - 18 * B + 128) >> 8) + 128;
-
-                // NV21 has a plane of Y and interleaved planes of VU each sampled by a factor of 2
-                //    meaning for every 4 Y pixels there are 1 V and 1 U.  Note the sampling is every other
-                //    pixel AND every other scanline.
-                yuv420sp[yIndex++] = (byte) ((Y < 0) ? 0 : ((Y > 255) ? 255 : Y));
-                if (j % 2 == 0 && index % 2 == 0) {
-                    yuv420sp[uvIndex++] = (byte) ((V < 0) ? 0 : ((V > 255) ? 255 : V));
-                    yuv420sp[uvIndex++] = (byte) ((U < 0) ? 0 : ((U > 255) ? 255 : U));
-                }
-                index++;
-            }
-        }
-    }
 
     public static final int THUMBNAIL_SIZE = 100;
 

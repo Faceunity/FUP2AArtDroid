@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements
     private HomeFragment mHomeFragment;
     private BaseFragment mBaseFragment;
 
+    private boolean isCanController = true;
     private GestureDetectorCompat mGestureDetector;
     private ScaleGestureDetector mScaleGestureDetector;
 
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (HomeFragment.TAG.equals(mShowFragmentFlag) || EditFaceFragment.TAG.equals(mShowFragmentFlag)) {
+        if (isCanController && (HomeFragment.TAG.equals(mShowFragmentFlag) || EditFaceFragment.TAG.equals(mShowFragmentFlag))) {
             if (event.getPointerCount() == 2) {
                 mScaleGestureDetector.onTouchEvent(event);
             } else if (event.getPointerCount() == 1)
@@ -299,5 +300,9 @@ public class MainActivity extends AppCompatActivity implements
         params.topMargin = isMin ? getResources().getDimensionPixelSize(R.dimen.x158) : 0;
         mGLSurfaceView.setLayoutParams(params);
         mGroupPhotoRound.setVisibility(isMin ? View.VISIBLE : View.GONE);
+    }
+
+    public void setCanController(boolean canController) {
+        isCanController = canController;
     }
 }

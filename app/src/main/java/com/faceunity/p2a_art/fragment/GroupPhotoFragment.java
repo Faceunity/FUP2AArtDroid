@@ -1,8 +1,10 @@
 package com.faceunity.p2a_art.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.faceunity.gif_sdk.GifEncoderWrapper;
+import com.faceunity.gif.GifHardEncoderWrapper;
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.core.AvatarHandle;
@@ -51,7 +53,28 @@ public class GroupPhotoFragment extends BaseFragment {
     private Bitmap mShowBitmap;
 
     private String mGifPath = "";
-    private GifEncoderWrapper mGifEncoderWrapper;
+    private GifHardEncoderWrapper mGifHardEncoder;
+    static final int NONE_FRAME_ID = -100;
+    int frameId = NONE_FRAME_ID;
+
+    private static final int IMAGE_REQUEST_CODE = 0x102;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            String filePath = FileUtil.getFileAbsolutePath(mActivity, data.getData());
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (mP2AMultipleCore != null) {
+                    mP2AMultipleCore.loadBackground(filePath);
+                    startGifEncoder();
+                }
+            } else {
+                ToastUtil.showCenterToast(mActivity, "所选图片文件不存在。");
+            }
+        }
+    }
 
     @Nullable
     @Override
@@ -74,20 +97,18 @@ public class GroupPhotoFragment extends BaseFragment {
                 mAvatarLayout.setScenes(mScenes);
                 mActivity.setGLSurfaceViewSize(true);
                 mP2AMultipleCore = new P2AMultipleCore(mActivity, mFUP2ARenderer) {
-                    static final int NONE_FRAME_ID = -100;
-                    int frameId = NONE_FRAME_ID;
 
                     @Override
                     public int onDrawFrame(byte[] img, int tex, int w, int h) {
                         int fuTex = super.onDrawFrame(img, tex, w, h);
                         AvatarHandle avatarHandle = mAvatarHandleSparse.get(0);
-                        if (avatarHandle != null && mGifEncoderWrapper != null) {
+                        if (avatarHandle != null && mGifHardEncoder != null) {
                             int nowFrameId = avatarHandle.getNowFrameId();
                             if (frameId > nowFrameId) {
                                 releaseGifEncoder();
                                 frameId = NONE_FRAME_ID;
                             } else {
-                                mGifEncoderWrapper.encodeFrame(getReadBackImg(), getReadBackW(), getReadBackH(), mCameraRenderer.getCameraOrientation());
+                                mGifHardEncoder.encodeFrame(fuTex);
                                 frameId = nowFrameId;
                             }
                         }
@@ -132,21 +153,9 @@ public class GroupPhotoFragment extends BaseFragment {
                                     mAvatarLayout.updateAvatarPoint();
                                     if (++isLoadComplete == mAvatarHandleSparse.size()) {
                                         if (isAnimationScenes) {
-                                            mP2AMultipleCore.queueEvent(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    mGifEncoderWrapper = new GifEncoderWrapper(mGifPath = Constant.TmpPath + DateUtil.getCurrentDate() + "_tmp.gif",
-                                                            mP2AMultipleCore.getReadBackH(), mP2AMultipleCore.getReadBackW());
-                                                    for (int i = 0; i < mAvatarP2As.length; i++) {
-                                                        if (mAvatarHandleSparse.get(i) != null) {
-                                                            mAvatarHandleSparse.get(i).seekToAnimFrameId(1);
-                                                            mAvatarHandleSparse.get(i).setAnimState(1);
-                                                        }
-                                                    }
-                                                }
-                                            });
+                                            startGifEncoder();
                                         } else {
-                                            mAvatarLayout.updateNextBtn();
+                                            mAvatarLayout.updateNextBtn(true);
                                         }
                                     }
                                     avatarHandle.seekToAnimFrameId(1);
@@ -197,6 +206,20 @@ public class GroupPhotoFragment extends BaseFragment {
                         }
                     });
                 }
+            }
+        });
+        mAvatarLayout.setBackgroundRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent2 = new Intent();
+                intent2.addCategory(Intent.CATEGORY_OPENABLE);
+                intent2.setType("image/*");
+                if (Build.VERSION.SDK_INT < 19) {
+                    intent2.setAction(Intent.ACTION_GET_CONTENT);
+                } else {
+                    intent2.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                }
+                startActivityForResult(intent2, IMAGE_REQUEST_CODE);
             }
         });
 
@@ -288,11 +311,32 @@ public class GroupPhotoFragment extends BaseFragment {
         mShowLayout.setShowGIF("");
     }
 
+    private void startGifEncoder() {
+        mP2AMultipleCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (mGifHardEncoder != null) {
+                    mGifHardEncoder.release();
+                }
+                mGifHardEncoder = new GifHardEncoderWrapper(mGifPath = Constant.TmpPath + DateUtil.getCurrentDate() + "_tmp.gif",
+                        mCameraRenderer.getCameraHeight() / 2, mCameraRenderer.getCameraWidth() / 2);
+                for (int i = 0; i < mAvatarP2As.length; i++) {
+                    if (mAvatarHandleSparse.get(i) != null) {
+                        mAvatarHandleSparse.get(i).seekToAnimFrameId(1);
+                        mAvatarHandleSparse.get(i).setAnimState(1);
+                    }
+                }
+                frameId = NONE_FRAME_ID;
+                mAvatarLayout.updateNextBtn(false);
+            }
+        });
+    }
+
     private void releaseGifEncoder() {
-        if (mGifEncoderWrapper != null) {
-            mGifEncoderWrapper.release();
-            mGifEncoderWrapper = null;
-            mAvatarLayout.updateNextBtn();
+        if (mGifHardEncoder != null) {
+            mGifHardEncoder.release();
+            mGifHardEncoder = null;
+            mAvatarLayout.updateNextBtn(true);
         }
     }
 }

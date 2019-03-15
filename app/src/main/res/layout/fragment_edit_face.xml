@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.faceunity.p2a_art.fragment.editface.core.shape.EditPointLayout
+        android:id="@+id/point_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/edit_face_bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x600"
         android:layout_above="@+id/edit_face_bottom_title"
-        android:layout_marginBottom="@dimen/x2"/>
+        android:layout_marginBottom="@dimen/x2" />
 
     <ImageButton
         android:id="@+id/edit_face_back"
@@ -21,7 +27,7 @@
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/edit_face_back"/>
+        android:src="@drawable/edit_face_back" />
 
     <ImageButton
         android:id="@+id/edit_face_save"
@@ -33,13 +39,13 @@
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/edit_face_save"/>
+        android:src="@drawable/edit_face_save" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/x2"
         android:layout_above="@+id/edit_face_bottom_title"
-        android:background="#E5E5E5"/>
+        android:background="#E5E5E5" />
 
     <com.faceunity.p2a_art.ui.BottomTitleGroup
         android:id="@+id/edit_face_bottom_title"
@@ -49,5 +55,5 @@
         android:background="#FFFFFF"
         app:padding="@dimen/x40"
         app:text_color="@color/bottom_title_text_color"
-        app:text_size="@dimen/text_size_28"/>
+        app:text_size="@dimen/text_size_28" />
 </RelativeLayout>

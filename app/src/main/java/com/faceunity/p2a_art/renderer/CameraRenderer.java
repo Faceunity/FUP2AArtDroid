@@ -16,8 +16,8 @@ import com.faceunity.p2a_art.gles.ProgramLandmarks;
 import com.faceunity.p2a_art.gles.ProgramTexture2d;
 import com.faceunity.p2a_art.gles.ProgramTextureOES;
 import com.faceunity.p2a_art.gles.core.GlUtil;
-import com.faceunity.p2a_art.utils.BitmapUtil;
 import com.faceunity.p2a_art.utils.CameraUtils;
+import com.faceunity.pic.PictureEncoder;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -381,9 +381,9 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         }
         mIsNeedTakePic = false;
         setNeedStopDrawFrame(true);
-        BitmapUtil.glReadBitmap(textureId, mtx, GlUtil.IDENTITY_MATRIX, texWidth, texHeight, new BitmapUtil.OnReadBitmapListener() {
+        PictureEncoder.encoderPicture(textureId, mtx, GlUtil.IDENTITY_MATRIX, texWidth, texHeight, new PictureEncoder.OnEncoderPictureListener() {
             @Override
-            public void onReadBitmapListener(Bitmap bitmap) {
+            public void onEncoderPictureListener(Bitmap bitmap) {
                 if (mTakePhotoCallBack != null) {
                     mTakePhotoCallBack.takePhotoCallBack(bitmap);
                 }

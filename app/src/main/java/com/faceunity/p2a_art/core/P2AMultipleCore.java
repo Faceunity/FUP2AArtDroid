@@ -5,6 +5,7 @@ import android.util.SparseArray;
 
 import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.p2a_art.entity.Scenes;
+import com.faceunity.p2a_art.utils.BackgroundUtil;
 import com.faceunity.wrapper.faceunity;
 
 import java.util.Arrays;
@@ -17,13 +18,11 @@ public class P2AMultipleCore extends BaseCore {
 
     private final SparseArray<AvatarHandle> mAvatarHandles = new SparseArray<>();
 
+    private BackgroundUtil mBackgroundUtil;
     public int fxaaItem, bgItem;
-    private byte[] readBackImg;
-    private int readBackW, readBackH;
 
     public P2AMultipleCore(Context context, FUP2ARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
-
         bgItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_default_bg);
         fxaaItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_fxaa);
     }
@@ -34,7 +33,9 @@ public class P2AMultipleCore extends BaseCore {
             AvatarHandle avatarHandle = new AvatarHandle(this, mFUItemHandler, new Runnable() {
                 @Override
                 public void run() {
-                    mAvatarHandles.get(finalI).resetAllMinGroup();
+                    AvatarHandle handle = mAvatarHandles.get(finalI);
+                    if (handle != null)
+                        handle.resetAllMinGroup();
                 }
             });
             mAvatarHandles.put(i, avatarHandle);
@@ -49,16 +50,15 @@ public class P2AMultipleCore extends BaseCore {
             itemsArray[i] = mAvatarHandles.get(mAvatarHandles.keyAt(i)).controllerItem;
         }
         itemsArray[itemsArray.length - 1] = fxaaItem;
-        itemsArray[itemsArray.length - 2] = bgItem;
+        if (mBackgroundUtil != null && !mBackgroundUtil.isHasBackground())
+            itemsArray[itemsArray.length - 2] = bgItem;
         return itemsArray;
     }
 
     @Override
     public int onDrawFrame(byte[] img, int tex, int w, int h) {
-        if (readBackImg == null || readBackW != w / 2 || readBackH != h / 2) {
-            readBackW = w / 2;
-            readBackH = h / 2;
-            readBackImg = new byte[readBackW * readBackH * 4];
+        if (mBackgroundUtil == null) {
+            mBackgroundUtil = new BackgroundUtil(w, h);
         }
         Arrays.fill(landmarksData, 0.0f);
         Arrays.fill(rotationData, 0.0f);
@@ -67,8 +67,9 @@ public class P2AMultipleCore extends BaseCore {
         Arrays.fill(rotationModeData, 0.0f);
         rotationModeData[0] = (360 - mInputImageOrientation) / 90;
 
-        return faceunity.fuAvatarToImage(pupilPosData, expressionData, rotationData, rotationModeData,
-                faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray(), 0, readBackW, readBackH, readBackImg);
+        int fuTex = faceunity.fuAvatarToTexture(pupilPosData, expressionData, rotationData, rotationModeData,
+                faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray(), 0);
+        return mBackgroundUtil.drawBackground(fuTex);
     }
 
     @Override
@@ -98,15 +99,12 @@ public class P2AMultipleCore extends BaseCore {
         queueEvent(destroyItem(bgItem));
     }
 
-    public byte[] getReadBackImg() {
-        return readBackImg;
-    }
-
-    public int getReadBackW() {
-        return readBackW;
-    }
-
-    public int getReadBackH() {
-        return readBackH;
+    public void loadBackground(final String path) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mBackgroundUtil.loadBackground(path);
+            }
+        });
     }
 }

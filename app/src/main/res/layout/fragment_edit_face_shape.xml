@@ -1,59 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_gravity="bottom"
-              android:animateLayoutChanges="true"
-              android:gravity="bottom"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:animateLayoutChanges="true"
+    android:gravity="bottom"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/shape_seek_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x120"
-        android:background="@color/edit_face_bottom_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/shape_seek_bar_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="@dimen/x30"
-            android:gravity="center"
-            android:text=""/>
-
-        <com.faceunity.p2a_art.ui.seekbar.DiscreteSeekBar
-            android:id="@+id/shape_seek_bar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="@dimen/x40"
-            android:paddingRight="@dimen/x40"
-            app:dsb_indicatorColor="#4C96FF"
-            app:dsb_indicatorElevation="0dp"
-            app:dsb_indicatorPopupEnabled="true"
-            app:dsb_max="100"
-            app:dsb_min="-100"
-            app:dsb_progressColor="#4C96FF"
-            app:dsb_rippleColor="@color/colorWhite"
-            app:dsb_scrubberHeight="@dimen/x6"
-            app:dsb_thumbSize="@dimen/x32"
-            app:dsb_trackBaseHeight="@dimen/x16"
-            app:dsb_trackColor="#EEEEEE"
-            app:dsb_trackHeight="@dimen/x6"
-            app:dsb_value="0"/>
-    </LinearLayout>
-
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
-        android:id="@+id/shape_color_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x120"
-        android:background="@color/edit_face_bottom_background"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:visibility="gone"/>
+    <CheckBox
+        android:id="@+id/edit_face_shape_position"
+        android:layout_width="@dimen/x96"
+        android:layout_height="@dimen/x96"
+        android:layout_gravity="right"
+        android:layout_marginRight="@dimen/x32"
+        android:layout_marginBottom="@dimen/x30"
+        android:background="@drawable/edit_face_shape_position"
+        android:button="@null"
+        android:checked="true" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -69,28 +33,49 @@
             android:layout_marginLeft="@dimen/x20"
             android:layout_marginRight="@dimen/x20"
             android:scaleType="centerInside"
-            android:src="@drawable/edit_face_shape_reset"/>
+            android:src="@drawable/edit_face_shape_reset" />
 
         <View
             android:layout_width="@dimen/x2"
             android:layout_height="@dimen/x46"
-            android:background="#EEEEEE"/>
+            android:background="#EEEEEE" />
 
-        <HorizontalScrollView
-            android:id="@+id/edit_face_radio_shape_scroll"
+        <com.faceunity.p2a_art.ui.EditFaceRadioGroup
+            android:id="@+id/edit_face_radio_shape"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:scrollbars="none">
+            android:orientation="horizontal">
 
-            <com.faceunity.p2a_art.ui.EditFaceRadioGroup
-                android:id="@+id/edit_face_radio_shape"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"/>
-        </HorizontalScrollView>
+            <com.faceunity.p2a_art.ui.EditFaceRadio
+                android:id="@+id/edit_face_radio_shape_face"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:checked="true"
+                app:drawable_checked="@drawable/edit_face_shape_face_checked"
+                app:drawable_normal="@drawable/edit_face_shape_face_normal" />
+
+            <com.faceunity.p2a_art.ui.EditFaceRadio
+                android:id="@+id/edit_face_radio_shape_eye"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:drawable_checked="@drawable/edit_face_shape_eye_checked"
+                app:drawable_normal="@drawable/edit_face_shape_eye_normal" />
+
+            <com.faceunity.p2a_art.ui.EditFaceRadio
+                android:id="@+id/edit_face_radio_shape_mouth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:drawable_checked="@drawable/edit_face_shape_mouth_checked"
+                app:drawable_normal="@drawable/edit_face_shape_mouth_normal" />
+
+            <com.faceunity.p2a_art.ui.EditFaceRadio
+                android:id="@+id/edit_face_radio_shape_nose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:drawable_checked="@drawable/edit_face_shape_nose_checked"
+                app:drawable_normal="@drawable/edit_face_shape_nose_normal" />
+        </com.faceunity.p2a_art.ui.EditFaceRadioGroup>
 
     </LinearLayout>
 </LinearLayout>

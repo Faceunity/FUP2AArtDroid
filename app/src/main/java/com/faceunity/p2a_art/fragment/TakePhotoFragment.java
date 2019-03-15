@@ -7,12 +7,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +21,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.core.AvatarBuilder;
 import com.faceunity.p2a_art.core.NamaCore;
-import com.faceunity.p2a_art.core.P2AClientWrapper;
 import com.faceunity.p2a_art.entity.AvatarP2A;
-import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.entity.DBHelper;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
 import com.faceunity.p2a_art.ui.CreateAvatarDialog;
@@ -37,7 +36,8 @@ import com.faceunity.p2a_art.utils.LightSensorUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
 import com.faceunity.p2a_art.web.CreateFailureToast;
 import com.faceunity.p2a_art.web.OkHttpUtils;
-import com.faceunity.p2a_art.web.ProgressRequestBody;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,20 +55,24 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
     private TextView mTakePhotoPoint;
 
-    private boolean isCancel = false;
     private CreateAvatarDialog mCreateAvatarDialog;
     private NormalDialog mCancelDialog;
 
     private DBHelper mDBHelper;
+    private AvatarBuilder mAvatarBuilder;
 
     private NamaCore mNamaCore;
+
+    private Handler mHandler;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_take_photo, container, false);
         mDBHelper = new DBHelper(mActivity);
+        mAvatarBuilder = new AvatarBuilder(mActivity);
         mSensorManager = LightSensorUtil.getSensorManager(mActivity);
+        mHandler = new Handler(Looper.getMainLooper());
 
         mTakePhotoPoint = view.findViewById(R.id.take_photo_point);
         view.findViewById(R.id.take_photo_back).setOnClickListener(this);
@@ -101,22 +105,19 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Uri uri;
-            if (data != null) {
-                uri = data.getData();
-                String filePath = FileUtil.getFileAbsolutePath(mActivity, uri);
-                File file = new File(filePath);
-                if (!Constant.is_debug || !createAvatarDebug(file)) {
-                    if (file.exists()) {
-                        Bitmap bitmap = BitmapUtil.loadBitmap(filePath, 720);
-                        String dir = BitmapUtil.saveBitmap(bitmap, null);
-                        createAvatar(bitmap, dir);
-                        return;
-                    } else {
-                        ToastUtil.showCenterToast(mActivity, "所选图片文件不存在。");
-                    }
+        if (requestCode == IMAGE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            String filePath = FileUtil.getFileAbsolutePath(mActivity, data.getData());
+            File file = new File(filePath);
+            if (file.exists()) {
+                if (Constant.is_debug) {
+                    createAvatarDebug(file);
+                } else {
+                    Bitmap bitmap = BitmapUtil.loadBitmap(filePath, 720);
+                    String dir = BitmapUtil.saveBitmap(bitmap, null);
+                    createAvatar(bitmap, dir);
                 }
+            } else {
+                ToastUtil.showCenterToast(mActivity, "所选图片文件不存在。");
             }
         }
     }
@@ -149,7 +150,11 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         public void takePhotoCallBack(final Bitmap bmp) {
                             mCameraRenderer.setNeedStopDrawFrame(false);
                             String dir = BitmapUtil.saveBitmap(bmp, isTracking == 1 ? faceRect : null);
-                            createAvatar(bmp, dir);
+                            if (Constant.is_debug) {
+                                createAvatarDebug(bmp, dir);
+                            } else {
+                                createAvatar(bmp, dir);
+                            }
                         }
                     });
                 } else {
@@ -166,15 +171,19 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
+        onBackPressed(mCreateAvatarDialog);
+    }
+
+    public void onBackPressed(final CreateAvatarDialog createAvatarDialog) {
         mFUP2ARenderer.setFUCore(mP2ACore);
         mNamaCore.release();
-        if (mCreateAvatarDialog != null) {
+        if (createAvatarDialog != null) {
             mCameraRenderer.updateMTX();
             mFUP2ARenderer.queueNextEvent(new Runnable() {
                 @Override
                 public void run() {
                     mActivity.showHomeFragment();
-                    mCreateAvatarDialog.dismiss();
+                    createAvatarDialog.dismiss();
                 }
             });
         } else {
@@ -187,7 +196,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                isCancel = false;
                 mCreateAvatarDialog = new CreateAvatarDialog();
                 mCreateAvatarDialog.setPhotoBitmap(bitmap);
                 mCreateAvatarDialog.show(mActivity.getSupportFragmentManager(), CreateAvatarDialog.TAG);
@@ -211,7 +219,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                             public void onPositiveListener() {
                                 if (mCreateAvatarDialog != null)
                                     mCreateAvatarDialog.dismiss();
-                                isCancel = true;
+                                mAvatarBuilder.cancel();
                                 OkHttpUtils.cancelAll();
                                 FileUtil.deleteDirAndFile(new File(dir));
                             }
@@ -235,124 +243,118 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         });
     }
 
-    private long uploadDataTime;
-    private long downloadDataTime;
-    private long serverDataTime;
-    private long headDataTime;
-    private long allTime;
-
     private void createAvatar(final String dir, final int gender, final int style) {
-        final long createAvatarTime = System.nanoTime();
-        OkHttpUtils.createAvatarRequest(dir + AvatarP2A.FILE_NAME_CLIENT_DATA_ORIGIN_PHOTO, gender, style, new Callback() {
+        OkHttpUtils.getAvatarToken(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                if (!call.isCanceled()) {
-                    Log.e(TAG, "response onFailure " + call.toString() + "\n IOException：\n" + e.toString());
-                    CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureNet);
-                    mCreateAvatarDialog.dismiss();
-                }
-                FileUtil.deleteDirAndFile(new File(dir));
+                Log.e(TAG, "getAvatarToken response onFailure " + call.toString() + "\n IOException：\n" + e.toString());
+                requestFailure(call, dir);
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Log.i(TAG, "response message " + response.message() + " code " + response.code());
+            public void onResponse(final Call call, final Response response) throws IOException {
+                final String token = response.body().string();
+                Log.i(TAG, "getAvatarToken response message " + response.message() + " code " + response.code() + " token " + token);
                 if (response.isSuccessful()) {
-                    long onResponseTime = System.nanoTime();
-                    byte[] bytes = response.body().bytes();
-                    long downloadTime = System.nanoTime();
-                    downloadDataTime = (downloadTime - onResponseTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
-                    serverDataTime = (downloadTime - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
-                    final AvatarP2A avatarP2A = handleP2AConvert(bytes, dir, gender, style);
-                    long completeTime = System.nanoTime();
-                    headDataTime = (completeTime - downloadTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
-                    allTime = (completeTime - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
-                    if (avatarP2A != null) {
-                        mDBHelper.insertHistory(avatarP2A);
-                        mActivity.updateAvatarP2As();
-                        mActivity.setShowAvatarP2A(avatarP2A);
-                        mAvatarHandle.setAvatar(avatarP2A, new Runnable() {
-                            @Override
-                            public void run() {
-                                onBackPressed();
+                    OkHttpUtils.updatePicRequest(token, dir + AvatarP2A.FILE_NAME_CLIENT_DATA_ORIGIN_PHOTO, gender, new Callback() {
+                        @Override
+                        public void onFailure(Call c, IOException e) {
+                            Log.e(TAG, "updatePicRequest response onFailure " + c.toString() + "\n IOException：\n" + e.toString());
+                            requestFailure(c, dir);
+                        }
+
+                        @Override
+                        public void onResponse(Call c, Response r) throws IOException {
+                            Log.i(TAG, "updatePicRequest response message " + r.message() + " code " + r.code());
+                            if (r.isSuccessful()) {
+                                String json = r.body().string();
+                                try {
+                                    JSONObject jsonObject = new JSONObject(json);
+                                    if (2 == jsonObject.getInt("code")) {
+                                        JSONObject object = jsonObject.getJSONObject("data");
+                                        final String taskid = object.getString("taskid");
+                                        download(token, taskid, dir, gender, style);
+                                        return;
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
-                        });
-                        return;
-                    } else {
-                        CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
-                    }
+                            requestFailure(c, dir);
+                        }
+                    });
                 } else {
-                    CreateFailureToast.onCreateFailure(mActivity, response.code() == 500 ? response.body().string() : CreateFailureToast.CreateFailureNet);
-                }
-                FileUtil.deleteDirAndFile(new File(dir));
-                mCreateAvatarDialog.dismiss();
-            }
-        }, new ProgressRequestBody.UploadProgressListener() {
-            @Override
-            public void onUploadRequestProgress(long byteWritten, long contentLength) {
-                if (byteWritten == contentLength) {
-                    uploadDataTime = (System.nanoTime() - createAvatarTime) / Constant.NANO_IN_ONE_MILLI_SECOND;
+                    requestFailure(call, dir);
                 }
             }
         });
     }
 
-    private volatile int isCreateIndex = 2;
+    public void download(final String token, final String taskid, final String dir, final int gender, final int style) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpUtils.downloadAvatarRequest(token, taskid, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.e(TAG, "downloadAvatarRequest response onFailure " + call.toString() + "\n IOException：\n" + e.toString());
+                        requestFailure(call, dir);
+                    }
 
-    public AvatarP2A handleP2AConvert(final byte[] objData, final String dir, final int gender, final int style) {
-        try {
-            final AvatarP2A avatarP2A = P2AClientWrapper.initializeAvatarP2A(dir, gender, style);
-            if (isCancel) return null;
-            isCreateIndex = 2;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    BundleRes[] hairBundles = AvatarConstant.hairBundleRes(gender);
-                    try {
-                        P2AClientWrapper.initializeAvatarP2AData(objData, avatarP2A);
-                        P2AClientWrapper.createHair(mActivity, objData, hairBundles[avatarP2A.getHairIndex()].path, avatarP2A.getHairFile());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        synchronized (avatarP2A) {
-                            if (--isCreateIndex == 0)
-                                avatarP2A.notify();
-                            else
-                                avatarP2A.wait();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (isCancel) return;
-                    try {
-                        for (int i = 0; i < hairBundles.length; i++) {
-                            String hairPath = hairBundles[i].path;
-                            if (!TextUtils.isEmpty(hairPath) && i != avatarP2A.getHairIndex()) {
-                                P2AClientWrapper.createHair(mActivity, objData, hairPath, avatarP2A.getHairFileList()[i]);
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        Log.i(TAG, "downloadAvatarRequest response message " + response.message() + " code " + response.code());
+                        if (response.isSuccessful()) {
+                            String json = response.body().string();
+                            Log.i(TAG, "json " + json);
+                            try {
+                                JSONObject jsonObject = new JSONObject(json);
+                                if (2 == jsonObject.getInt("code")) {
+                                    String data = jsonObject.getString("data");
+                                    byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
+                                    final AvatarP2A avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, style);
+                                    if (avatarP2A != null) {
+                                        showAvatar(avatarP2A, mCreateAvatarDialog);
+                                        return;
+                                    }
+                                } else if (1 == jsonObject.getInt("code")) {
+                                    download(token, taskid, dir, gender, style);
+                                    return;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
+                            CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
+                        } else {
+                            CreateFailureToast.onCreateFailure(mActivity, response.code() == 500 ? response.body().string() : CreateFailureToast.CreateFailureNet);
                         }
-                        handleP2AConvertDebug(dir, objData);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        FileUtil.deleteDirAndFile(new File(dir));
+                        mCreateAvatarDialog.dismiss();
                     }
-                }
-            }).start();
-            P2AClientWrapper.createHead(objData, avatarP2A.getHeadFile());
-            synchronized (avatarP2A) {
-                if (--isCreateIndex == 0)
-                    avatarP2A.notify();
-                else
-                    avatarP2A.wait();
+                });
             }
-            if (isCancel) return null;
-            return avatarP2A;
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        }, 1000);
+    }
+
+    public void requestFailure(Call call, String dir) {
+        if (!call.isCanceled()) {
+            CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureNet);
+            if (mCreateAvatarDialog != null)
+                mCreateAvatarDialog.dismiss();
         }
-        return null;
+        FileUtil.deleteDirAndFile(new File(dir));
+    }
+
+    public void showAvatar(AvatarP2A avatarP2A, final CreateAvatarDialog createAvatarDialog) {
+        mDBHelper.insertHistory(avatarP2A);
+        mActivity.updateAvatarP2As();
+        mActivity.setShowAvatarP2A(avatarP2A);
+        mAvatarHandle.setAvatar(avatarP2A, new Runnable() {
+            @Override
+            public void run() {
+                onBackPressed(createAvatarDialog);
+            }
+        });
     }
 
     //*****************************人脸检测*********************************
@@ -409,27 +411,26 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
     //*****************************debug部分代码*********************************
 
-    private boolean createAvatarDebug(File file) {
-        if (!Constant.is_debug) return false;
+    private void createAvatarDebug(File file) {
+        if (!Constant.is_debug) return;
         try {
-            Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugP2AClientWrapper");
+            Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugCreateAvatar");
             if (aClass != null) {
-                Method createAvatarDebug = aClass.getMethod("createAvatarDebug", new Class[]{File.class, TakePhotoFragment.class});
-                return (boolean) createAvatarDebug.invoke(null, new Object[]{file, TakePhotoFragment.this});
+                Method createAvatarDebug = aClass.getMethod("createAvatarDebug", new Class[]{TakePhotoFragment.class, File.class});
+                createAvatarDebug.invoke(null, new Object[]{TakePhotoFragment.this, file});
             }
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        return false;
     }
 
-    private void handleP2AConvertDebug(String dir, byte[] objData) {
+    private void createAvatarDebug(Bitmap bitmap, String dir) {
         if (!Constant.is_debug) return;
         try {
-            Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugP2AClientWrapper");
+            Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugCreateAvatar");
             if (aClass != null) {
-                Method handleP2AConvertDebug = aClass.getMethod("handleP2AConvertDebug", new Class[]{String.class, byte[].class, Long.class, Long.class, Long.class, Long.class, Long.class});
-                handleP2AConvertDebug.invoke(null, new Object[]{dir, objData, uploadDataTime, downloadDataTime, serverDataTime, headDataTime, allTime});
+                Method createAvatarDebug = aClass.getMethod("createAvatarDebug", new Class[]{TakePhotoFragment.class, Bitmap.class, String.class});
+                createAvatarDebug.invoke(null, new Object[]{TakePhotoFragment.this, bitmap, dir});
             }
         } catch (Throwable t) {
             t.printStackTrace();

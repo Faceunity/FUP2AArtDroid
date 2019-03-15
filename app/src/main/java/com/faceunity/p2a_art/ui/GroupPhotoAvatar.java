@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ public class GroupPhotoAvatar extends RelativeLayout {
     private RecyclerView mAvatarRecycler;
     private List<AvatarP2A> mAvatarP2As;
     private AvatarAdapter mAvatarAdapter;
+    private ImageView mAvatarBackground;
     private TextView mAvatarPoint;
     private static final String str_select = "选择至多%d个模型";
     private static final String str_select_boy = "选择一个男模型";
@@ -85,6 +87,15 @@ public class GroupPhotoAvatar extends RelativeLayout {
         ((SimpleItemAnimator) mAvatarRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
 
         mAvatarPoint = findViewById(R.id.group_photo_avatar_point);
+        mAvatarBackground = findViewById(R.id.group_photo_avatar_background);
+        mAvatarBackground.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mBackgroundRunnable != null) {
+                    mBackgroundRunnable.run();
+                }
+            }
+        });
     }
 
     class AvatarAdapter extends RecyclerView.Adapter<AvatarAdapter.HomeRecyclerHolder> {
@@ -113,7 +124,7 @@ public class GroupPhotoAvatar extends RelativeLayout {
                     isSelectList[position] = !isSelectList[position];
                     notifyDataSetChanged();
                     if (!isSelectList[position]) {
-                        updateNextBtn();
+                        updateNextBtn(true);
                         updateAvatarPoint();
                     } else {
                         isSelectEnable = false;
@@ -152,6 +163,12 @@ public class GroupPhotoAvatar extends RelativeLayout {
 
     public void setNextRunnable(Runnable nextRunnable) {
         mNextRunnable = nextRunnable;
+    }
+
+    private Runnable mBackgroundRunnable;
+
+    public void setBackgroundRunnable(Runnable backgroundRunnable) {
+        mBackgroundRunnable = backgroundRunnable;
     }
 
     private AvatarSelectListener mAvatarSelectListener;
@@ -210,15 +227,15 @@ public class GroupPhotoAvatar extends RelativeLayout {
             }
         }
         mAvatarAdapter.notifyDataSetChanged();
-        updateNextBtn();
+        updateNextBtn(true);
         updateAvatarPoint();
     }
 
-    public void updateNextBtn() {
+    public void updateNextBtn(final boolean isEnabled) {
         mNextBtn.post(new Runnable() {
             @Override
             public void run() {
-                mNextBtn.setEnabled(!checkIsEnable(AvatarP2A.gender_boy) && !checkIsEnable(AvatarP2A.gender_girl));
+                mNextBtn.setEnabled(isEnabled && !checkIsEnable(AvatarP2A.gender_boy) && !checkIsEnable(AvatarP2A.gender_girl));
             }
         });
     }

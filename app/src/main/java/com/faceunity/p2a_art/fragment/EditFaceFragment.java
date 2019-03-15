@@ -15,16 +15,17 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
-import com.faceunity.p2a.P2AClientInterface;
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.constant.ColorConstant;
 import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.P2AClientWrapper;
+import com.faceunity.p2a_art.core.P2ACore;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.entity.DBHelper;
+import com.faceunity.p2a_art.fragment.editface.EditFaceColorFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceColorItemFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceGlassesFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceItemFragment;
@@ -33,6 +34,10 @@ import com.faceunity.p2a_art.fragment.editface.EditFaceSkinFragment;
 import com.faceunity.p2a_art.fragment.editface.core.ColorValuesChangeListener;
 import com.faceunity.p2a_art.fragment.editface.core.EditFaceBaseFragment;
 import com.faceunity.p2a_art.fragment.editface.core.ItemChangeListener;
+import com.faceunity.p2a_art.fragment.editface.core.shape.EditFaceParameter;
+import com.faceunity.p2a_art.fragment.editface.core.shape.EditFacePoint;
+import com.faceunity.p2a_art.fragment.editface.core.shape.EditFacePointFactory;
+import com.faceunity.p2a_art.fragment.editface.core.shape.EditPointLayout;
 import com.faceunity.p2a_art.ui.BottomTitleGroup;
 import com.faceunity.p2a_art.ui.LoadingDialog;
 import com.faceunity.p2a_art.ui.NormalDialog;
@@ -64,39 +69,36 @@ public class EditFaceFragment extends BaseFragment
     public static final int TITLE_FACE_INDEX = 2;
     public static final int TITLE_EYE_INDEX = 3;
     public static final int TITLE_LIP_INDEX = 4;
-    public static final int TITLE_NOSE_INDEX = 5;
-    public static final int TITLE_BEARD_INDEX = 6;
-    public static final int TITLE_EYEBROW_INDEX = 7;
-    public static final int TITLE_EYELASH_INDEX = 8;
-    public static final int TITLE_GLASSES_INDEX = 9;
-    public static final int TITLE_HAT_INDEX = 10;
-    public static final int TITLE_CLOTHES_INDEX = 11;
-    private static final int EditFaceSelectBottomCount = 12;
+    public static final int TITLE_BEARD_INDEX = 5;
+    public static final int TITLE_EYEBROW_INDEX = 6;
+    public static final int TITLE_EYELASH_INDEX = 7;
+    public static final int TITLE_GLASSES_INDEX = 8;
+    public static final int TITLE_HAT_INDEX = 9;
+    public static final int TITLE_CLOTHES_INDEX = 10;
+    private static final int EditFaceSelectBottomCount = 11;
     private int mEditFaceSelectBottomId = TITLE_HAIR_INDEX;
     private SparseArray<EditFaceBaseFragment> mEditFaceBaseFragments = new SparseArray<>();
 
-    private static final String[] title_boy = new String[]{"发型", "肤色", "面部", "眼睛", "嘴唇", "鼻子", "胡子", "眉毛", "眼镜", "帽子", "衣服"};
+    private static final String[] title_boy = new String[]{"发型", "肤色", "捏脸", "瞳色", "唇色", "胡子", "眉毛", "眼镜", "帽子", "衣服"};
     private static final int[] title_id_boy = new int[]{
             TITLE_HAIR_INDEX,
             TITLE_SKIN_INDEX,
             TITLE_FACE_INDEX,
             TITLE_EYE_INDEX,
             TITLE_LIP_INDEX,
-            TITLE_NOSE_INDEX,
             TITLE_BEARD_INDEX,
             TITLE_EYEBROW_INDEX,
             TITLE_GLASSES_INDEX,
             TITLE_HAT_INDEX,
             TITLE_CLOTHES_INDEX
     };
-    private static final String[] title_girl = new String[]{"发型", "肤色", "面部", "眼睛", "嘴唇", "鼻子", "眉毛", "睫毛", "眼镜", "帽子", "衣服"};
+    private static final String[] title_girl = new String[]{"发型", "肤色", "捏脸", "瞳色", "唇色", "眉毛", "睫毛", "眼镜", "帽子", "衣服"};
     private static final int[] title_id_girl = new int[]{
             TITLE_HAIR_INDEX,
             TITLE_SKIN_INDEX,
             TITLE_FACE_INDEX,
             TITLE_EYE_INDEX,
             TITLE_LIP_INDEX,
-            TITLE_NOSE_INDEX,
             TITLE_EYEBROW_INDEX,
             TITLE_EYELASH_INDEX,
             TITLE_GLASSES_INDEX,
@@ -105,6 +107,10 @@ public class EditFaceFragment extends BaseFragment
     };
 
     private Runnable task;
+
+    private EditPointLayout mEditPointLayout;
+    private EditFacePoint[] mEditFacePoints;
+    private EditFaceParameter mEditFaceParameter;
 
     @Override
     public void onAttach(Context context) {
@@ -116,7 +122,7 @@ public class EditFaceFragment extends BaseFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_face, container, false);
+        final View view = inflater.inflate(R.layout.fragment_edit_face, container, false);
         view.findViewById(R.id.edit_face_back).setOnClickListener(this);
         mSaveBtn = view.findViewById(R.id.edit_face_save);
         mSaveBtn.setOnClickListener(this);
@@ -139,8 +145,40 @@ public class EditFaceFragment extends BaseFragment
         updateSaveBtn();
 
         mAvatarHandle.setNeedFacePUP(true);
+        mAvatarHandle.setAvatar(mAvatarP2A);
 
-        setDefaultShapeValues();
+        mP2ACore = new P2ACore(mP2ACore) {
+            @Override
+            public int onDrawFrame(byte[] img, int tex, int w, int h) {
+                int fuTex = super.onDrawFrame(img, tex, w, h);
+                if (mEditFacePoints != null) {
+                    mAvatarHandle.parsePoint(mEditFacePoints,
+                            mCameraRenderer.getCameraWidth(),
+                            mCameraRenderer.getCameraHeight(),
+                            view.getWidth(),
+                            view.getHeight()
+                    );
+                    mEditPointLayout.setPointList(mEditFacePoints);
+                }
+                return fuTex;
+            }
+        };
+        mFUP2ARenderer.setFUCore(mP2ACore);
+        mEditFaceParameter = new EditFaceParameter(mAvatarHandle);
+
+        mEditPointLayout = view.findViewById(R.id.point_layout);
+        mEditPointLayout.setOnScrollListener(new EditPointLayout.OnScrollListener() {
+            @Override
+            public void onScrollListener(EditFacePoint point, float distanceX, float distanceY) {
+                if (mEditFaceParameter != null) {
+                    mEditFaceParameter.setParamFaceShape(point, distanceX, distanceY);
+                }
+                updateSaveBtn();
+            }
+        });
+
+        EditFacePointFactory.init(mActivity);
+
         return view;
     }
 
@@ -183,6 +221,8 @@ public class EditFaceFragment extends BaseFragment
     public void backToHome() {
         mActivity.showHomeFragment();
         mAvatarHandle.setNeedFacePUP(false);
+        mActivity.setCanController(true);
+        mFUP2ARenderer.setFUCore(mP2ACore = new P2ACore(mP2ACore));
     }
 
     @Override
@@ -247,16 +287,26 @@ public class EditFaceFragment extends BaseFragment
                         ((EditFaceSkinFragment) show).initDate(value, mColorValuesChangeListener);
                         break;
                     case TITLE_FACE_INDEX:
-                    case TITLE_EYE_INDEX:
-                    case TITLE_LIP_INDEX:
-                    case TITLE_NOSE_INDEX:
                         show = new EditFaceShapeFragment();
-                        ((EditFaceShapeFragment) show).initDate(mShapeValues, mColorValuesChangeListener, new EditFaceShapeFragment.ShapeValuesChaneListener() {
+                        ((EditFaceShapeFragment) show).initDate(mEditFaceParameter, new EditFaceShapeFragment.EditFaceStatusChaneListener() {
                             @Override
-                            public void shapeValuesChaneListener(int id, float value) {
+                            public void editFacePointChaneListener(EditFacePoint[] point) {
+                                setEditFacePoints(point);
+                            }
+
+                            @Override
+                            public void resetDefaultDeformParam() {
                                 updateSaveBtn();
                             }
                         });
+                        break;
+                    case TITLE_EYE_INDEX:
+                        show = new EditFaceColorFragment();
+                        ((EditFaceColorFragment) show).initData(ColorConstant.iris_color, (int) mAvatarP2A.getIrisColorValue(), mColorValuesChangeListener);
+                        break;
+                    case TITLE_LIP_INDEX:
+                        show = new EditFaceColorFragment();
+                        ((EditFaceColorFragment) show).initData(ColorConstant.lip_color, (int) mAvatarP2A.getLipColorValue(), mColorValuesChangeListener);
                         break;
                     case TITLE_HAIR_INDEX:
                         show = new EditFaceColorItemFragment();
@@ -303,12 +353,14 @@ public class EditFaceFragment extends BaseFragment
                 transaction.show(show);
             }
             transaction.commit();
-            if (id == -1) {
+            if (id == -1 || id == TITLE_FACE_INDEX) {
             } else if (id == TITLE_CLOTHES_INDEX) {
                 mAvatarHandle.resetAllMinTop();
             } else {
                 mAvatarHandle.resetAll();
             }
+            setEditFacePoints(null);
+            mActivity.setCanController(id != TITLE_FACE_INDEX);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -386,17 +438,7 @@ public class EditFaceFragment extends BaseFragment
     };
 
     private boolean isChangeValues() {
-        return isShapeChangeValues() || mAvatarP2A.compare(mDefaultAvatarP2A);
-    }
-
-    private boolean isShapeChangeValues() {
-        if (mShapeValues == null || mDefaultShapeValues == null) return false;
-        for (int i = 0; i < mShapeValues.length; i++) {
-            if (mShapeValues[i] != mDefaultShapeValues[i]) {
-                return true;
-            }
-        }
-        return false;
+        return (mEditFaceParameter != null && mEditFaceParameter.isShapeChangeValues()) || mAvatarP2A.compare(mDefaultAvatarP2A);
     }
 
     private LoadingDialog mLoadingDialog;
@@ -491,60 +533,20 @@ public class EditFaceFragment extends BaseFragment
     }
 
     private boolean saveAvatarHead() throws IOException {
-        boolean isChange = isShapeChangeValues();
+        boolean isChange = mEditFaceParameter.isShapeChangeValues();
         if (isChange) {
-            P2AClientWrapper.deformAvatarHead(mAvatarP2A.getHeadFile().startsWith(Constant.filePath) ? new FileInputStream(new File(mAvatarP2A.getHeadFile())) : mActivity.getAssets().open(mAvatarP2A.getHeadFile()), mNewAvatarP2A.getHeadFile(), mShapeValues);
+            P2AClientWrapper.deformAvatarHead(mAvatarP2A.getHeadFile().startsWith(Constant.filePath) ? new FileInputStream(new File(mAvatarP2A.getHeadFile())) : mActivity.getAssets().open(mAvatarP2A.getHeadFile()), mNewAvatarP2A.getHeadFile(), mEditFaceParameter.getEditFaceParameters());
         }
         return !isChange;
     }
 
-    private float[] mDefaultShapeValues;
-    private float[] mShapeValues;
-
-    private void setDefaultShapeValues() {
-        mP2ACore.queueEvent(new Runnable() {
+    private void setEditFacePoints(EditFacePoint[] editFacePoints) {
+        mEditFacePoints = editFacePoints;
+        if (mEditPointLayout == null) return;
+        mEditPointLayout.post(new Runnable() {
             @Override
             public void run() {
-                mDefaultShapeValues = new float[P2AClientInterface.index_count];
-                mDefaultShapeValues[P2AClientInterface.index_cheek_narrow] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_cheek_narrow);
-                mDefaultShapeValues[P2AClientInterface.index_Head_fat] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Head_fat);
-                mDefaultShapeValues[P2AClientInterface.index_Head_shrink] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Head_shrink);
-                mDefaultShapeValues[P2AClientInterface.index_Head_stretch] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Head_stretch);
-                mDefaultShapeValues[P2AClientInterface.index_HeadBone_shrink] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_HeadBone_shrink);
-                mDefaultShapeValues[P2AClientInterface.index_HeadBone_stretch] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_HeadBone_stretch);
-                mDefaultShapeValues[P2AClientInterface.index_jaw_lower] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_jaw_lower);
-                mDefaultShapeValues[P2AClientInterface.index_jaw_up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_jaw_up);
-                mDefaultShapeValues[P2AClientInterface.index_jawbone_Narrow] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_jawbone_Narrow);
-                mDefaultShapeValues[P2AClientInterface.index_jawbone_Wide] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_jawbone_Wide);
-                mDefaultShapeValues[P2AClientInterface.index_lipCorner_In] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_lipCorner_In);
-                mDefaultShapeValues[P2AClientInterface.index_lipCorner_Out] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_lipCorner_Out);
-                mDefaultShapeValues[P2AClientInterface.index_lowerLip_Thick] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_lowerLip_Thick);
-                mDefaultShapeValues[P2AClientInterface.index_lowerLip_Thin] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_lowerLip_Thin);
-                mDefaultShapeValues[P2AClientInterface.index_lowerLipSide_Thick] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_lowerLipSide_Thick);
-                mDefaultShapeValues[P2AClientInterface.index_mouth_Down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_mouth_Down);
-                mDefaultShapeValues[P2AClientInterface.index_mouth_Up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_mouth_Up);
-                mDefaultShapeValues[P2AClientInterface.index_nose_Down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_nose_Down);
-                mDefaultShapeValues[P2AClientInterface.index_nose_UP] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_nose_UP);
-                mDefaultShapeValues[P2AClientInterface.index_noseTip_Down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_noseTip_Down);
-                mDefaultShapeValues[P2AClientInterface.index_noseTip_Up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_noseTip_Up);
-                mDefaultShapeValues[P2AClientInterface.index_nostril_In] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_nostril_In);
-                mDefaultShapeValues[P2AClientInterface.index_nostril_Out] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_nostril_Out);
-                mDefaultShapeValues[P2AClientInterface.index_upperLip_Thick] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_upperLip_Thick);
-                mDefaultShapeValues[P2AClientInterface.index_upperLip_Thin] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_upperLip_Thin);
-                mDefaultShapeValues[P2AClientInterface.index_upperLipSide_Thick] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_upperLipSide_Thick);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_both_in] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_both_in);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_both_out] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_both_out);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_close] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_close);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_down);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_inner_down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_inner_down);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_inner_up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_inner_up);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_open] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_open);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_outter_down] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_outter_down);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_outter_up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_outter_up);
-                mDefaultShapeValues[P2AClientInterface.index_Eye_up] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_Eye_up);
-                mDefaultShapeValues[P2AClientInterface.index_Forehead_Narrow] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_forehead_Narrow);
-                mDefaultShapeValues[P2AClientInterface.index_Forehead_Wide] = mAvatarHandle.fuItemGetParamShape(AvatarHandle.PARAM_KEY_forehead_Wide);
-                mShapeValues = Arrays.copyOf(mDefaultShapeValues, mDefaultShapeValues.length);
+                mEditPointLayout.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
             }
         });
     }

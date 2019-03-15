@@ -77,16 +77,16 @@ public abstract class AvatarConstant {
 
     private static final BundleRes[] GLASSED_ART_BOY = {
             new BundleRes("", R.drawable.edit_face_item_none),
-            new BundleRes("male_glass_1.bundle", R.drawable.glass_1),
-            new BundleRes("male_glass_2.bundle", R.drawable.glass_2),
+            new BundleRes("male_glass_1.bundle", R.drawable.glass_1, new Integer[]{1, 0}),
+            new BundleRes("male_glass_2.bundle", R.drawable.glass_2, new Integer[]{0, 0}),
             new BundleRes("male_glass_3.bundle", R.drawable.glass_3),
             new BundleRes("male_glass_4.bundle", R.drawable.glass_4),
             new BundleRes("male_glass_5.bundle", R.drawable.glass_5),
             new BundleRes("male_glass_6.bundle", R.drawable.glass_6),
             new BundleRes("male_glass_7.bundle", R.drawable.glass_7),
-            new BundleRes("male_glass_8.bundle", R.drawable.glass_8),
+            new BundleRes("male_glass_8.bundle", R.drawable.glass_8, new Integer[]{1, 1}),
             new BundleRes("male_glass_10.bundle", R.drawable.glass_10),
-            new BundleRes("male_glass_11.bundle", R.drawable.glass_11),
+            new BundleRes("male_glass_11.bundle", R.drawable.glass_11, new Integer[]{1, 2}),
             new BundleRes("male_glass_15.bundle", R.drawable.glass_15),
             new BundleRes("male_glass_16.bundle", R.drawable.glass_16),
             new BundleRes("male_glass_17.bundle", R.drawable.glass_17),
@@ -97,16 +97,16 @@ public abstract class AvatarConstant {
     };
     private static final BundleRes[] GLASSED_ART_GIRL = {
             new BundleRes("", R.drawable.edit_face_item_none),
-            new BundleRes("female_glass_1.bundle", R.drawable.glass_1),
-            new BundleRes("female_glass_2.bundle", R.drawable.glass_2),
+            new BundleRes("female_glass_1.bundle", R.drawable.glass_1, new Integer[]{1, 0}),
+            new BundleRes("female_glass_2.bundle", R.drawable.glass_2, new Integer[]{0, 0}),
             new BundleRes("female_glass_3.bundle", R.drawable.glass_3),
             new BundleRes("female_glass_4.bundle", R.drawable.glass_4),
             new BundleRes("female_glass_5.bundle", R.drawable.glass_5),
             new BundleRes("female_glass_6.bundle", R.drawable.glass_6),
             new BundleRes("female_glass_7.bundle", R.drawable.glass_7),
-            new BundleRes("female_glass_8.bundle", R.drawable.glass_8),
+            new BundleRes("female_glass_8.bundle", R.drawable.glass_8, new Integer[]{1, 1}),
             new BundleRes("female_glass_10.bundle", R.drawable.glass_10),
-            new BundleRes("female_glass_11.bundle", R.drawable.glass_11),
+            new BundleRes("female_glass_11.bundle", R.drawable.glass_11, new Integer[]{1, 2}),
             new BundleRes("female_glass_15.bundle", R.drawable.glass_15),
             new BundleRes("female_glass_16.bundle", R.drawable.glass_16),
             new BundleRes("female_glass_17.bundle", R.drawable.glass_17),
@@ -226,6 +226,16 @@ public abstract class AvatarConstant {
 
     public static BundleRes[] glassesBundleRes(int gender) {
         return gender == AvatarP2A.gender_boy ? GLASSED_ART_BOY : GLASSED_ART_GIRL;
+    }
+
+    public static int glassesIndex(int gender, int shape, int rim) {
+        BundleRes[] bundleRes = glassesBundleRes(gender);
+        for (int i = 0; i < bundleRes.length; i++) {
+            if (bundleRes[i].labels != null && bundleRes[i].labels[0] == shape && bundleRes[i].labels[1] == rim) {
+                return i;
+            }
+        }
+        return 1;
     }
 
     public static BundleRes[] clothesBundleRes(int gender) {

@@ -25,6 +25,14 @@ public class P2ACore extends BaseCore {
 
     private boolean isNeedTrackFace = false;
 
+    public P2ACore(P2ACore core) {
+        super(core.mContext, core.mFUP2ARenderer);
+        avatarHandle = core.avatarHandle;
+        System.arraycopy(core.mItemsArray, 0, mItemsArray, 0, ITEM_ARRAYS_COUNT);
+        fxaaItem = core.fxaaItem;
+        bgItem = core.bgItem;
+    }
+
     public P2ACore(Context context, FUP2ARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
 
@@ -66,11 +74,11 @@ public class P2ACore extends BaseCore {
                  */
                 faceunity.fuGetFaceInfo(0, "expression", expressionData);
                 /**
-                 * pupil pos 人脸朝向，0-3分别对应手机四种朝向，长度1
+                 * pupil pos 眼球方向，长度2
                  */
                 faceunity.fuGetFaceInfo(0, "pupil_pos", pupilPosData);
                 /**
-                 * rotation mode
+                 * rotation mode 人脸朝向，0-3分别对应手机四种朝向，长度1
                  */
                 faceunity.fuGetFaceInfo(0, "rotation_mode", rotationModeData);
             }
