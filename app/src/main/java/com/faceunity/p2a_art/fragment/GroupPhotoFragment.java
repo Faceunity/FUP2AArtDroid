@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.faceunity.gif.GifHardEncoderWrapper;
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.core.AvatarHandle;
@@ -27,6 +26,7 @@ import com.faceunity.p2a_art.ui.GroupPhotoShow;
 import com.faceunity.p2a_art.utils.DateUtil;
 import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
+import com.faceunity.p2a_helper.gif.GifHardEncoderWrapper;
 
 import java.io.File;
 import java.io.IOException;

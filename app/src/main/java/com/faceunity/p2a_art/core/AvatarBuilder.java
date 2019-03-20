@@ -26,7 +26,11 @@ public class AvatarBuilder {
         isCancel = true;
     }
 
-    public AvatarP2A createAvatar(final byte[] objData, final String dir, final int gender, final int style) {
+    public AvatarP2A createAvatar(byte[] objData, String dir, int gender, int style) {
+        return createAvatar(objData, dir, gender, style, null);
+    }
+
+    public AvatarP2A createAvatar(final byte[] objData, final String dir, final int gender, final int style, final Runnable createComplete) {
         try {
             isCancel = false;
             final AvatarP2A avatarP2A = P2AClientWrapper.initializeAvatarP2A(dir, gender, style);
@@ -63,6 +67,8 @@ public class AvatarBuilder {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    if (createComplete != null)
+                        createComplete.run();
                 }
             }).start();
             P2AClientWrapper.createHead(objData, avatarP2A.getHeadFile());

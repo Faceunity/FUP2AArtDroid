@@ -137,9 +137,17 @@
 -keep class okhttp3.** { *;}
 -dontwarn okio.**
 
+-keep class  com.faceunity.p2a_art.web.CustomSslSocketFactory {*;}
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
 -keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
   **[] $VALUES;
   public *;
 }
+
+#
+# ----------------------------- faceunity库 -----------------------------
+#
+
+-keep class com.faceunity.p2a_client.** { *;}
+-keep class com.faceunity.p2a_helper.** { *;}

@@ -104,15 +104,6 @@
             android:padding="@dimen/x20">
 
             <ToggleButton
-                android:id="@+id/main_debug_bottom_face"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:enabled="false"
-                android:textOff="面部细节\n关"
-                android:textOn="面部细节\n开" />
-
-            <ToggleButton
                 android:id="@+id/main_debug_bottom_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -134,23 +125,18 @@
                 android:textOn="批量生成\n开" />
 
             <ToggleButton
-                android:id="@+id/main_debug_bottom_deform"
+                android:id="@+id/main_debug_test_client_create_api"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:textOff="deform\n关"
-                android:textOn="deform\n开" />
+                android:checked="false"
+                android:textOff="生成api测试\n关"
+                android:textOn="生成api测试\n开" />
 
             <Button
                 android:id="@+id/main_debug_bottom_clear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="清除数据" />
-
-            <Spinner
-                android:id="@+id/main_debug_bottom_count_ratio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
         </LinearLayout>
     </HorizontalScrollView>
 </RelativeLayout>

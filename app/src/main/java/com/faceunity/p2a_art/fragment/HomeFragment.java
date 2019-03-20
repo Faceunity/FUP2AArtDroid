@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.faceunity.p2a.FUP2AClient;
 import com.faceunity.p2a_art.AvatarP2ADeleteActivity;
 import com.faceunity.p2a_art.BuildConfig;
 import com.faceunity.p2a_art.MainActivity;
@@ -30,6 +29,7 @@ import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
 import com.faceunity.p2a_art.entity.AvatarP2A;
+import com.faceunity.p2a_client.FUP2AClient;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

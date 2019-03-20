@@ -2,11 +2,11 @@ package com.faceunity.p2a_art;
 
 import android.app.Application;
 
-import com.faceunity.FUAuthCheck;
 import com.faceunity.p2a_art.constant.ColorConstant;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
 import com.faceunity.p2a_art.core.P2AClientWrapper;
 import com.faceunity.p2a_art.web.OkHttpUtils;
+import com.faceunity.p2a_helper.FUAuthCheck;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

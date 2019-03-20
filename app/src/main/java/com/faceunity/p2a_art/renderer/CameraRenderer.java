@@ -17,7 +17,7 @@ import com.faceunity.p2a_art.gles.ProgramTexture2d;
 import com.faceunity.p2a_art.gles.ProgramTextureOES;
 import com.faceunity.p2a_art.gles.core.GlUtil;
 import com.faceunity.p2a_art.utils.CameraUtils;
-import com.faceunity.pic.PictureEncoder;
+import com.faceunity.p2a_helper.pic.PictureEncoder;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

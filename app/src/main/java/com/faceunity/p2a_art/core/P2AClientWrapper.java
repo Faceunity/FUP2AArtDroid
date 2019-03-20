@@ -5,11 +5,11 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.faceunity.p2a.FUP2AClient;
 import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.utils.FileUtil;
+import com.faceunity.p2a_client.FUP2AClient;
 
 import java.io.IOException;
 import java.io.InputStream;
