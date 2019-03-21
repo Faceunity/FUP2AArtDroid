@@ -66,6 +66,7 @@ public class HomeFragment extends BaseFragment
         mGuideView.setVisibility(View.VISIBLE);
         mVersionText = view.findViewById(R.id.main_version_text);
         mVersionText.setText(String.format("DigiMe Art v%s\nSDK v%s", BuildConfig.VERSION_NAME, FUP2AClient.getVersion()));
+        Log.e(TAG, "FUP2AClient.Version " + FUP2AClient.getVersion());
 
         mTrackBtn = view.findViewById(R.id.main_track_image_btn);
         mTrackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

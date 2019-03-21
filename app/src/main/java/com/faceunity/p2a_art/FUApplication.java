@@ -5,6 +5,7 @@ import android.app.Application;
 import com.faceunity.p2a_art.constant.ColorConstant;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
 import com.faceunity.p2a_art.core.P2AClientWrapper;
+import com.faceunity.p2a_art.core.authpack;
 import com.faceunity.p2a_art.web.OkHttpUtils;
 import com.faceunity.p2a_helper.FUAuthCheck;
 

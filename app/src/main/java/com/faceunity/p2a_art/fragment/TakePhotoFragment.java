@@ -191,7 +191,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-    private void createAvatar(final Bitmap bitmap, final String dir) {
+    public void createAvatar(final Bitmap bitmap, final String dir) {
         Log.e(TAG, "createAvatar");
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -412,7 +412,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     //*****************************debug部分代码*********************************
 
     private void createAvatarDebug(File file) {
-        if (!Constant.is_debug) return;
         try {
             Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugCreateAvatar");
             if (aClass != null) {
@@ -425,7 +424,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     }
 
     private void createAvatarDebug(Bitmap bitmap, String dir) {
-        if (!Constant.is_debug) return;
         try {
             Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugCreateAvatar");
             if (aClass != null) {

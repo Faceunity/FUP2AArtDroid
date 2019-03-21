@@ -108,8 +108,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:textOff="debug\n关"
-                android:textOn="debug\n开" />
+                android:textOff="debug info\n关"
+                android:textOn="debug info\n开" />
 
             <Spinner
                 android:id="@+id/main_debug_bottom_web"
