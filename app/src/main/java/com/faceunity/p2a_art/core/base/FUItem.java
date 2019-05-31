@@ -15,4 +15,9 @@ public class FUItem {
         this.name = name;
         this.handle = handle;
     }
+
+    public void clear() {
+        name = "";
+        handle = 0;
+    }
 }

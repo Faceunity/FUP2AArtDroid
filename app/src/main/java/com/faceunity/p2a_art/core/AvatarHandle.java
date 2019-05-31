@@ -1,14 +1,17 @@
 package com.faceunity.p2a_art.core;
 
+import android.graphics.Point;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
+import com.faceunity.p2a_art.core.base.BaseP2AHandle;
 import com.faceunity.p2a_art.core.base.FUItem;
 import com.faceunity.p2a_art.core.base.FUItemHandler;
 import com.faceunity.p2a_art.entity.AvatarP2A;
-import com.faceunity.p2a_art.fragment.editface.core.shape.EditFacePoint;
 import com.faceunity.wrapper.faceunity;
 
 import java.util.Arrays;
@@ -19,10 +22,6 @@ import java.util.Arrays;
 public class AvatarHandle extends BaseP2AHandle {
     private static final String TAG = AvatarHandle.class.getSimpleName();
 
-    private static final String EXPRESSION_ART_BOY = "male_animation.bundle";
-    private static final String POSE_ART_BOY = "male_pose_v2.bundle";
-    private static final String EXPRESSION_ART_GIRL = "female_animation.bundle";
-    private static final String POSE_ART_GIRL = "female_pose.bundle";
     private boolean mIsNeedTrack;
     private boolean mIsNeedFacePUP;
 
@@ -35,11 +34,19 @@ public class AvatarHandle extends BaseP2AHandle {
     public final FUItem hatItem = new FUItem();
     public final FUItem bodyItem = new FUItem();
     public final FUItem clothesItem = new FUItem();
+    public final FUItem shoeItem = new FUItem();
     public final FUItem expressionItem = new FUItem();
+    public final FUItem otherItem[] = new FUItem[5];
+
+    {
+        for (int i = 0; i < otherItem.length; i++) {
+            otherItem[i] = new FUItem();
+        }
+    }
 
     public AvatarHandle(BaseCore baseCore, FUItemHandler FUItemHandler, final Runnable prepare) {
         super(baseCore, FUItemHandler);
-        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new FUItemHandler.LoadFUItemListener(FUP2ARenderer.BUNDLE_controller) {
+        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new FUItemHandler.LoadFUItemListener(FilePathFactory.bundleController()) {
 
             @Override
             public void onLoadComplete(FUItem fuItem) {
@@ -72,11 +79,27 @@ public class AvatarHandle extends BaseP2AHandle {
                 loadItem(hatItem, avatar.getHatFile());
                 loadItem(bodyItem, avatar.getBodyFile());
                 loadItem(clothesItem, avatar.getClothesFile());
+                loadItem(shoeItem, avatar.getShoeFile());
                 loadItem(expressionItem,
                         TextUtils.isEmpty(avatar.getExpressionFile()) ?
-                                (avatar.getGender() == AvatarP2A.gender_boy ? (mIsNeedTrack || mIsNeedFacePUP ? POSE_ART_BOY : EXPRESSION_ART_BOY) : (mIsNeedTrack || mIsNeedFacePUP ? POSE_ART_GIRL : EXPRESSION_ART_GIRL))
+                                mIsNeedTrack || mIsNeedFacePUP ? FilePathFactory.bundlePose(avatar.getGender()) : FilePathFactory.bundleAnim(avatar.getGender())
                                 : avatar.getExpressionFile());
-
+                String[] others = avatar.getOtherFile();
+                for (int i = 0; i < otherItem.length; i++) {
+                    if (others != null && i < others.length) {
+                        loadItem(otherItem[i], others[i]);
+                    } else if (otherItem[i] != null) {
+                        final int finalI = i;
+                        mBaseCore.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                faceunity.fuUnBindItems(controllerItem, new int[]{otherItem[finalI].handle});
+                                mBaseCore.destroyItem(otherItem[finalI].handle).run();
+                                otherItem[finalI].clear();
+                            }
+                        });
+                    }
+                }
                 commitItem(avatar);
                 if (completeListener != null)
                     mBaseCore.queueNextEvent(completeListener);
@@ -87,12 +110,12 @@ public class AvatarHandle extends BaseP2AHandle {
     }
 
     @Override
-    void bindAll() {
+    protected void bindAll() {
         if (controllerItem > 0)
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, expressionItem.handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, shoeItem.handle, expressionItem.handle, otherItem[0].handle, otherItem[1].handle, otherItem[2].handle, otherItem[3].handle, otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " bindAll " + Arrays.toString(items));
                     faceunity.fuBindItems(controllerItem, items);
                     setAvatarColor();
@@ -101,12 +124,12 @@ public class AvatarHandle extends BaseP2AHandle {
     }
 
     @Override
-    void unBindAll() {
+    protected void unBindAll() {
         if (controllerItem > 0)
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, expressionItem.handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, shoeItem.handle, expressionItem.handle, otherItem[0].handle, otherItem[1].handle, otherItem[2].handle, otherItem[3].handle, otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " unBindAll " + Arrays.toString(items));
                     faceunity.fuUnBindItems(controllerItem, items);
                 }
@@ -125,21 +148,29 @@ public class AvatarHandle extends BaseP2AHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(hatItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(bodyItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
+        for (FUItem item : otherItem) {
+            mBaseCore.queueEvent(mBaseCore.destroyItem(item.handle));
+        }
         mBaseCore.queueEvent(mBaseCore.destroyItem(controllerItem));
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                headItem.handle = 0;
-                hairItem.handle = 0;
-                glassItem.handle = 0;
-                beardItem.handle = 0;
-                eyebrowItem.handle = 0;
-                eyelashItem.handle = 0;
-                hatItem.handle = 0;
-                bodyItem.handle = 0;
-                clothesItem.handle = 0;
-                expressionItem.handle = 0;
+                headItem.clear();
+                hairItem.clear();
+                glassItem.clear();
+                beardItem.clear();
+                eyebrowItem.clear();
+                eyelashItem.clear();
+                hatItem.clear();
+                bodyItem.clear();
+                clothesItem.clear();
+                shoeItem.clear();
+                expressionItem.clear();
+                for (FUItem item : otherItem) {
+                    item.clear();
+                }
                 controllerItem = 0;
             }
         });
@@ -191,8 +222,8 @@ public class AvatarHandle extends BaseP2AHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", 20);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 5);
+                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? 30 : 100);
+                faceunity.fuItemSetParam(controllerItem, "target_trans", 15);
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -203,7 +234,7 @@ public class AvatarHandle extends BaseP2AHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", -10);
+                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? -10 : 30);
                 faceunity.fuItemSetParam(controllerItem, "target_trans", -2);
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 3);
@@ -215,7 +246,7 @@ public class AvatarHandle extends BaseP2AHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", -10);
+                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? -10 : 30);
                 faceunity.fuItemSetParam(controllerItem, "target_trans", -2);
                 faceunity.fuItemSetParam(controllerItem, "target_angle", -1);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 3);
@@ -240,7 +271,19 @@ public class AvatarHandle extends BaseP2AHandle {
             @Override
             public void run() {
                 faceunity.fuItemSetParam(controllerItem, "target_scale", 350);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 120);
+                faceunity.fuItemSetParam(controllerItem, "target_trans", Constant.style == Constant.style_art ? 120 : 110);
+                faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
+                faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
+            }
+        });
+    }
+
+    public void resetAllMinBottom() {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuItemSetParam(controllerItem, "target_scale", 30);
+                faceunity.fuItemSetParam(controllerItem, "target_trans", 150);
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -301,6 +344,10 @@ public class AvatarHandle extends BaseP2AHandle {
     }
 
     public void fuItemSetParamFaceShape(final String key, final double values) {
+        if (values < 0 || values > 1) {
+            Log.e(TAG, "fuItemSetParamFaceShape error values " + values);
+            return;
+        }
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
@@ -313,25 +360,10 @@ public class AvatarHandle extends BaseP2AHandle {
         return (float) faceunity.fuItemGetParam(controllerItem, "{\"name\":\"facepup\",\"param\":\"" + key + "\"}");
     }
 
-    public void parsePoint(EditFacePoint[] editFacePoints, int width, int height, int widthView, int heightView) {
-        for (EditFacePoint point : editFacePoints) {
-            faceunity.fuItemSetParam(controllerItem, "query_vert", point.index);
-            int x = (int) faceunity.fuItemGetParam(controllerItem, "query_vert_x");
-            int y = (int) faceunity.fuItemGetParam(controllerItem, "query_vert_y");
-            x = width - x;
-            y = height - y;
-
-            float sW = (float) heightView / width;
-            float sH = (float) widthView / height;
-            if (sW > sH) {
-                x = (int) (x * sW);
-                y = (int) (y * sW - (height * sW - widthView) / 2);
-            } else {
-                x = (int) (x * sH - (width * sH - heightView) / 2);
-                y = (int) (y * sH);
-            }
-
-            point.set(y, x);
-        }
+    public Point getPointByIndex(int index) {
+        faceunity.fuItemSetParam(controllerItem, "query_vert", index);
+        int x = (int) faceunity.fuItemGetParam(controllerItem, "query_vert_x");
+        int y = (int) faceunity.fuItemGetParam(controllerItem, "query_vert_y");
+        return new Point(x, y);
     }
 }

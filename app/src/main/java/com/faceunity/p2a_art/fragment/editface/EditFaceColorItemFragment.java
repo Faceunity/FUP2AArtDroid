@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.fragment.EditFaceFragment;
 import com.faceunity.p2a_art.fragment.editface.core.ColorValuesChangeListener;
@@ -20,6 +20,8 @@ import com.faceunity.p2a_art.fragment.editface.core.item.ItemAdapter;
 import com.faceunity.p2a_art.fragment.editface.core.item.ItemSelectView;
 import com.faceunity.p2a_art.utils.ToastUtil;
 
+import java.util.List;
+
 /**
  * Created by tujh on 2018/8/22.
  */
@@ -29,7 +31,7 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
     private ItemSelectView mItemRecycler;
     private ColorSelectView mColorRecycler;
 
-    private BundleRes[] itemList;
+    private List<BundleRes> itemList;
     private int mDefaultSelectItem;
     private ItemChangeListener mItemSelectListener;
     private double[][] colorList;
@@ -51,10 +53,10 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
             public boolean itemSelectListener(int position) {
                 if ((mEditFaceBaseFragmentId == EditFaceFragment.TITLE_HAIR_INDEX
                         && mAvatarP2A.getHatIndex() > 0
-                        && (!AvatarConstant.hairBundleRes(mAvatarP2A.getGender())[position].isSupport)
+                        && (!FilePathFactory.hairBundleRes(mAvatarP2A.getGender()).get(position).isSupport)
                 ) || (mEditFaceBaseFragmentId == EditFaceFragment.TITLE_HAT_INDEX
                         && position > 0
-                        && (!AvatarConstant.hairBundleRes(mAvatarP2A.getGender())[mAvatarP2A.getHairIndex()].isSupport)
+                        && (!FilePathFactory.hairBundleRes(mAvatarP2A.getGender()).get(mAvatarP2A.getHairIndex()).isSupport)
                 )) {
                     ToastUtil.showCenterToast(mActivity, "此发型暂不支持帽子哦");
                     return false;
@@ -77,7 +79,7 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
     }
 
     public void initData(double[][] colorList, int defaultSelectColor, ColorValuesChangeListener colorSelectListener,
-                         BundleRes[] itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
+                         List<BundleRes> itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
         this.colorList = colorList;
         this.mDefaultSelectColor = defaultSelectColor;
         this.mColorSelectListener = colorSelectListener;

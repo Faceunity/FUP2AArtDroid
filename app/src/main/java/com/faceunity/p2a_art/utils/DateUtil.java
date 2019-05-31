@@ -9,7 +9,7 @@ import java.util.Date;
 public abstract class DateUtil {
 
     public static String getCurrentDate() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        SimpleDateFormat df = new SimpleDateFormat("MMdd_HHmmss");
         return df.format(new Date());
     }
 }

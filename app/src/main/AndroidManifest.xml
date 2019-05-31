@@ -37,6 +37,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
         <activity
+            android:name=".SelectStyleActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ActivityBaseTheme" />
+        <activity
             android:name=".AvatarP2ADeleteActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ActivityBaseTheme" />

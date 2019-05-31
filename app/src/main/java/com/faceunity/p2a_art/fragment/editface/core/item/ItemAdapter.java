@@ -10,30 +10,26 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.entity.BundleRes;
 
 /**
  * Created by tujh on 2018/11/7.
  */
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
+public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
     private Context mContext;
     private int mLayoutId;
 
-    private BundleRes[] mBundleResList;
     private int mSelectPosition = -1;
 
     private ItemAdapter.ItemSelectListener itemSelectListener;
 
-    public ItemAdapter(Context context, @LayoutRes int layoutId, BundleRes[] bundleResList) {
+    public ItemAdapter(Context context, @LayoutRes int layoutId) {
         mContext = context;
         mLayoutId = layoutId;
-        mBundleResList = bundleResList;
     }
 
-    public ItemAdapter(Context mContext, BundleRes[] bundleResList) {
-        this.mContext = mContext;
-        this.mBundleResList = bundleResList;
+    public ItemAdapter(Context context) {
+        mContext = context;
     }
 
     @NonNull
@@ -45,7 +41,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
     @Override
     public void onBindViewHolder(@NonNull ItemHolder holder, int pos) {
         final int position = holder.getLayoutPosition();
-        holder.mItemImg.setImageResource(mBundleResList[position].resId);
+        holder.mItemImg.setImageResource(getRes(position));
         holder.mSelect.setVisibility(mSelectPosition == position ? View.VISIBLE : View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +55,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
     @Override
     public int getItemCount() {
-        return mBundleResList.length;
+        return getSize();
     }
 
     class ItemHolder extends RecyclerView.ViewHolder {
@@ -89,4 +85,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
         boolean itemSelectListener(int position);
     }
+
+    public abstract int getRes(int pos);
+
+    public abstract int getSize();
+
 }

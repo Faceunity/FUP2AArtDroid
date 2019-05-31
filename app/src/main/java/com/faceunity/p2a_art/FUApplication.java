@@ -1,10 +1,10 @@
 package com.faceunity.p2a_art;
 
 import android.app.Application;
+import android.util.Log;
 
-import com.faceunity.p2a_art.constant.ColorConstant;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
-import com.faceunity.p2a_art.core.P2AClientWrapper;
+import com.faceunity.p2a_art.core.client.P2AClientWrapper;
 import com.faceunity.p2a_art.core.authpack;
 import com.faceunity.p2a_art.web.OkHttpUtils;
 import com.faceunity.p2a_helper.FUAuthCheck;
@@ -23,17 +23,28 @@ public class FUApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this));
-        ColorConstant.init(this);
         closeAndroidPDialog();
+        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this));
 
         //TODO 初始化部分
+
+        long startTime = System.currentTimeMillis();
         //初始化nama
         FUP2ARenderer.initFURenderer(this);
-        //初始化P2A Client
-        P2AClientWrapper.setupData(this);
+        long endInitNamaTime = System.currentTimeMillis();
+
         //初始化P2A Helper
         FUAuthCheck.fuP2ASetAuth(authpack.A());
+        long endInitP2ATime = System.currentTimeMillis();
+
+        //初始化 core data 数据
+        P2AClientWrapper.setupData(this);
+        long endInitCoreDataTime = System.currentTimeMillis();
+
+        Log.i(TAG, "InitAllTime: " + (endInitCoreDataTime - startTime)
+                + "\nInitNamaTime: " + (endInitNamaTime - startTime)
+                + "\nInitP2ATime: " + (endInitP2ATime - endInitNamaTime)
+                + "\nInitCoreDataTime: " + (endInitCoreDataTime - endInitP2ATime));
     }
 
     /**
@@ -56,7 +67,6 @@ public class FUApplication extends Application {
             mHiddenApiWarningShown.setAccessible(true);
             mHiddenApiWarningShown.setBoolean(activityThread, true);
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 }

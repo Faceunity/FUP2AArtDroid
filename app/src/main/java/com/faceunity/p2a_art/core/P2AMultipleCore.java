@@ -1,8 +1,10 @@
 package com.faceunity.p2a_art.core;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.p2a_art.entity.Scenes;
 import com.faceunity.p2a_art.utils.BackgroundUtil;
@@ -21,10 +23,10 @@ public class P2AMultipleCore extends BaseCore {
     private BackgroundUtil mBackgroundUtil;
     public int fxaaItem, bgItem;
 
-    public P2AMultipleCore(Context context, FUP2ARenderer fuP2ARenderer) {
+    public P2AMultipleCore(Context context, FUP2ARenderer fuP2ARenderer, String bg) {
         super(context, fuP2ARenderer);
-        bgItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_default_bg);
-        fxaaItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_fxaa);
+        bgItem = mFUItemHandler.loadFUItem(TextUtils.isEmpty(bg) ? FilePathFactory.BUNDLE_default_bg : bg);
+        fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
     public SparseArray<AvatarHandle> createAvatarMultiple(Scenes scenes) {
@@ -99,7 +101,7 @@ public class P2AMultipleCore extends BaseCore {
         queueEvent(destroyItem(bgItem));
     }
 
-    public void loadBackground(final String path) {
+    public void loadBackgroundImage(final String path) {
         queueEvent(new Runnable() {
             @Override
             public void run() {

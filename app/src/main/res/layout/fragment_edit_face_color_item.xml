@@ -11,7 +11,7 @@
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x120"
-        android:background="@color/edit_face_bottom_background"
+        android:background="@color/colorF7F7F7"
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
         android:scrollbars="none"

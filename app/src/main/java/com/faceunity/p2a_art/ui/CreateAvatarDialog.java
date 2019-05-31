@@ -112,7 +112,7 @@ public class CreateAvatarDialog extends DialogFragment implements View.OnClickLi
                 mPointTex.setVisibility(View.GONE);
 
                 if (mSelectParamListener != null) {
-                    mSelectParamListener.selectParamListener(mGender, 1);
+                    mSelectParamListener.selectParamListener(mGender);
                 }
                 showLoadingLayout();
             }
@@ -169,7 +169,7 @@ public class CreateAvatarDialog extends DialogFragment implements View.OnClickLi
     }
 
     public interface SelectParamListener {
-        void selectParamListener(int gender, int style);
+        void selectParamListener(int gender);
 
         void cancelListener();
 
@@ -179,7 +179,7 @@ public class CreateAvatarDialog extends DialogFragment implements View.OnClickLi
     public static class SimpleSelectParamListener implements SelectParamListener {
 
         @Override
-        public void selectParamListener(int gender, int style) {
+        public void selectParamListener(int gender) {
         }
 
         @Override

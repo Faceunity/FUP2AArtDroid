@@ -192,7 +192,7 @@ public class OkHttpUtils {
         RequestBody requestBody = (new okhttp3.MultipartBody.Builder())
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("gender", String.valueOf(gender))
-                .addFormDataPart("version", Constant.p2a_client_version)
+                .addFormDataPart("version", Constant.style == Constant.style_new ? Constant.p2a_client_version_new : Constant.p2a_client_version_art)
                 .addFormDataPart("image", "filename", RequestBody.create(MediaType.parse("image/png"), reallyUploadFile))
                 .build();
         getInstance().getOkHttpClient().newCall(new Request.Builder().url(url).post(requestBody).build()).enqueue(new Callback() {

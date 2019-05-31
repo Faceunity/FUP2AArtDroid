@@ -17,12 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.faceunity.p2a_art.entity.AvatarP2A;
-import com.faceunity.p2a_art.ui.NormalDialog;
 import com.faceunity.p2a_art.entity.DBHelper;
+import com.faceunity.p2a_art.ui.NormalDialog;
 import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.FullScreenUtils;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,7 +90,7 @@ public class AvatarP2ADeleteActivity extends AppCompatActivity implements View.O
                                     mAvatarP2As.remove(i);
                                     mAvatarP2ARecyclerAdapter.notifyItemRemoved(i);
                                     mDBHelper.deleteHistoryByDir(avatarP2A.getBundleDir());
-                                    FileUtil.deleteDirAndFile(new File(avatarP2A.getBundleDir()));
+                                    FileUtil.deleteDirAndFile(avatarP2A.getBundleDir());
                                 }
                             }
                             isDeleteList = new boolean[mAvatarP2As.size()];

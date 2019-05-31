@@ -1,5 +1,7 @@
 package com.faceunity.p2a_art.utils;
 
+import android.util.Log;
+
 /**
  * FPS工具类
  * Created by tujh on 2018/5/24.
@@ -8,23 +10,19 @@ public class FPSUtil {
     private static final String TAG = FPSUtil.class.getSimpleName();
     private static final int NANO_IN_ONE_MILLI_SECOND = 1000000;
 
-    private static final int sFrameTimeStampTime = 5;
     private static long mLastFrameTimeStamp = 0;
-    private static int mCurrentFrameCnt = 0;
 
     /**
-     * 5帧都计算一次
+     * 每帧都计算
      *
      * @return
      */
     public static double fps() {
-        double fps = -1;
-        if (++mCurrentFrameCnt % sFrameTimeStampTime == 0) {
-            long tmp = System.nanoTime();
-            fps = 1000.0f * NANO_IN_ONE_MILLI_SECOND * sFrameTimeStampTime / (tmp - mLastFrameTimeStamp);
-            mLastFrameTimeStamp = tmp;
-//            Log.e(TAG, "FPS : " + fps);
-        }
+        double fps = 0;
+        long tmp = System.nanoTime();
+        fps = 1000.0f * NANO_IN_ONE_MILLI_SECOND / (tmp - mLastFrameTimeStamp);
+        mLastFrameTimeStamp = tmp;
+        Log.e(TAG, "FPS : " + fps);
         return fps;
     }
 
@@ -75,5 +73,10 @@ public class FPSUtil {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public void resetLimit() {
+        mLimitStartTime = 0;
+        mLimitFrameRate = 0;
     }
 }

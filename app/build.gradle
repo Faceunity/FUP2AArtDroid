@@ -6,8 +6,8 @@ android {
         applicationId "com.faceunity.p2aart"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 28
-        versionName "1.4.0"
+        versionCode 29
+        versionName "1.5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
@@ -20,37 +20,15 @@ android {
         }
         release {
             minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     sourceSets {
-        main.assets.srcDirs += [
-                'src/main/assets',
-                'src/main/ornament/expression',
-                'src/main/ornament/glasses',
-                'src/main/ornament/body',
-                'src/main/ornament/head',
-                'src/main/ornament/hair',
-                'src/main/ornament/clothes',
-                'src/main/ornament/filter',
-                'src/main/ornament/beard',
-                'src/main/ornament/hat',
-                'src/main/ornament/eyebrow',
-                'src/main/ornament/eyelash',
-        ]
         main.res.srcDirs += [
                 'src/mian/res',
-                'src/main/ornament/expression_res',
-                'src/main/ornament/glasses_res',
-                'src/main/ornament/body_res',
-                'src/main/ornament/head_res',
-                'src/main/ornament/hair_res',
-                'src/main/ornament/clothes_res',
-                'src/main/ornament/filter_res',
-                'src/main/ornament/beard_res',
-                'src/main/ornament/hat_res',
-                'src/main/ornament/eyebrow_res',
-                'src/main/ornament/eyelash_res',
+                'src/main/res_icon',
         ]
     }
 }

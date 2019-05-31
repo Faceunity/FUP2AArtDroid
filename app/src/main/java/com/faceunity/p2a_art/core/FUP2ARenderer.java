@@ -5,6 +5,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.p2a_art.core.base.FUItemHandler;
 import com.faceunity.wrapper.faceunity;
@@ -35,22 +36,6 @@ public class FUP2ARenderer {
     }
 
     /**
-     * 目录assets下的 *.bundle为程序的数据文件。
-     * 其中 v3.bundle：人脸识别数据文件，缺少该文件会导致系统初始化失败；
-     * anim_model.bundle：优化表情跟踪功能所需要加载的动画数据文件；适用于使用Animoji和avatar功能的用户，如果不是，可不加载
-     * fxaa.bundle：3D绘制抗锯齿数据文件。加载后，会使得3D绘制效果更加平滑。
-     * controller.bundle：controller数据文件，用于控制和显示avatar。
-     * default_bg.bundle：背景道具，使用方法与普通道具相同。
-     * 目录effects下是我们打包签名好的道具
-     */
-    public static final String BUNDLE_v3 = "v3.bundle";
-    public static final String BUNDLE_anim_model = "anim_model.bundle";
-    public static final String BUNDLE_fxaa = "fxaa.bundle";
-    public static final String BUNDLE_controller = "controller.bundle";
-    public static final String BUNDLE_default_bg = "default_bg.bundle";
-    public static final String BUNDLE_tongue = "tongue.bundle";
-
-    /**
      * 全局加载相应的底层数据包
      */
     public static void initFURenderer(Context ct) {
@@ -65,25 +50,17 @@ public class FUP2ARenderer {
              *      authpack：用于鉴权证书内存数组。若没有,请咨询support@faceunity.com
              * 首先调用完成后再调用其他FU API
              */
-            InputStream v3 = context.getAssets().open(BUNDLE_v3);
+            InputStream v3 = context.getAssets().open(FilePathFactory.BUNDLE_v3);
             byte[] v3Data = new byte[v3.available()];
             v3.read(v3Data);
             v3.close();
             faceunity.fuSetup(v3Data, authpack.A());
 
             /**
-             * 加载优化表情跟踪功能所需要加载的动画数据文件anim_model.bundle；
-             * 启用该功能可以使表情系数及avatar驱动表情更加自然，减少异常表情、模型缺陷的出现。该功能对性能的影响较小。
-             * 启用该功能时，通过 fuLoadAnimModel 加载动画模型数据，加载成功即可启动。该功能会影响通过fuGetFaceInfo获取的expression表情系数，以及通过表情驱动的avatar模型。
-             * 适用于使用Animoji和avatar功能的用户，如果不是，可不加载
+             * fuLoadTongueModel 识别舌头动作数据包加载
+             * 其中 tongue.bundle：头动作驱动数据包；
              */
-            InputStream animModel = context.getAssets().open(BUNDLE_anim_model);
-            byte[] animModelData = new byte[animModel.available()];
-            animModel.read(animModelData);
-            animModel.close();
-            faceunity.fuLoadAnimModel(animModelData);
-
-            InputStream tongue = context.getAssets().open(BUNDLE_tongue);
+            InputStream tongue = context.getAssets().open(FilePathFactory.BUNDLE_tongue);
             byte[] tongueDate = new byte[tongue.available()];
             tongue.read(tongueDate);
             tongue.close();

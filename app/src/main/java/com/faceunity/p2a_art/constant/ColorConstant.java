@@ -15,8 +15,6 @@ import java.util.List;
 public abstract class ColorConstant {
     private static final String TAG = ColorConstant.class.getSimpleName();
 
-    private static final String COLOR_PATH = "color.json";
-
     public static double[][] skin_color;
     public static double[][] lip_color;
     public static double[][] iris_color;
@@ -28,7 +26,7 @@ public abstract class ColorConstant {
 
     public static void init(Context context) {
         try {
-            InputStream is = context.getAssets().open(COLOR_PATH);
+            InputStream is = context.getAssets().open(FilePathFactory.jsonColor());
             byte[] itemData = new byte[is.available()];
             is.read(itemData);
             is.close();

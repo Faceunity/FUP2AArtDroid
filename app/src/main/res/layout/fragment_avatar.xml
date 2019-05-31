@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <CheckBox
+        android:id="@+id/avatar_track_image_btn"
+        android:layout_width="@dimen/x136"
+        android:layout_height="@dimen/x140"
+        android:layout_above="@+id/avatar_bottom_recycler"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/x10"
+        android:layout_marginBottom="@dimen/x30"
+        android:background="@drawable/avatar_track_image_btn"
+        android:button="@null" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/avatar_bottom_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x516"
+        android:layout_above="@+id/avatar_bottom_layout"
+        android:layout_marginBottom="@dimen/x2"
+        android:background="#FFFFFF"
+        android:paddingTop="@dimen/x14" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x2"
+        android:layout_above="@+id/avatar_bottom_layout"
+        android:background="#E5E5E5" />
+
+    <LinearLayout
+        android:id="@+id/avatar_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x98"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorWhite"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/avatar_bottom_item_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/x48"
+                android:layout_height="@dimen/x48"
+                android:scaleType="centerInside"
+                android:src="@drawable/avatar_bottom_item_delete" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x28"
+                android:gravity="center"
+                android:lineSpacingExtra="@dimen/x28"
+                android:text="批量删除"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/avatar_bottom_item_create"
+            android:layout_width="@dimen/x152"
+            android:layout_height="@dimen/x72"
+            android:scaleType="centerInside"
+            android:src="@drawable/avatar_bottom_item_create" />
+
+        <LinearLayout
+            android:id="@+id/avatar_bottom_item_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="@dimen/x48"
+                android:layout_height="@dimen/x48"
+                android:scaleType="centerInside"
+                android:src="@drawable/avatar_bottom_item_switch" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/x28"
+                android:gravity="center"
+                android:lineSpacingExtra="@dimen/x28"
+                android:text="风格切换"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/text_size_20" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

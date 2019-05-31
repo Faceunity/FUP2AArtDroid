@@ -2,10 +2,10 @@ package com.faceunity.p2a_art.entity;
 
 import android.text.TextUtils;
 
-import com.faceunity.p2a_art.constant.AvatarConstant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by tujh on 2018/6/20.
@@ -19,12 +19,12 @@ public class AvatarP2A implements Serializable {
     public static final String FILE_NAME_HEAD_BUNDLE = "head.bundle";
     public static final String FILE_NAME_SERVER_DATA = "server.bundle";
 
-    public static final int style_basic = 0;
-    public static final int style_art = 1;
     public static final int gender_boy = 0;
     public static final int gender_girl = 1;
+    public static final int gender_mid = 2;
 
-    private int style = style_art;
+    private boolean isCreateAvatar = true;
+
     private String bundleDir = "";
     private int originPhotoRes = -1;
     private String originPhoto = "";
@@ -33,18 +33,17 @@ public class AvatarP2A implements Serializable {
     private String bodyFile = "";
     private int gender = gender_boy;//识别性别, gender 0 is man 1 is woman
     private int hairIndex = 0;
-    private String[] hairFileList = new String[0];
     private int glassesIndex = 0;
     private int clothesIndex = 0;
     private int beardIndex = 0;
     private int eyelashIndex = 0;
     private int eyebrowIndex = 0;
     private int hatIndex = 0;
+    private int shoeIndex = 1;
     private String expressionFile = "";
+    private String[] otherFiles;
 
-    private double[] skinColorServerValues = new double[]{0, 0, 0};
     private double skinColorValue = -1;
-    private double[] lipColorServerValues = new double[]{0, 0, 0};
     private double lipColorValue = -1;
     private double irisColorValue = 0;
     private double hairColorValue = 0;
@@ -61,43 +60,43 @@ public class AvatarP2A implements Serializable {
         eyelashIndex = -1;
         eyebrowIndex = -1;
         hatIndex = -1;
+        shoeIndex = -1;
     }
 
-    public AvatarP2A(int style, int originPhotoRes, int gender, String headFile, String[] hairFileList, int hairIndex, int beardIndex) {
-        this.style = style;
+    public AvatarP2A(String bundleDir, int originPhotoRes, int gender, String headFile, int hairIndex, int beardIndex, int clothesIndex, int shoeIndex) {
+        this.bundleDir = bundleDir;
         this.originPhotoRes = originPhotoRes;
         this.gender = gender;
         this.headFile = headFile;
-        this.bodyFile = AvatarConstant.bodyBundle(gender);
-        this.hairFileList = hairFileList;
+        this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.hairIndex = hairIndex;
         this.beardIndex = beardIndex;
+        this.clothesIndex = clothesIndex;
+        this.shoeIndex = shoeIndex;
+
+        this.isCreateAvatar = false;
     }
 
-    public AvatarP2A(int style, String bundleDir, int gender, String headFile, String[] hairFileList) {
-        this.style = style;
+    public AvatarP2A(String bundleDir, int gender, String headFile) {
         setBundleDir(bundleDir);
-
         this.headFile = headFile;
-        this.bodyFile = AvatarConstant.bodyBundle(gender);
+        this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.gender = gender;
-        this.hairFileList = hairFileList;
     }
 
-    public AvatarP2A(int style, String bundleDir, int gender) {
-        this.style = style;
+    public AvatarP2A(String bundleDir, int gender) {
         setBundleDir(bundleDir);
 
-        this.bodyFile = AvatarConstant.bodyBundle(gender);
+        this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.gender = gender;
     }
 
-    public int getStyle() {
-        return style;
+    public boolean isCreateAvatar() {
+        return isCreateAvatar;
     }
 
-    public void setStyle(int style) {
-        this.style = style;
+    public void setCreateAvatar(boolean createAvatar) {
+        isCreateAvatar = createAvatar;
     }
 
     public String getBundleDir() {
@@ -137,14 +136,6 @@ public class AvatarP2A implements Serializable {
 
     public String getBodyFile() {
         return bodyFile;
-    }
-
-    public String[] getHairFileList() {
-        return hairFileList;
-    }
-
-    public void setHairFileList(String[] hairFileList) {
-        this.hairFileList = hairFileList;
     }
 
     public int getGender() {
@@ -211,48 +202,63 @@ public class AvatarP2A implements Serializable {
         this.hatIndex = hatIndex;
     }
 
+    public int getShoeIndex() {
+        return shoeIndex;
+    }
+
+    public void setShoeIndex(int shoeIndex) {
+        this.shoeIndex = shoeIndex;
+    }
+
     public String getExpressionFile() {
         return expressionFile;
     }
 
-    public void setExpressionFile(String expressionFile) {
-        this.expressionFile = expressionFile;
+    public String[] getOtherFile() {
+        return otherFiles;
+    }
+
+    public void setExpression(BundleRes expression) {
+        this.expressionFile = expression.path;
+        this.otherFiles = expression.others;
     }
 
     public String getHairFile() {
-        return hairFileList == null || hairFileList.length == 0 || hairIndex < 0 ? "" : hairFileList[hairIndex];
+        List<BundleRes> lists = FilePathFactory.hairBundleRes(gender);
+        String name = lists == null || lists.isEmpty() || hairIndex < 0 || hairIndex >= lists.size() ? "" : lists.get(hairIndex).name;
+        return bundleDir + name;
     }
 
     public String getGlassesFile() {
-        return glassesIndex < 0 ? "" : AvatarConstant.glassesBundleRes(gender)[glassesIndex].path;
+        return getStringByIndex(FilePathFactory.glassesBundleRes(gender), glassesIndex);
     }
 
     public String getClothesFile() {
-        return clothesIndex < 0 ? "" : AvatarConstant.clothesBundleRes(gender)[clothesIndex].path;
+        return getStringByIndex(FilePathFactory.clothesBundleRes(gender), clothesIndex);
     }
 
     public String getEyelashFile() {
-        return eyelashIndex < 0 ? "" : AvatarConstant.eyelashBundleRes()[eyelashIndex].path;
+        return getStringByIndex(FilePathFactory.eyelashBundleRes(gender), eyelashIndex);
     }
 
     public String getEyebrowFile() {
-        return eyebrowIndex < 0 ? "" : AvatarConstant.eyebrowBundleRes(gender)[eyebrowIndex].path;
+        return getStringByIndex(FilePathFactory.eyebrowBundleRes(gender), eyebrowIndex);
     }
 
     public String getBeardFile() {
-        return beardIndex < 0 ? "" : AvatarConstant.beardBundleRes()[beardIndex].path;
+        return getStringByIndex(FilePathFactory.beardBundleRes(gender), beardIndex);
     }
 
     public String getHatFile() {
-        return hatIndex < 0 ? "" : AvatarConstant.hatBundleRes(gender)[hatIndex].path;
+        return getStringByIndex(FilePathFactory.hatBundleRes(gender), hatIndex);
     }
 
-    public double[] getSkinColorServerValues() {
-        return skinColorServerValues;
+    public String getShoeFile() {
+        return getStringByIndex(FilePathFactory.shoeBundleRes(gender), shoeIndex);
     }
 
-    public void setSkinColorServerValues(double[] skinColorServerValues) {
-        this.skinColorServerValues = skinColorServerValues;
+    private String getStringByIndex(List<BundleRes> lists, int index) {
+        return lists == null || lists.isEmpty() || index < 0 || index >= lists.size() ? "" : lists.get(index).path;
     }
 
     public double getSkinColorValue() {
@@ -261,14 +267,6 @@ public class AvatarP2A implements Serializable {
 
     public void setSkinColorValue(double skinColorValue) {
         this.skinColorValue = skinColorValue;
-    }
-
-    public double[] getLipColorServerValues() {
-        return lipColorServerValues;
-    }
-
-    public void setLipColorServerValues(double[] lipColorServerValues) {
-        this.lipColorServerValues = lipColorServerValues;
     }
 
     public double getLipColorValue() {
@@ -329,15 +327,15 @@ public class AvatarP2A implements Serializable {
 
     @Override
     public String toString() {
-        return " bundleDir " + bundleDir + "\n"
+        return " bundleDir " + bundleDir + " isCreateAvatar " + isCreateAvatar + "\n"
                 + " originPhotoRes " + originPhotoRes + " originPhoto " + originPhoto + " originPhotoThumbNail " + originPhotoThumbNail + "\n"
-                + " style " + style + " gender " + gender + "\n"
-                + " mHeadFile " + headFile + " lipColorValue " + lipColorValue + " lipColorServerValues " + Arrays.toString(lipColorServerValues) + " irisColorValue " + irisColorValue + " skinColorValue " + skinColorValue + " skinColorServerValues " + Arrays.toString(skinColorServerValues) + "\n"
+                + " gender " + gender + "\n"
+                + " mHeadFile " + headFile + " lipColorValue " + lipColorValue + " irisColorValue " + irisColorValue + " skinColorValue " + skinColorValue + "\n"
                 + " bodyFile " + bodyFile + "\n"
-                + " hairIndex " + hairIndex + " hair " + getHairFile() + " hairColorValue " + hairColorValue + " hairFileList " + Arrays.toString(hairFileList) + "\n"
+                + " hairIndex " + hairIndex + " hair " + getHairFile() + " hairColorValue " + hairColorValue + "\n"
                 + " glassesIndex " + glassesIndex + " glasses " + getGlassesFile() + " glassesColorValue " + glassesColorValue + " glassesFrameColorValue " + glassesFrameColorValue + "\n"
                 + " clothesIndex " + clothesIndex + " clothes " + getClothesFile() + " hatIndex " + hatIndex + " hat " + getHatFile() + " hatColorValue " + hatColorValue + "\n"
-                + " expressionFile " + expressionFile + "\n"
+                + " shoeIndex " + shoeIndex + " shoe " + getShoeFile() + " expressionFile " + expressionFile + "\n"
                 + " eyelashIndex " + eyelashIndex + " eyebrowIndex " + eyebrowIndex + "\n"
                 + " beardIndex " + beardIndex + " beard " + getBeardFile() + " beardColorValue " + beardColorValue + "\n";
     }
@@ -354,7 +352,7 @@ public class AvatarP2A implements Serializable {
     @Override
     public AvatarP2A clone() {
         AvatarP2A avatarP2A = new AvatarP2A();
-        avatarP2A.style = this.style;
+        avatarP2A.isCreateAvatar = this.isCreateAvatar;
         avatarP2A.bundleDir = this.bundleDir;
         avatarP2A.originPhotoRes = this.originPhotoRes;
         avatarP2A.originPhoto = this.originPhoto;
@@ -363,7 +361,6 @@ public class AvatarP2A implements Serializable {
         avatarP2A.bodyFile = this.bodyFile;
         avatarP2A.gender = this.gender;
         avatarP2A.hairIndex = this.hairIndex;
-        avatarP2A.hairFileList = Arrays.copyOf(this.hairFileList, this.hairFileList.length);
         avatarP2A.glassesIndex = this.glassesIndex;
         avatarP2A.clothesIndex = this.clothesIndex;
         avatarP2A.expressionFile = this.expressionFile;
@@ -371,11 +368,10 @@ public class AvatarP2A implements Serializable {
         avatarP2A.eyelashIndex = this.eyelashIndex;
         avatarP2A.eyebrowIndex = this.eyebrowIndex;
         avatarP2A.hatIndex = this.hatIndex;
+        avatarP2A.shoeIndex = this.shoeIndex;
 
         avatarP2A.skinColorValue = this.skinColorValue;
-        avatarP2A.skinColorServerValues = Arrays.copyOf(this.skinColorServerValues, this.skinColorServerValues.length);
         avatarP2A.lipColorValue = this.lipColorValue;
-        avatarP2A.lipColorServerValues = Arrays.copyOf(this.lipColorServerValues, this.lipColorServerValues.length);
         avatarP2A.irisColorValue = this.irisColorValue;
         avatarP2A.hairColorValue = this.hairColorValue;
         avatarP2A.glassesColorValue = this.glassesColorValue;
@@ -393,6 +389,7 @@ public class AvatarP2A implements Serializable {
                 avatarP2A.eyelashIndex != this.eyelashIndex ||
                 avatarP2A.eyebrowIndex != this.eyebrowIndex ||
                 avatarP2A.hatIndex != this.hatIndex ||
+                avatarP2A.shoeIndex != this.shoeIndex ||
                 avatarP2A.skinColorValue != this.skinColorValue ||
                 avatarP2A.lipColorValue != this.lipColorValue ||
                 avatarP2A.irisColorValue != this.irisColorValue ||

@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.faceunity.p2a_art.core.AvatarHandle;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,18 +19,27 @@ public class EditFaceParameter {
     private LinkedHashMap<String, Float> mMap;
     private LinkedHashMap<String, Float> mDefaultMap;
 
+    public static final String HeadBone_stretch = "HeadBone_stretch";
+    public static final String HeadBone_shrink = "HeadBone_shrink";
+    public static final String HeadBone_wide = "HeadBone_wide";
+    public static final String HeadBone_narrow = "HeadBone_narrow";
+    public static final String Head_wide = "Head_wide";
+    public static final String Head_narrow = "Head_narrow";
+    public static final String head_shrink = "head_shrink";
+    public static final String head_stretch = "head_stretch";
+
     public EditFaceParameter(AvatarHandle avatarHandle) {
         mAvatarHandle = avatarHandle;
         mMap = new LinkedHashMap<>();
         mDefaultMap = new LinkedHashMap<>();
-        mMap.put("HeadBone_stretch", 0F);
-        mMap.put("HeadBone_shrink", 0F);
-        mMap.put("HeadBone_wide", 0F);
-        mMap.put("HeadBone_narrow", 0F);
-        mMap.put("Head_wide", 0F);
-        mMap.put("Head_narrow", 0F);
-        mMap.put("head_shrink", 0F);
-        mMap.put("head_stretch", 0F);
+        mMap.put(HeadBone_stretch, 0F);
+        mMap.put(HeadBone_shrink, 0F);
+        mMap.put(HeadBone_wide, 0F);
+        mMap.put(HeadBone_narrow, 0F);
+        mMap.put(Head_wide, 0F);
+        mMap.put(Head_narrow, 0F);
+        mMap.put(head_shrink, 0F);
+        mMap.put(head_stretch, 0F);
         mMap.put("head_fat", 0F);
         mMap.put("head_thin", 0F);
         mMap.put("cheek_wide", 0F);
@@ -99,6 +109,17 @@ public class EditFaceParameter {
         }
     }
 
+    public void setParamMap(HashMap<String, Float> map) {
+        for (Map.Entry<String, Float> entry : map.entrySet()) {
+            mMap.put(entry.getKey(), entry.getValue());
+            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), entry.getValue());
+        }
+    }
+
+    public Float getParamByKey(String key) {
+        return mMap.get(key);
+    }
+
     private void setParamFaceShape(String positiveKey, String negativeKey, float distance) {
         if (mMap.get(positiveKey) == null || mMap.get(negativeKey) == null) {
             Log.e(TAG, "setParamFaceShape error " + positiveKey + ":" + mMap.get(positiveKey) + " " + negativeKey + ":" + mMap.get(negativeKey));
@@ -139,6 +160,17 @@ public class EditFaceParameter {
             }
         }
         return false;
+    }
+
+    public boolean isHeadShapeChangeValues() {
+        return !mDefaultMap.get(HeadBone_stretch).equals(mMap.get(HeadBone_stretch))
+                || !mDefaultMap.get(HeadBone_shrink).equals(mMap.get(HeadBone_shrink))
+                || !mDefaultMap.get(HeadBone_wide).equals(mMap.get(HeadBone_wide))
+                || !mDefaultMap.get(HeadBone_narrow).equals(mMap.get(HeadBone_narrow))
+                || !mDefaultMap.get(Head_wide).equals(mMap.get(Head_wide))
+                || !mDefaultMap.get(Head_narrow).equals(mMap.get(Head_narrow))
+                || !mDefaultMap.get(head_shrink).equals(mMap.get(head_shrink))
+                || !mDefaultMap.get(head_stretch).equals(mMap.get(head_stretch));
     }
 
     public float[] getEditFaceParameters() {

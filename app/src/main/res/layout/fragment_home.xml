@@ -4,6 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <CheckBox
+        android:id="@+id/avatar_track_image_btn"
+        android:layout_width="@dimen/x136"
+        android:layout_height="@dimen/x140"
+        android:layout_above="@+id/main_bottom_layout"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/x10"
+        android:layout_marginBottom="@dimen/x30"
+        android:background="@drawable/avatar_track_image_btn"
+        android:button="@null" />
+
     <TextView
         android:id="@+id/main_version_text"
         android:layout_width="wrap_content"
@@ -14,19 +25,8 @@
         android:layout_marginTop="@dimen/x39"
         android:gravity="left"
         android:lineSpacingExtra="@dimen/x9"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/colorBlack"
         android:textSize="@dimen/text_size_24" />
-
-    <CheckBox
-        android:id="@+id/main_track_image_btn"
-        android:layout_width="@dimen/x136"
-        android:layout_height="@dimen/x140"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/x10"
-        android:layout_marginBottom="@dimen/x146"
-        android:background="@drawable/main_track_image_btn"
-        android:button="@null" />
 
     <LinearLayout
         android:id="@+id/main_bottom_layout"
@@ -57,7 +57,7 @@
                 android:layout_marginTop="@dimen/x4"
                 android:gravity="center"
                 android:text="模型"
-                android:textColor="@color/main_image_btn_text_color"
+                android:textColor="@color/colorBlack"
                 android:textSize="@dimen/text_size_20" />
         </LinearLayout>
 
@@ -82,7 +82,7 @@
                 android:layout_marginTop="@dimen/x4"
                 android:gravity="center"
                 android:text="形象"
-                android:textColor="@color/main_image_btn_text_color"
+                android:textColor="@color/colorBlack"
                 android:textSize="@dimen/text_size_20" />
         </LinearLayout>
 
@@ -107,7 +107,7 @@
                 android:layout_marginTop="@dimen/x4"
                 android:gravity="center"
                 android:text="AR滤镜"
-                android:textColor="@color/main_image_btn_text_color"
+                android:textColor="@color/colorBlack"
                 android:textSize="@dimen/text_size_20" />
         </LinearLayout>
 
@@ -132,18 +132,10 @@
                 android:layout_marginTop="@dimen/x4"
                 android:gravity="center"
                 android:text="合影"
-                android:textColor="@color/main_image_btn_text_color"
+                android:textColor="@color/colorBlack"
                 android:textSize="@dimen/text_size_20" />
         </LinearLayout>
     </LinearLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/main_edit_bottom_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        android:paddingTop="@dimen/x14" />
 
     <View
         android:id="@+id/main_guide_img"

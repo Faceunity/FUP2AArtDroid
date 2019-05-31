@@ -22,7 +22,7 @@
             android:layout_marginTop="@dimen/x9"
             android:gravity="left"
             android:lineSpacingExtra="@dimen/x9"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorBlack"
             android:textSize="@dimen/text_size_28" />
 
         <TextView
@@ -35,7 +35,7 @@
             android:gravity="left"
             android:lineSpacingExtra="@dimen/x9"
             android:text="肤色(上server,下当前):"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorBlack"
             android:textSize="@dimen/text_size_28" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:gravity="left"
             android:lineSpacingExtra="@dimen/x9"
             android:text="唇色(上server,下当前):"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorBlack"
             android:textSize="@dimen/text_size_28" />
 
         <TextView
@@ -110,6 +110,14 @@
                 android:checked="false"
                 android:textOff="debug info\n关"
                 android:textOn="debug info\n开" />
+
+            <ToggleButton
+                android:id="@+id/main_debug_bottom_deform"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:textOff="debug deform\n关"
+                android:textOn="debug deform\n开" />
 
             <Spinner
                 android:id="@+id/main_debug_bottom_web"

@@ -51,7 +51,8 @@
                 android:gravity="center"
                 android:text="单人场景"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32" />
+                android:textSize="@dimen/text_size_32"
+                android:visibility="gone" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/group_photo_scenes_single_recycler"
@@ -60,7 +61,8 @@
                 android:layout_marginTop="@dimen/x20"
                 android:layout_marginBottom="@dimen/x40"
                 android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20" />
+                android:paddingRight="@dimen/x20"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/group_photo_scenes_multiple_text"
@@ -71,7 +73,8 @@
                 android:gravity="center"
                 android:text="多人场景"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32" />
+                android:textSize="@dimen/text_size_32"
+                android:visibility="gone" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/group_photo_scenes_multiple_recycler"
@@ -80,7 +83,8 @@
                 android:layout_marginTop="@dimen/x20"
                 android:layout_marginBottom="@dimen/x40"
                 android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20" />
+                android:paddingRight="@dimen/x20"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/group_photo_animation_text"
@@ -91,7 +95,8 @@
                 android:gravity="center"
                 android:text="动画场景"
                 android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32" />
+                android:textSize="@dimen/text_size_32"
+                android:visibility="gone" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/group_photo_animation_recycler"
@@ -100,7 +105,8 @@
                 android:layout_marginTop="@dimen/x20"
                 android:layout_marginBottom="@dimen/x40"
                 android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20" />
+                android:paddingRight="@dimen/x20"
+                android:visibility="gone" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </RelativeLayout>

@@ -8,7 +8,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +16,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.faceunity.p2a_art.R;
+import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.BundleRes;
 import com.faceunity.p2a_art.entity.DBHelper;
@@ -40,6 +40,7 @@ public class GroupPhotoAvatar extends RelativeLayout {
     private static final String str_select = "选择至多%d个模型";
     private static final String str_select_boy = "选择一个男模型";
     private static final String str_select_girl = "选择一个女模型";
+    private static final String str_select_one = "选择一个模型";
     private static final String str_creating = "生成中...";
     private static final String str_create_complete = "完美";
 
@@ -47,6 +48,7 @@ public class GroupPhotoAvatar extends RelativeLayout {
 
     private Scenes mScenes;
     private int maxBoy, maxGirl;
+    private int maxNum;
 
     private boolean isSelectEnable = true;
 
@@ -115,12 +117,22 @@ public class GroupPhotoAvatar extends RelativeLayout {
             } else {
                 holder.img.setImageBitmap(BitmapFactory.decodeFile(avatarP2A.getOriginPhotoThumbNail()));
             }
-            holder.itemView.setAlpha((!checkIsEnable(avatarP2A.getGender()) && !isSelectList[position]) ? 0.5f : 1.0f);
+            if (Constant.style_art == Constant.style) {
+                holder.itemView.setAlpha(!checkIsEnable(avatarP2A.getGender()) && !isSelectList[position] ? 0.5f : 1.0f);
+            } else {
+                holder.itemView.setAlpha(maxNum <= checkIsEnableNum() && !isSelectList[position] ? 0.5f : 1.0f);
+            }
+
             holder.img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!isSelectEnable) return;
-                    if ((!checkIsEnable(avatarP2A.getGender()) && !isSelectList[position])) return;
+                    if ((Constant.style_art == Constant.style
+                            && !checkIsEnable(avatarP2A.getGender())
+                            && !isSelectList[position])) return;
+                    if ((Constant.style_new == Constant.style
+                            && maxNum <= checkIsEnableNum()
+                            && !isSelectList[position])) return;
                     isSelectList[position] = !isSelectList[position];
                     notifyDataSetChanged();
                     if (!isSelectList[position]) {
@@ -195,21 +207,42 @@ public class GroupPhotoAvatar extends RelativeLayout {
         return num;
     }
 
+    private int checkIsEnableNum() {
+        int num = 0;
+        for (int i = 0; i < mAvatarP2As.size(); i++) {
+            if (isSelectList[i]) {
+                num++;
+            }
+        }
+        return num;
+    }
+
     public void updateAvatarPoint() {
         mAvatarPoint.post(new Runnable() {
             @Override
             public void run() {
                 isSelectEnable = true;
-                int boy = maxBoy - checkIsEnableNum(AvatarP2A.gender_boy);
-                int girl = maxGirl - checkIsEnableNum(AvatarP2A.gender_girl);
-                if (boy + girl > 1) {
-                    mAvatarPoint.setText(String.format(str_select, boy + girl));
-                } else if (boy > 0) {
-                    mAvatarPoint.setText(str_select_boy);
-                } else if (girl > 0) {
-                    mAvatarPoint.setText(str_select_girl);
+                if (Constant.style == Constant.style_art) {
+                    int boy = maxBoy - checkIsEnableNum(AvatarP2A.gender_boy);
+                    int girl = maxGirl - checkIsEnableNum(AvatarP2A.gender_girl);
+                    if (boy + girl > 1) {
+                        mAvatarPoint.setText(String.format(str_select, boy + girl));
+                    } else if (boy > 0) {
+                        mAvatarPoint.setText(str_select_boy);
+                    } else if (girl > 0) {
+                        mAvatarPoint.setText(str_select_girl);
+                    } else {
+                        mAvatarPoint.setText(str_create_complete);
+                    }
                 } else {
-                    mAvatarPoint.setText(str_create_complete);
+                    int num = maxNum - checkIsEnableNum();
+                    if (num > 1) {
+                        mAvatarPoint.setText(String.format(str_select, num));
+                    } else if (num > 0) {
+                        mAvatarPoint.setText(str_select_one);
+                    } else {
+                        mAvatarPoint.setText(str_create_complete);
+                    }
                 }
             }
         });
@@ -217,13 +250,20 @@ public class GroupPhotoAvatar extends RelativeLayout {
 
     public void setScenes(Scenes scenes) {
         Arrays.fill(isSelectList, false);
-        maxBoy = maxGirl = 0;
         mScenes = scenes;
-        for (BundleRes b : mScenes.bundles) {
-            if (b.gender == AvatarP2A.gender_boy) {
-                maxBoy++;
-            } else {
-                maxGirl++;
+        if (Constant.style == Constant.style_art) {
+            maxBoy = maxGirl = 0;
+            for (BundleRes b : mScenes.bundles) {
+                if (b.gender == AvatarP2A.gender_boy) {
+                    maxBoy++;
+                } else {
+                    maxGirl++;
+                }
+            }
+        } else {
+            maxNum = 0;
+            for (BundleRes b : mScenes.bundles) {
+                maxNum++;
             }
         }
         mAvatarAdapter.notifyDataSetChanged();
@@ -235,7 +275,11 @@ public class GroupPhotoAvatar extends RelativeLayout {
         mNextBtn.post(new Runnable() {
             @Override
             public void run() {
-                mNextBtn.setEnabled(isEnabled && !checkIsEnable(AvatarP2A.gender_boy) && !checkIsEnable(AvatarP2A.gender_girl));
+                if (Constant.style == Constant.style_art) {
+                    mNextBtn.setEnabled(isEnabled && !checkIsEnable(AvatarP2A.gender_boy) && !checkIsEnable(AvatarP2A.gender_girl));
+                } else {
+                    mNextBtn.setEnabled(isEnabled && maxNum <= checkIsEnableNum());
+                }
             }
         });
     }

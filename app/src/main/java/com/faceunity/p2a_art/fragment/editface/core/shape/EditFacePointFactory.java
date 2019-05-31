@@ -2,6 +2,11 @@ package com.faceunity.p2a_art.fragment.editface.core.shape;
 
 import android.content.Context;
 
+import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
+import com.faceunity.p2a_art.entity.AvatarP2A;
+import com.faceunity.p2a_art.fragment.EditFaceFragment;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,12 +20,11 @@ import java.util.List;
 public abstract class EditFacePointFactory {
     private static final String TAG = EditFacePointFactory.class.getSimpleName();
 
-    private static final String MESHPOINTS_PATH = "MeshPoints.json";
-
     private static final String EMPTY = "";
 
     private static final String MALE = "male";
     private static final String FEMALE = "female";
+    private static final String MID = "mid";
 
     public static final String FACE_FRONT = "face_front";
     public static final String FACE_SIDE = "face_side";
@@ -57,32 +61,52 @@ public abstract class EditFacePointFactory {
     public static EditFacePoint[] mFemaleNoseFrontPoints;
     public static EditFacePoint[] mFemaleNoseSidePoints;
 
+    public static EditFacePoint[] mMidFaceFrontPoints;
+    public static EditFacePoint[] mMidFaceSidePoints;
+    public static EditFacePoint[] mMidEyeFrontPoints;
+    public static EditFacePoint[] mMidEyeSidePoints;
+    public static EditFacePoint[] mMidMouthFrontPoints;
+    public static EditFacePoint[] mMidMouthSidePoints;
+    public static EditFacePoint[] mMidNoseFrontPoints;
+    public static EditFacePoint[] mMidNoseSidePoints;
+
     public static void init(Context context) {
         try {
-            InputStream is = context.getAssets().open(MESHPOINTS_PATH);
+            InputStream is = context.getAssets().open(FilePathFactory.jsonMeshPoint());
             byte[] itemData = new byte[is.available()];
             is.read(itemData);
             is.close();
             String json = new String(itemData);
             JSONObject jsonObject = new JSONObject(json);
 
-            mMaleFaceFrontPoints = parseJson(jsonObject, MALE, FACE_FRONT);
-            mMaleFaceSidePoints = parseJson(jsonObject, MALE, FACE_SIDE);
-            mMaleEyeFrontPoints = parseJson(jsonObject, MALE, EYE_FRONT);
-            mMaleEyeSidePoints = parseJson(jsonObject, MALE, EYE_SIDE);
-            mMaleMouthFrontPoints = parseJson(jsonObject, MALE, MOUTH_FRONT);
-            mMaleMouthSidePoints = parseJson(jsonObject, MALE, MOUTH_SIDE);
-            mMaleNoseFrontPoints = parseJson(jsonObject, MALE, NOSE_FRONT);
-            mMaleNoseSidePoints = parseJson(jsonObject, MALE, NOSE_SIDE);
+            if (Constant.style == Constant.style_art) {
+                mMaleFaceFrontPoints = parseJson(jsonObject, MALE, FACE_FRONT);
+                mMaleFaceSidePoints = parseJson(jsonObject, MALE, FACE_SIDE);
+                mMaleEyeFrontPoints = parseJson(jsonObject, MALE, EYE_FRONT);
+                mMaleEyeSidePoints = parseJson(jsonObject, MALE, EYE_SIDE);
+                mMaleMouthFrontPoints = parseJson(jsonObject, MALE, MOUTH_FRONT);
+                mMaleMouthSidePoints = parseJson(jsonObject, MALE, MOUTH_SIDE);
+                mMaleNoseFrontPoints = parseJson(jsonObject, MALE, NOSE_FRONT);
+                mMaleNoseSidePoints = parseJson(jsonObject, MALE, NOSE_SIDE);
 
-            mFemaleFaceFrontPoints = parseJson(jsonObject, FEMALE, FACE_FRONT);
-            mFemaleFaceSidePoints = parseJson(jsonObject, FEMALE, FACE_SIDE);
-            mFemaleEyeFrontPoints = parseJson(jsonObject, FEMALE, EYE_FRONT);
-            mFemaleEyeSidePoints = parseJson(jsonObject, FEMALE, EYE_SIDE);
-            mFemaleMouthFrontPoints = parseJson(jsonObject, FEMALE, MOUTH_FRONT);
-            mFemaleMouthSidePoints = parseJson(jsonObject, FEMALE, MOUTH_SIDE);
-            mFemaleNoseFrontPoints = parseJson(jsonObject, FEMALE, NOSE_FRONT);
-            mFemaleNoseSidePoints = parseJson(jsonObject, FEMALE, NOSE_SIDE);
+                mFemaleFaceFrontPoints = parseJson(jsonObject, FEMALE, FACE_FRONT);
+                mFemaleFaceSidePoints = parseJson(jsonObject, FEMALE, FACE_SIDE);
+                mFemaleEyeFrontPoints = parseJson(jsonObject, FEMALE, EYE_FRONT);
+                mFemaleEyeSidePoints = parseJson(jsonObject, FEMALE, EYE_SIDE);
+                mFemaleMouthFrontPoints = parseJson(jsonObject, FEMALE, MOUTH_FRONT);
+                mFemaleMouthSidePoints = parseJson(jsonObject, FEMALE, MOUTH_SIDE);
+                mFemaleNoseFrontPoints = parseJson(jsonObject, FEMALE, NOSE_FRONT);
+                mFemaleNoseSidePoints = parseJson(jsonObject, FEMALE, NOSE_SIDE);
+            } else {
+                mMidFaceFrontPoints = parseJson(jsonObject, MID, FACE_FRONT);
+                mMidFaceSidePoints = parseJson(jsonObject, MID, FACE_SIDE);
+                mMidEyeFrontPoints = parseJson(jsonObject, MID, EYE_FRONT);
+                mMidEyeSidePoints = parseJson(jsonObject, MID, EYE_SIDE);
+                mMidMouthFrontPoints = parseJson(jsonObject, MID, MOUTH_FRONT);
+                mMidMouthSidePoints = parseJson(jsonObject, MID, MOUTH_SIDE);
+                mMidNoseFrontPoints = parseJson(jsonObject, MID, NOSE_FRONT);
+                mMidNoseSidePoints = parseJson(jsonObject, MID, NOSE_SIDE);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -107,4 +131,33 @@ public abstract class EditFacePointFactory {
         return points;
     }
 
+    public static EditFacePoint[] getEditPoints(int id, int gender, boolean isFront) {
+        switch (id) {
+            case EditFaceFragment.TITLE_FACE_INDEX:
+                return Constant.style == Constant.style_art ?
+                        (gender == AvatarP2A.gender_boy ?
+                                isFront ? EditFacePointFactory.mMaleFaceFrontPoints : EditFacePointFactory.mMaleFaceSidePoints
+                                : isFront ? EditFacePointFactory.mFemaleFaceFrontPoints : EditFacePointFactory.mFemaleFaceSidePoints)
+                        : isFront ? EditFacePointFactory.mMidFaceFrontPoints : EditFacePointFactory.mMidFaceSidePoints;
+            case EditFaceFragment.TITLE_EYE_INDEX:
+                return Constant.style == Constant.style_art ?
+                        (gender == AvatarP2A.gender_boy ?
+                                isFront ? EditFacePointFactory.mMaleEyeFrontPoints : EditFacePointFactory.mMaleEyeSidePoints
+                                : isFront ? EditFacePointFactory.mFemaleEyeFrontPoints : EditFacePointFactory.mFemaleEyeSidePoints)
+                        : isFront ? EditFacePointFactory.mMidEyeFrontPoints : EditFacePointFactory.mMidEyeSidePoints;
+            case EditFaceFragment.TITLE_MOUTH_INDEX:
+                return Constant.style == Constant.style_art ?
+                        (gender == AvatarP2A.gender_boy ?
+                                isFront ? EditFacePointFactory.mMaleMouthFrontPoints : EditFacePointFactory.mMaleMouthSidePoints
+                                : isFront ? EditFacePointFactory.mFemaleMouthFrontPoints : EditFacePointFactory.mFemaleMouthSidePoints)
+                        : isFront ? EditFacePointFactory.mMidMouthFrontPoints : EditFacePointFactory.mMidMouthSidePoints;
+            case EditFaceFragment.TITLE_NOSE_INDEX:
+                return Constant.style == Constant.style_art ?
+                        (gender == AvatarP2A.gender_boy ?
+                                isFront ? EditFacePointFactory.mMaleNoseFrontPoints : EditFacePointFactory.mMaleNoseSidePoints
+                                : isFront ? EditFacePointFactory.mFemaleNoseFrontPoints : EditFacePointFactory.mFemaleNoseSidePoints)
+                        : isFront ? EditFacePointFactory.mMidNoseFrontPoints : EditFacePointFactory.mMidNoseSidePoints;
+        }
+        return new EditFacePoint[0];
+    }
 }

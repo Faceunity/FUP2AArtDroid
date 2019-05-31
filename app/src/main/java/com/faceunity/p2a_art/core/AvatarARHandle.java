@@ -4,7 +4,9 @@ import android.hardware.Camera;
 import android.os.Message;
 import android.util.Log;
 
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
+import com.faceunity.p2a_art.core.base.BaseP2AHandle;
 import com.faceunity.p2a_art.core.base.FUItem;
 import com.faceunity.p2a_art.core.base.FUItemHandler;
 import com.faceunity.p2a_art.entity.AvatarP2A;
@@ -30,7 +32,7 @@ public class AvatarARHandle extends BaseP2AHandle {
 
     public AvatarARHandle(BaseCore baseCore, FUItemHandler FUItemHandler) {
         super(baseCore, FUItemHandler);
-        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new FUItemHandler.LoadFUItemListener(FUP2ARenderer.BUNDLE_controller) {
+        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new FUItemHandler.LoadFUItemListener(FilePathFactory.bundleController()) {
 
             @Override
             public void onLoadComplete(FUItem fuItem) {
@@ -79,7 +81,7 @@ public class AvatarARHandle extends BaseP2AHandle {
     }
 
     @Override
-    void bindAll() {
+    protected void bindAll() {
         if (controllerItem > 0)
             mBaseCore.queueEvent(new Runnable() {
                 @Override
@@ -93,7 +95,7 @@ public class AvatarARHandle extends BaseP2AHandle {
     }
 
     @Override
-    void unBindAll() {
+    protected void unBindAll() {
         if (controllerItem > 0)
             mBaseCore.queueEvent(new Runnable() {
                 @Override
@@ -120,14 +122,14 @@ public class AvatarARHandle extends BaseP2AHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                filterItem.handle = 0;
-                headItem.handle = 0;
-                hairItem.handle = 0;
-                glassItem.handle = 0;
-                beardItem.handle = 0;
-                eyebrowItem.handle = 0;
-                eyelashItem.handle = 0;
-                hatItem.handle = 0;
+                filterItem.clear();
+                headItem.clear();
+                hairItem.clear();
+                glassItem.clear();
+                beardItem.clear();
+                eyebrowItem.clear();
+                eyelashItem.clear();
+                hatItem.clear();
                 controllerItem = 0;
             }
         });

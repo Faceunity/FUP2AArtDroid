@@ -21,6 +21,8 @@ import com.faceunity.p2a_art.fragment.editface.core.color.ColorAdapter;
 import com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView;
 import com.faceunity.p2a_art.fragment.editface.core.item.ItemAdapter;
 
+import java.util.List;
+
 /**
  * Created by tujh on 2018/8/22.
  */
@@ -40,7 +42,7 @@ public class EditFaceGlassesFragment extends EditFaceBaseFragment {
     public static final int GLASSES_COLOR = 0;
     public static final int GLASSES_FRAME_COLOR = 1;
 
-    private BundleRes[] mItemList;
+    private List<BundleRes> mItemList;
     private int mDefaultSelectItem;
     private ItemChangeListener mItemSelectListener;
     private double[][] colorFrameList;
@@ -58,7 +60,17 @@ public class EditFaceGlassesFragment extends EditFaceBaseFragment {
 
         mGlassesRecycler = view.findViewById(R.id.glasses_recycler);
         mGlassesRecycler.setLayoutManager(mGlassesLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        mGlassesRecycler.setAdapter(mItemAdapter = new ItemAdapter(getContext(), R.layout.layout_edit_face_item_glasses, mItemList));
+        mGlassesRecycler.setAdapter(mItemAdapter = new ItemAdapter(getContext(), R.layout.layout_edit_face_item_glasses) {
+            @Override
+            public int getRes(int pos) {
+                return mItemList.get(pos).resId;
+            }
+
+            @Override
+            public int getSize() {
+                return mItemList.size();
+            }
+        });
         ((SimpleItemAnimator) mGlassesRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
         mItemAdapter.setItemSelectListener(new ItemAdapter.ItemSelectListener() {
             @Override
@@ -75,7 +87,7 @@ public class EditFaceGlassesFragment extends EditFaceBaseFragment {
         mGlassesRecycler.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-                int size = mItemList.length;
+                int size = mItemList.size();
                 int index = parent.getChildAdapterPosition(view);
                 int left = index == 0 ? l22 : l22 + l4;
                 int right = index == size - 1 ? l22 : 0;
@@ -135,7 +147,7 @@ public class EditFaceGlassesFragment extends EditFaceBaseFragment {
 
     public void initData(double[][] colorList, int defaultSelectColor, ColorValuesChangeListener colorSelectListener,
                          double[][] colorFrameList, int defaultSelectColorFrame, ColorValuesChangeListener colorFrameSelectListener,
-                         BundleRes[] itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
+                         List<BundleRes> itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
         this.colorList = colorList;
         this.mDefaultSelectColor = defaultSelectColor;
         this.mColorSelectListener = colorSelectListener;

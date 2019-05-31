@@ -11,7 +11,9 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.entity.BundleRes;
+import com.faceunity.p2a_art.entity.FURes;
+
+import java.util.List;
 
 /**
  * Created by tujh on 2019/1/9.
@@ -25,7 +27,7 @@ public class ItemSelectView extends RecyclerView {
     private GridLayoutManager mGridLayoutManager;
     private ItemAdapter.ItemSelectListener mItemSelectListener;
 
-    private BundleRes[] mItemList;
+    private int size;
     private int mDefaultSelectItem;
 
     public ItemSelectView(@NonNull Context context) {
@@ -40,20 +42,33 @@ public class ItemSelectView extends RecyclerView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void init(final BundleRes[] itemList, int defaultSelectItem) {
-        mItemAdapter = new ItemAdapter(getContext(), this.mItemList = itemList);
+    public <T extends FURes> void init(final List<T> itemList, int defaultSelectItem) {
+        size = itemList.size();
+        mItemAdapter = new ItemAdapter(getContext()) {
+            @Override
+            public int getRes(int pos) {
+                return itemList.get(pos).resId;
+            }
+
+            @Override
+            public int getSize() {
+                return size;
+            }
+        };
         mItemAdapter.setSelectPosition(this.mDefaultSelectItem = defaultSelectItem);
 
+        init();
+    }
+
+    private void init() {
         setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), spanCount, GridLayoutManager.VERTICAL, false));
         setAdapter(mItemAdapter);
-
         final int wL = getResources().getDimensionPixelSize(R.dimen.x8);
         final int hL = getResources().getDimensionPixelSize(R.dimen.x17);
         final int topNormalL = getResources().getDimensionPixelSize(R.dimen.x14);
         addItemDecoration(new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
-                int size = mItemList.length;
                 int index = parent.getChildAdapterPosition(view);
                 int left = index % spanCount == 0 ? wL : 0;
                 int right = index % spanCount == spanCount - 1 ? wL : 0;
@@ -88,6 +103,10 @@ public class ItemSelectView extends RecyclerView {
                 smoothScrollBy(0, dy);
             }
         });
+    }
+
+    public void setSelectPosition(int selectPos) {
+        mItemAdapter.setSelectPosition(selectPos);
     }
 
     public void setItemControllerListener(ItemAdapter.ItemSelectListener itemSelectListener) {

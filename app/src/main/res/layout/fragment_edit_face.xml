@@ -10,6 +10,19 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
+    <CheckBox
+        android:id="@+id/edit_shape_position"
+        android:layout_width="@dimen/x96"
+        android:layout_height="@dimen/x96"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/x32"
+        android:layout_marginBottom="@dimen/x30"
+        android:background="@drawable/edit_face_shape_position"
+        android:button="@null"
+        android:checked="true"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/edit_face_bottom_layout"
         android:layout_width="match_parent"

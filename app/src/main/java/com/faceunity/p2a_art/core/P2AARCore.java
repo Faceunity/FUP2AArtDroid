@@ -2,6 +2,7 @@ package com.faceunity.p2a_art.core;
 
 import android.content.Context;
 
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.wrapper.faceunity;
 
@@ -24,7 +25,7 @@ public class P2AARCore extends BaseCore {
     public P2AARCore(Context context, FUP2ARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
 
-        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_fxaa);
+        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
     public AvatarARHandle createAvatarARHandle() {

@@ -17,6 +17,7 @@ import com.faceunity.p2a_art.gles.ProgramTexture2d;
 import com.faceunity.p2a_art.gles.ProgramTextureOES;
 import com.faceunity.p2a_art.gles.core.GlUtil;
 import com.faceunity.p2a_art.utils.CameraUtils;
+import com.faceunity.p2a_art.utils.FPSUtil;
 import com.faceunity.p2a_helper.pic.PictureEncoder;
 
 import java.util.concurrent.CountDownLatch;
@@ -89,6 +90,8 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private boolean isShowCamera = false;
     private boolean isNeedStopDrawFrame = false;
 
+    private FPSUtil mFPSUtil;
+
     public CameraRenderer(Activity activity, GLSurfaceView GLSurfaceView) {
         mActivity = activity;
         mGLSurfaceView = GLSurfaceView;
@@ -134,6 +137,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         cameraStartPreview();
 
         mOnCameraRendererStatusListener.onSurfaceCreated(gl, config);
+        mFPSUtil = new FPSUtil();
     }
 
     @Override
@@ -141,6 +145,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         GLES20.glViewport(0, 0, mViewWidth = width, mViewHeight = height);
         mvp = GlUtil.changeMVPMatrix(GlUtil.IDENTITY_MATRIX, mViewWidth, mViewHeight, mCameraHeight, mCameraWidth);
         mOnCameraRendererStatusListener.onSurfaceChanged(gl, width, height);
+        mFPSUtil.resetLimit();
     }
 
     @Override
@@ -169,6 +174,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         checkPic(mFuTextureId, mtx, mCameraHeight, mCameraWidth);
         if (!isNeedStopDrawFrame)
             mGLSurfaceView.requestRender();
+        mFPSUtil.limit();
     }
 
     private void drawToScreen() {
@@ -248,7 +254,8 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 mCameraWidth = size[0];
                 mCameraHeight = size[1];
                 mvp = GlUtil.changeMVPMatrix(GlUtil.IDENTITY_MATRIX, mViewWidth, mViewHeight, mCameraHeight, mCameraWidth);
-
+                if (cameraType == Camera.CameraInfo.CAMERA_FACING_FRONT)
+                    System.arraycopy(mtxAvatar, 0, mtx, 0, mtx.length);
                 mCamera.setParameters(parameters);
 
                 cameraStartPreview();
@@ -327,11 +334,6 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         isChangeCamera = false;
     }
 
-    public void updateMTX() {
-        if (mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_BACK)
-            System.arraycopy(mtxAvatar, 0, mtx, 0, mtx.length);
-    }
-
     public int getCameraOrientation() {
         return mCameraOrientation;
     }
@@ -360,6 +362,10 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
 
     public void setShowCamera(boolean showCamera) {
         isShowCamera = showCamera;
+    }
+
+    public boolean isShowCamera() {
+        return isShowCamera;
     }
 
     private boolean mTakePicing = false;

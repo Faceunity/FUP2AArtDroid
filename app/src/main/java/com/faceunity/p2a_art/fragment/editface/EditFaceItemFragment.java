@@ -14,6 +14,8 @@ import com.faceunity.p2a_art.fragment.editface.core.ItemChangeListener;
 import com.faceunity.p2a_art.fragment.editface.core.item.ItemAdapter;
 import com.faceunity.p2a_art.fragment.editface.core.item.ItemSelectView;
 
+import java.util.List;
+
 /**
  * Created by tujh on 2018/8/22.
  */
@@ -22,7 +24,7 @@ public class EditFaceItemFragment extends EditFaceBaseFragment {
 
     private ItemSelectView mItemRecycler;
 
-    private BundleRes[] itemList;
+    private List<BundleRes> itemList;
     private int mDefaultSelectItem;
     private ItemChangeListener mItemChangeListener;
 
@@ -44,7 +46,7 @@ public class EditFaceItemFragment extends EditFaceBaseFragment {
         return view;
     }
 
-    public void initData(BundleRes[] itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
+    public void initData(List<BundleRes> itemList, int defaultSelectItem, ItemChangeListener itemSelectListener) {
         this.itemList = itemList;
         this.mDefaultSelectItem = defaultSelectItem;
         this.mItemChangeListener = itemSelectListener;

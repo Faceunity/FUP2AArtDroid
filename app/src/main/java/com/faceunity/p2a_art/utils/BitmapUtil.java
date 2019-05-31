@@ -10,8 +10,6 @@ import com.faceunity.p2a_art.entity.AvatarP2A;
 import java.io.File;
 import java.io.IOException;
 
-import static com.faceunity.p2a_art.constant.Constant.filePath;
-
 /**
  * Created by tujh on 2018/6/28.
  */
@@ -123,8 +121,7 @@ public abstract class BitmapUtil {
         return bitmap;
     }
 
-    public static String saveBitmap(Bitmap bitmap, float[] faceRect) {
-        String dir = filePath + DateUtil.getCurrentDate() + File.separator;
+    public static void saveBitmap(String dir, Bitmap bitmap, float[] faceRect) {
         File dirFile = new File(dir);
         if (!dirFile.exists()) {
             dirFile.mkdirs();
@@ -144,6 +141,5 @@ public abstract class BitmapUtil {
         FileUtil.saveBitmapToFile(dir + AvatarP2A.FILE_NAME_CLIENT_DATA_THUMB_NAIL, thumbNail);
         final String originPhoto = dir + AvatarP2A.FILE_NAME_CLIENT_DATA_ORIGIN_PHOTO;
         FileUtil.saveBitmapToFile(originPhoto, bitmap);
-        return dir;
     }
 }

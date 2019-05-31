@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.entity.Scenes;
 
 /**
@@ -48,20 +48,32 @@ public class GroupPhotoScenes extends RelativeLayout {
             }
         });
 
-        mSingleRecycler = view.findViewById(R.id.group_photo_scenes_single_recycler);
-        mSingleRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        mSingleRecycler.setAdapter(new ScenesAdapter(AvatarConstant.SCENES_ART_SINGLE));
-        ((SimpleItemAnimator) mSingleRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+        if (FilePathFactory.singleScenes().length > 0) {
+            mSingleRecycler = view.findViewById(R.id.group_photo_scenes_single_recycler);
+            mSingleRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            mSingleRecycler.setAdapter(new ScenesAdapter(FilePathFactory.singleScenes()));
+            ((SimpleItemAnimator) mSingleRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+            mSingleRecycler.setVisibility(VISIBLE);
+            view.findViewById(R.id.group_photo_scenes_single_text).setVisibility(VISIBLE);
+        }
 
-        mMultipleRecycler = view.findViewById(R.id.group_photo_scenes_multiple_recycler);
-        mMultipleRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        mMultipleRecycler.setAdapter(new ScenesAdapter(AvatarConstant.SCENES_ART_MULTIPLE));
-        ((SimpleItemAnimator) mMultipleRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+        if (FilePathFactory.multipleScenes().length > 0) {
+            mMultipleRecycler = view.findViewById(R.id.group_photo_scenes_multiple_recycler);
+            mMultipleRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            mMultipleRecycler.setAdapter(new ScenesAdapter(FilePathFactory.multipleScenes()));
+            ((SimpleItemAnimator) mMultipleRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+            mMultipleRecycler.setVisibility(VISIBLE);
+            view.findViewById(R.id.group_photo_scenes_multiple_text).setVisibility(VISIBLE);
+        }
 
-        mAnimationRecycler = view.findViewById(R.id.group_photo_animation_recycler);
-        mAnimationRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        mAnimationRecycler.setAdapter(new ScenesAdapter(AvatarConstant.SCENES_ART_ANIMATION));
-        ((SimpleItemAnimator) mAnimationRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+        if (FilePathFactory.animationScenes().length > 0) {
+            mAnimationRecycler = view.findViewById(R.id.group_photo_animation_recycler);
+            mAnimationRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            mAnimationRecycler.setAdapter(new ScenesAdapter(FilePathFactory.animationScenes()));
+            ((SimpleItemAnimator) mAnimationRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+            mAnimationRecycler.setVisibility(VISIBLE);
+            view.findViewById(R.id.group_photo_animation_text).setVisibility(VISIBLE);
+        }
     }
 
     class ScenesAdapter extends RecyclerView.Adapter<ScenesAdapter.ScenesHolder> {
@@ -84,7 +96,7 @@ public class GroupPhotoScenes extends RelativeLayout {
                 @Override
                 public void onClick(View v) {
                     if (mScenesSelectListener != null) {
-                        mScenesSelectListener.onScenesSelectListener(scenes == AvatarConstant.SCENES_ART_ANIMATION, scenes[position]);
+                        mScenesSelectListener.onScenesSelectListener(scenes == FilePathFactory.animationScenes(), scenes[position]);
                     }
                 }
             });

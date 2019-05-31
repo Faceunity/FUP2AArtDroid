@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -79,7 +80,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void needStartFUMainActivity(final String codeStr) {
-        new Thread(new Runnable() {
+        AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
                 OkHttpUtils.createAvatarRequest(GuideActivity.this, codeStr, new Callback() {
@@ -119,7 +120,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
             }
-        }).start();
+        });
     }
 
     private void showCheckText(final String info) {
@@ -135,7 +136,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void startFUMainActivity() {
-        startActivity(new Intent(GuideActivity.this, MainActivity.class));
+        startActivity(new Intent(GuideActivity.this, SelectStyleActivity.class));
         finish();
         overridePendingTransition(0, 0);
     }
@@ -145,7 +146,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
-                ) {
+        ) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE,

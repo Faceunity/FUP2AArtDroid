@@ -1,54 +1,51 @@
 package com.faceunity.p2a_art.fragment;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.constant.ColorConstant;
-import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.AvatarHandle;
-import com.faceunity.p2a_art.core.P2AClientWrapper;
 import com.faceunity.p2a_art.core.P2ACore;
+import com.faceunity.p2a_art.core.client.AvatarEditor;
 import com.faceunity.p2a_art.entity.AvatarP2A;
-import com.faceunity.p2a_art.entity.BundleRes;
-import com.faceunity.p2a_art.entity.DBHelper;
-import com.faceunity.p2a_art.fragment.editface.EditFaceColorFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceColorItemFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceGlassesFragment;
 import com.faceunity.p2a_art.fragment.editface.EditFaceItemFragment;
-import com.faceunity.p2a_art.fragment.editface.EditFaceShapeFragment;
-import com.faceunity.p2a_art.fragment.editface.EditFaceSkinFragment;
+import com.faceunity.p2a_art.fragment.editface.EditShapeFragment;
 import com.faceunity.p2a_art.fragment.editface.core.ColorValuesChangeListener;
 import com.faceunity.p2a_art.fragment.editface.core.EditFaceBaseFragment;
 import com.faceunity.p2a_art.fragment.editface.core.ItemChangeListener;
 import com.faceunity.p2a_art.fragment.editface.core.shape.EditFaceParameter;
 import com.faceunity.p2a_art.fragment.editface.core.shape.EditFacePoint;
 import com.faceunity.p2a_art.fragment.editface.core.shape.EditFacePointFactory;
+import com.faceunity.p2a_art.fragment.editface.core.shape.EditParamFactory;
 import com.faceunity.p2a_art.fragment.editface.core.shape.EditPointLayout;
+import com.faceunity.p2a_art.fragment.editface.core.shape.ParamRes;
 import com.faceunity.p2a_art.ui.BottomTitleGroup;
 import com.faceunity.p2a_art.ui.LoadingDialog;
 import com.faceunity.p2a_art.ui.NormalDialog;
-import com.faceunity.p2a_art.utils.DateUtil;
-import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -65,52 +62,66 @@ public class EditFaceFragment extends BaseFragment
     private BottomTitleGroup mEditFaceTitle;
 
     public static final int TITLE_HAIR_INDEX = 0;
-    public static final int TITLE_SKIN_INDEX = 1;
-    public static final int TITLE_FACE_INDEX = 2;
-    public static final int TITLE_EYE_INDEX = 3;
-    public static final int TITLE_LIP_INDEX = 4;
+    public static final int TITLE_FACE_INDEX = 1;
+    public static final int TITLE_EYE_INDEX = 2;
+    public static final int TITLE_MOUTH_INDEX = 3;
+    public static final int TITLE_NOSE_INDEX = 4;
     public static final int TITLE_BEARD_INDEX = 5;
     public static final int TITLE_EYEBROW_INDEX = 6;
     public static final int TITLE_EYELASH_INDEX = 7;
     public static final int TITLE_GLASSES_INDEX = 8;
     public static final int TITLE_HAT_INDEX = 9;
     public static final int TITLE_CLOTHES_INDEX = 10;
-    private static final int EditFaceSelectBottomCount = 11;
+    public static final int TITLE_SHOE_INDEX = 11;
+    private static final int EditFaceSelectBottomCount = 12;
     private int mEditFaceSelectBottomId = TITLE_HAIR_INDEX;
     private SparseArray<EditFaceBaseFragment> mEditFaceBaseFragments = new SparseArray<>();
 
-    private static final String[] title_boy = new String[]{"发型", "肤色", "捏脸", "瞳色", "唇色", "胡子", "眉毛", "眼镜", "帽子", "衣服"};
-    private static final int[] title_id_boy = new int[]{
-            TITLE_HAIR_INDEX,
-            TITLE_SKIN_INDEX,
-            TITLE_FACE_INDEX,
-            TITLE_EYE_INDEX,
-            TITLE_LIP_INDEX,
-            TITLE_BEARD_INDEX,
-            TITLE_EYEBROW_INDEX,
-            TITLE_GLASSES_INDEX,
-            TITLE_HAT_INDEX,
-            TITLE_CLOTHES_INDEX
-    };
-    private static final String[] title_girl = new String[]{"发型", "肤色", "捏脸", "瞳色", "唇色", "眉毛", "睫毛", "眼镜", "帽子", "衣服"};
-    private static final int[] title_id_girl = new int[]{
-            TITLE_HAIR_INDEX,
-            TITLE_SKIN_INDEX,
-            TITLE_FACE_INDEX,
-            TITLE_EYE_INDEX,
-            TITLE_LIP_INDEX,
-            TITLE_EYEBROW_INDEX,
-            TITLE_EYELASH_INDEX,
-            TITLE_GLASSES_INDEX,
-            TITLE_HAT_INDEX,
-            TITLE_CLOTHES_INDEX
-    };
+    private static final String[] title_final = new String[]{"发型", "脸型", "眼型", "嘴型", "鼻型", "胡子", "眉毛", "睫毛", "眼镜", "帽子", "衣服", "鞋子"};
+    private String[] title;
+    private int[] title_id;
+
+    private void updateTitle(int gender) {
+        List<Integer> titleT = new ArrayList<>();
+        if (FilePathFactory.hairBundleRes(gender).size() > 1)
+            titleT.add(TITLE_HAIR_INDEX);
+        titleT.add(TITLE_FACE_INDEX);
+        titleT.add(TITLE_EYE_INDEX);
+        titleT.add(TITLE_MOUTH_INDEX);
+        titleT.add(TITLE_NOSE_INDEX);
+        if (FilePathFactory.beardBundleRes(gender).size() > 1)
+            titleT.add(TITLE_BEARD_INDEX);
+        if (FilePathFactory.eyebrowBundleRes(gender).size() > 1)
+            titleT.add(TITLE_EYEBROW_INDEX);
+        if (FilePathFactory.eyelashBundleRes(gender).size() > 1)
+            titleT.add(TITLE_EYELASH_INDEX);
+        if (FilePathFactory.glassesBundleRes(gender).size() > 1)
+            titleT.add(TITLE_GLASSES_INDEX);
+        if (FilePathFactory.hatBundleRes(gender).size() > 1)
+            titleT.add(TITLE_HAT_INDEX);
+        if (FilePathFactory.clothesBundleRes(gender).size() > 1)
+            titleT.add(TITLE_CLOTHES_INDEX);
+        if (FilePathFactory.shoeBundleRes(gender).size() > 1)
+            titleT.add(TITLE_SHOE_INDEX);
+
+        title = new String[titleT.size()];
+        title_id = new int[titleT.size()];
+
+        for (int i = 0; i < titleT.size(); i++) {
+            title[i] = title_final[title_id[i] = titleT.get(i)];
+        }
+    }
 
     private Runnable task;
 
+    private FrameLayout mFragmentLayout;
     private EditPointLayout mEditPointLayout;
     private EditFacePoint[] mEditFacePoints;
     private EditFaceParameter mEditFaceParameter;
+    private CheckBox mIsFrontBox;
+    private boolean isFront = true;
+
+    private P2ACore mEditP2ACore;
 
     @Override
     public void onAttach(Context context) {
@@ -127,12 +138,11 @@ public class EditFaceFragment extends BaseFragment
         mSaveBtn = view.findViewById(R.id.edit_face_save);
         mSaveBtn.setOnClickListener(this);
 
+        mFragmentLayout = view.findViewById(R.id.edit_face_bottom_layout);
+
         mEditFaceTitle = view.findViewById(R.id.edit_face_bottom_title);
-        if (mAvatarP2A.getGender() == AvatarP2A.gender_boy) {
-            mEditFaceTitle.setResStrings(title_boy, title_id_boy, mEditFaceSelectBottomId);
-        } else {
-            mEditFaceTitle.setResStrings(title_girl, title_id_girl, mEditFaceSelectBottomId);
-        }
+        updateTitle(mAvatarP2A.getGender());
+        mEditFaceTitle.setResStrings(title, title_id, mEditFaceSelectBottomId);
         mEditFaceTitle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -147,12 +157,12 @@ public class EditFaceFragment extends BaseFragment
         mAvatarHandle.setNeedFacePUP(true);
         mAvatarHandle.setAvatar(mAvatarP2A);
 
-        mP2ACore = new P2ACore(mP2ACore) {
+        mEditP2ACore = new P2ACore(mP2ACore) {
             @Override
             public int onDrawFrame(byte[] img, int tex, int w, int h) {
                 int fuTex = super.onDrawFrame(img, tex, w, h);
                 if (mEditFacePoints != null) {
-                    mAvatarHandle.parsePoint(mEditFacePoints,
+                    parsePoint(mEditFacePoints,
                             mCameraRenderer.getCameraWidth(),
                             mCameraRenderer.getCameraHeight(),
                             view.getWidth(),
@@ -163,7 +173,7 @@ public class EditFaceFragment extends BaseFragment
                 return fuTex;
             }
         };
-        mFUP2ARenderer.setFUCore(mP2ACore);
+        mFUP2ARenderer.setFUCore(mEditP2ACore);
         mEditFaceParameter = new EditFaceParameter(mAvatarHandle);
 
         mEditPointLayout = view.findViewById(R.id.point_layout);
@@ -177,7 +187,18 @@ public class EditFaceFragment extends BaseFragment
             }
         });
 
+        mIsFrontBox = view.findViewById(R.id.edit_shape_position);
+        mIsFrontBox = view.findViewById(R.id.edit_shape_position);
+        mIsFrontBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isFront = isChecked;
+                updateEditPoint();
+            }
+        });
+
         EditFacePointFactory.init(mActivity);
+        EditParamFactory.init(mActivity);
 
         return view;
     }
@@ -193,7 +214,12 @@ public class EditFaceFragment extends BaseFragment
 
     @Override
     public void onBackPressed() {
-        if (isChangeValues()) {
+        EditFaceBaseFragment editFaceBaseFragment = mEditFaceBaseFragments.get(mEditFaceSelectBottomId);
+        if (mFragmentLayout.getVisibility() == View.GONE && editFaceBaseFragment instanceof EditShapeFragment) {
+            setEditFacePoints(null);
+            EditShapeFragment shapeFragment = (EditShapeFragment) editFaceBaseFragment;
+            shapeFragment.resetSelect();
+        } else if (isChangeValues()) {
             NormalDialog normalDialog = new NormalDialog();
             normalDialog.setNormalDialogTheme(R.style.FullScreenTheme);
             normalDialog.setMessageStr("是否保存当前形象编辑？");
@@ -208,21 +234,20 @@ public class EditFaceFragment extends BaseFragment
 
                 @Override
                 public void onNegativeListener() {
-                    backToHome();
-
-                    mAvatarHandle.setAvatar(mDefaultAvatarP2A);
+                    backToHome(mDefaultAvatarP2A);
                 }
             });
         } else {
-            backToHome();
+            backToHome(mDefaultAvatarP2A);
         }
     }
 
-    public void backToHome() {
+    public void backToHome(AvatarP2A avatarP2A) {
         mActivity.showHomeFragment();
         mAvatarHandle.setNeedFacePUP(false);
         mActivity.setCanController(true);
-        mFUP2ARenderer.setFUCore(mP2ACore = new P2ACore(mP2ACore));
+        mFUP2ARenderer.setFUCore(mP2ACore);
+        mAvatarHandle.setAvatar(avatarP2A);
     }
 
     @Override
@@ -237,7 +262,11 @@ public class EditFaceFragment extends BaseFragment
                 onBackPressed();
                 break;
             case R.id.edit_face_save:
-                saveAvatar();
+                if (mFragmentLayout.getVisibility() == View.GONE) {
+                    setEditFacePoints(null);
+                } else {
+                    saveAvatar();
+                }
                 break;
         }
     }
@@ -250,7 +279,7 @@ public class EditFaceFragment extends BaseFragment
     }
 
     private void updateSaveBtn() {
-        if (isChangeValues()) {
+        if (isChangeValues() || mFragmentLayout.getVisibility() == View.GONE) {
             mSaveBtn.setAlpha(1.0f);
             mSaveBtn.setEnabled(true);
         } else {
@@ -274,8 +303,8 @@ public class EditFaceFragment extends BaseFragment
             }
             if (show == null) {
                 switch (id) {
-                    case TITLE_SKIN_INDEX:
-                        show = new EditFaceSkinFragment();
+                    case TITLE_FACE_INDEX:
+                        show = new EditShapeFragment();
                         double value;
                         if (mAvatarP2A.getSkinColorValue() < 0) {
                             value = mAvatarHandle.fuItemGetParamSkinColorIndex();
@@ -284,61 +313,55 @@ public class EditFaceFragment extends BaseFragment
                         } else {
                             value = mAvatarP2A.getSkinColorValue();
                         }
-                        ((EditFaceSkinFragment) show).initDate(value, mColorValuesChangeListener);
-                        break;
-                    case TITLE_FACE_INDEX:
-                        show = new EditFaceShapeFragment();
-                        ((EditFaceShapeFragment) show).initDate(mEditFaceParameter, new EditFaceShapeFragment.EditFaceStatusChaneListener() {
-                            @Override
-                            public void editFacePointChaneListener(EditFacePoint[] point) {
-                                setEditFacePoints(point);
-                            }
-
-                            @Override
-                            public void resetDefaultDeformParam() {
-                                updateSaveBtn();
-                            }
-                        });
+                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamFace, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamFace), ColorConstant.skin_color, value, mColorValuesChangeListener);
                         break;
                     case TITLE_EYE_INDEX:
-                        show = new EditFaceColorFragment();
-                        ((EditFaceColorFragment) show).initData(ColorConstant.iris_color, (int) mAvatarP2A.getIrisColorValue(), mColorValuesChangeListener);
+                        show = new EditShapeFragment();
+                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamEye, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamEye), ColorConstant.iris_color, mAvatarP2A.getIrisColorValue(), mColorValuesChangeListener);
                         break;
-                    case TITLE_LIP_INDEX:
-                        show = new EditFaceColorFragment();
-                        ((EditFaceColorFragment) show).initData(ColorConstant.lip_color, (int) mAvatarP2A.getLipColorValue(), mColorValuesChangeListener);
+                    case TITLE_MOUTH_INDEX:
+                        show = new EditShapeFragment();
+                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamMouth, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamMouth), ColorConstant.lip_color, mAvatarP2A.getLipColorValue(), mColorValuesChangeListener);
+                        break;
+                    case TITLE_NOSE_INDEX:
+                        show = new EditShapeFragment();
+                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamNose, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamNose));
                         break;
                     case TITLE_HAIR_INDEX:
                         show = new EditFaceColorItemFragment();
                         ((EditFaceColorItemFragment) show).initData(ColorConstant.hair_color, (int) mAvatarP2A.getHairColorValue(), mColorValuesChangeListener,
-                                AvatarConstant.hairBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHairIndex(), mItemChangeListener);
+                                FilePathFactory.hairBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHairIndex(), mItemChangeListener);
                         break;
                     case TITLE_HAT_INDEX:
                         show = new EditFaceColorItemFragment();
                         ((EditFaceColorItemFragment) show).initData(ColorConstant.hat_color, (int) mAvatarP2A.getHatColorValue(), mColorValuesChangeListener,
-                                AvatarConstant.hatBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHatIndex(), mItemChangeListener);
+                                FilePathFactory.hatBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHatIndex(), mItemChangeListener);
                         break;
                     case TITLE_BEARD_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(AvatarConstant.beardBundleRes(), mAvatarP2A.getBeardIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.beardBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getBeardIndex(), mItemChangeListener);
                         break;
                     case TITLE_EYEBROW_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(AvatarConstant.eyebrowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyebrowIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyebrowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyebrowIndex(), mItemChangeListener);
                         break;
                     case TITLE_EYELASH_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(AvatarConstant.eyelashBundleRes(), mAvatarP2A.getEyelashIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyelashBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyelashIndex(), mItemChangeListener);
                         break;
                     case TITLE_CLOTHES_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(AvatarConstant.clothesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getClothesIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.clothesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getClothesIndex(), mItemChangeListener);
+                        break;
+                    case TITLE_SHOE_INDEX:
+                        show = new EditFaceItemFragment();
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.shoeBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getShoeIndex(), mItemChangeListener);
                         break;
                     case TITLE_GLASSES_INDEX:
                         show = new EditFaceGlassesFragment();
                         ((EditFaceGlassesFragment) show).initData(ColorConstant.glass_color, (int) mAvatarP2A.getGlassesColorValue(), mColorValuesChangeListener,
                                 ColorConstant.glass_frame_color, (int) mAvatarP2A.getGlassesFrameColorValue(), mColorValuesChangeListener,
-                                AvatarConstant.glassesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getGlassesIndex(), mItemChangeListener);
+                                FilePathFactory.glassesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getGlassesIndex(), mItemChangeListener);
                         break;
                 }
                 if (show != null) {
@@ -353,19 +376,51 @@ public class EditFaceFragment extends BaseFragment
                 transaction.show(show);
             }
             transaction.commit();
+            setEditFacePoints(null);
             if (id == -1 || id == TITLE_FACE_INDEX) {
             } else if (id == TITLE_CLOTHES_INDEX) {
                 mAvatarHandle.resetAllMinTop();
+            } else if (id == TITLE_SHOE_INDEX) {
+                mAvatarHandle.resetAllMinBottom();
             } else {
                 mAvatarHandle.resetAll();
             }
-            setEditFacePoints(null);
-            mActivity.setCanController(id != TITLE_FACE_INDEX);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private int checkSelectPos(List<ParamRes> paramResList) {
+        int pos = 0;
+        for (int i = 0; i < paramResList.size(); i++) {
+            ParamRes res = paramResList.get(i);
+            if (res == null || res.paramMap == null) continue;
+            boolean isEq = true;
+            for (String key : res.paramMap.keySet()) {
+                if (!res.paramMap.get(key).equals(mEditFaceParameter.getParamByKey(key))) {
+                    isEq = false;
+                    break;
+                }
+            }
+            if (isEq) {
+                pos = i;
+                break;
+            }
+        }
+        return pos;
+    }
+
+    EditShapeFragment.EditFaceStatusChaneListener mEditFaceStatusChaneListener = new EditShapeFragment.EditFaceStatusChaneListener() {
+        @Override
+        public void editFacePointChaneListener(int pos, ParamRes res) {
+            if (pos == 0) {
+                updateEditPoint();
+            } else {
+                mEditFaceParameter.setParamMap(res.paramMap);
+                updateSaveBtn();
+            }
+        }
+    };
     ItemChangeListener mItemChangeListener = new ItemChangeListener() {
         @Override
         public void itemChangeListener(int id, int pos) {
@@ -391,6 +446,9 @@ public class EditFaceFragment extends BaseFragment
                 case TITLE_CLOTHES_INDEX:
                     mAvatarP2A.setClothesIndex(pos);
                     break;
+                case TITLE_SHOE_INDEX:
+                    mAvatarP2A.setShoeIndex(pos);
+                    break;
             }
             mAvatarHandle.setAvatar(mAvatarP2A);
             updateSaveBtn();
@@ -407,17 +465,17 @@ public class EditFaceFragment extends BaseFragment
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hair_color, Arrays.copyOf(hair_color, 3));
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hair_color_intensity, (float) hair_color[3]);
                     break;
-                case TITLE_SKIN_INDEX:
+                case TITLE_FACE_INDEX:
                     mAvatarP2A.setSkinColorValue(values);
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_skin_color, ColorConstant.getColor(ColorConstant.skin_color, values));
                     break;
                 case TITLE_EYE_INDEX:
-                    mAvatarP2A.setIrisColorValue(pos);
-                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_iris_color, ColorConstant.iris_color[pos]);
+                    mAvatarP2A.setIrisColorValue(values);
+                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_iris_color, ColorConstant.getColor(ColorConstant.iris_color, values));
                     break;
-                case TITLE_LIP_INDEX:
-                    mAvatarP2A.setLipColorValue(pos);
-                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_lip_color, ColorConstant.lip_color[pos]);
+                case TITLE_MOUTH_INDEX:
+                    mAvatarP2A.setLipColorValue(values);
+                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_lip_color, ColorConstant.getColor(ColorConstant.lip_color, values));
                     break;
                 case TITLE_GLASSES_INDEX:
                     if (index == EditFaceGlassesFragment.GLASSES_COLOR) {
@@ -442,112 +500,102 @@ public class EditFaceFragment extends BaseFragment
     }
 
     private LoadingDialog mLoadingDialog;
-    private AvatarP2A mNewAvatarP2A;
 
     private void saveAvatar() {
         mLoadingDialog = new LoadingDialog();
         mLoadingDialog.show(getChildFragmentManager(), LoadingDialog.TAG);
 
-        new Thread(new Runnable() {
+        new AvatarEditor(mActivity).saveAvatar(mAvatarP2A, mEditFaceParameter, new AvatarEditor.SaveAvatarListener() {
             @Override
-            public void run() {
-                DBHelper dbHelper = new DBHelper(mActivity);
-                File dirFile = null;
-                try {
-                    if (TextUtils.isEmpty(mAvatarP2A.getBundleDir())) {
-                        final String dir = Constant.filePath + DateUtil.getCurrentDate() + File.separator;
-                        FileUtil.createFile(dir);
-                        dirFile = new File(dir);
-
-                        mNewAvatarP2A = mAvatarP2A.clone();
-                        mNewAvatarP2A.setBundleDir(dir);
-
-                        FileUtil.copyFileTo(getResources().openRawResource(mAvatarP2A.getOriginPhotoRes()), new File(mNewAvatarP2A.getOriginPhotoThumbNail()));
-
-                        String[] hairShowNows = mAvatarP2A.getHairFileList();
-                        BundleRes[] hairBundles = AvatarConstant.hairBundleRes(mNewAvatarP2A.getGender());
-                        String[] hairPaths = new String[hairBundles.length];
-                        for (int i = 0; i < hairBundles.length; i++) {
-                            if (!TextUtils.isEmpty(hairBundles[i].path)) {
-                                FileUtil.copyFileTo(mActivity.getAssets().open(hairShowNows[i]), new File(hairPaths[i] = (dir + hairBundles[i].path)));
-                            } else {
-                                hairPaths[i] = "";
-                            }
-                        }
-                        mNewAvatarP2A.setHairFileList(hairPaths);
-
-                        if (saveAvatarHead()) {
-                            FileUtil.copyFileTo(mActivity.getAssets().open(mAvatarP2A.getHeadFile()), new File(mNewAvatarP2A.getHeadFile()));
-                        }
-                        dbHelper.insertHistory(mNewAvatarP2A);
-                    } else {
-                        mNewAvatarP2A = mAvatarP2A;
-                        saveAvatarHead();
-                        dbHelper.updateHistory(mNewAvatarP2A);
-                    }
-
-                    task = new Runnable() {
-                        @Override
-                        public void run() {
-                            mActivity.updateAvatarP2As();
-                            mActivity.setShowAvatarP2A(mNewAvatarP2A);
-                            mAvatarHandle.setAvatar(mNewAvatarP2A, true, new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (mLoadingDialog != null && mNewAvatarP2A.getBundleDir().equals(mActivity.getShowAvatarP2A().getBundleDir())) {
-                                        mLoadingDialog.dismiss();
-                                        mLoadingDialog = null;
-                                        backToHome();
-                                    }
+            public void saveComplete(final AvatarP2A newAvatarP2A) {
+                task = new Runnable() {
+                    @Override
+                    public void run() {
+                        mActivity.updateAvatarP2As();
+                        mActivity.setShowAvatarP2A(newAvatarP2A);
+                        mAvatarHandle.setAvatar(newAvatarP2A, true, new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mLoadingDialog != null && newAvatarP2A.getBundleDir().equals(mActivity.getShowAvatarP2A().getBundleDir())) {
+                                    mLoadingDialog.dismiss();
+                                    mLoadingDialog = null;
+                                    backToHome(newAvatarP2A);
                                 }
-                            });
-                        }
-                    };
-                    if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
-                        mActivity.runOnUiThread(task);
-                        task = null;
+                            }
+                        });
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (dirFile != null) {
-                        dbHelper.deleteHistoryByDir(dirFile.getAbsolutePath());
-                        if (dirFile.exists()) {
-                            dirFile.delete();
-                        }
-                    }
-                    task = new Runnable() {
-                        @Override
-                        public void run() {
-                            mLoadingDialog.dismiss();
-                            mLoadingDialog = null;
-                            ToastUtil.showCenterToast(mActivity, "模型保存失败，请重试");
-                        }
-                    };
-                    if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
-                        mActivity.runOnUiThread(task);
-                        task = null;
-                    }
+                };
+                if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
+                    mActivity.runOnUiThread(task);
+                    task = null;
                 }
             }
-        }).start();
-    }
 
-    private boolean saveAvatarHead() throws IOException {
-        boolean isChange = mEditFaceParameter.isShapeChangeValues();
-        if (isChange) {
-            P2AClientWrapper.deformAvatarHead(mAvatarP2A.getHeadFile().startsWith(Constant.filePath) ? new FileInputStream(new File(mAvatarP2A.getHeadFile())) : mActivity.getAssets().open(mAvatarP2A.getHeadFile()), mNewAvatarP2A.getHeadFile(), mEditFaceParameter.getEditFaceParameters());
-        }
-        return !isChange;
+            @Override
+            public void saveFailure() {
+                task = new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadingDialog.dismiss();
+                        mLoadingDialog = null;
+                        ToastUtil.showCenterToast(mActivity, "模型保存失败，请重试");
+                    }
+                };
+                if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
+                    mActivity.runOnUiThread(task);
+                    task = null;
+                }
+            }
+        });
     }
 
     private void setEditFacePoints(EditFacePoint[] editFacePoints) {
         mEditFacePoints = editFacePoints;
         if (mEditPointLayout == null) return;
+        if (mEditFacePoints == null) {
+            mAvatarHandle.resetAll();
+        }
+        mActivity.setCanController(mEditFacePoints == null);
         mEditPointLayout.post(new Runnable() {
             @Override
             public void run() {
+                updateSaveBtn();
                 mEditPointLayout.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
+                mIsFrontBox.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
+                mFragmentLayout.setVisibility(mEditFacePoints != null ? View.GONE : View.VISIBLE);
+                mEditFaceTitle.setVisibility(mEditFacePoints != null ? View.GONE : View.VISIBLE);
             }
         });
+    }
+
+    private void updateEditPoint() {
+        setEditFacePoints(EditFacePointFactory.getEditPoints(mEditFaceSelectBottomId, mAvatarP2A.getGender(), isFront));
+        if (isFront) {
+            mAvatarHandle.resetAllFront();
+        } else {
+            mAvatarHandle.resetAllSide();
+        }
+    }
+
+    private void parsePoint(EditFacePoint[] editFacePoints, int width, int height, int widthView, int heightView) {
+        for (EditFacePoint point : editFacePoints) {
+            Point p = mAvatarHandle.getPointByIndex(point.index);
+            int x = p.x;
+            int y = p.y;
+            x = width - x;
+            y = height - y;
+
+            float sW = (float) heightView / width;
+            float sH = (float) widthView / height;
+            if (sW > sH) {
+                x = (int) (x * sW);
+                y = (int) (y * sW - (height * sW - widthView) / 2);
+            } else {
+                x = (int) (x * sH - (width * sH - heightView) / 2);
+                y = (int) (y * sH);
+            }
+
+            point.set(y, x);
+        }
     }
 }

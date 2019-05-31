@@ -1,13 +1,17 @@
 package com.faceunity.p2a_art;
 
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -15,12 +19,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.FUP2ARenderer;
 import com.faceunity.p2a_art.core.P2ACore;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.DBHelper;
 import com.faceunity.p2a_art.fragment.ARFilterFragment;
+import com.faceunity.p2a_art.fragment.AvatarFragment;
 import com.faceunity.p2a_art.fragment.BaseFragment;
 import com.faceunity.p2a_art.fragment.EditFaceFragment;
 import com.faceunity.p2a_art.fragment.GroupPhotoFragment;
@@ -28,6 +34,8 @@ import com.faceunity.p2a_art.fragment.HomeFragment;
 import com.faceunity.p2a_art.fragment.TakePhotoFragment;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -37,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements
         CameraRenderer.OnCameraRendererStatusListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private RelativeLayout mMainLayout;
     private View mGroupPhotoRound;
     private GLSurfaceView mGLSurfaceView;
     private CameraRenderer mCameraRenderer;
@@ -62,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        mMainLayout = findViewById(R.id.main_layout);
 
         mGroupPhotoRound = findViewById(R.id.group_photo_round);
         mGLSurfaceView = findViewById(R.id.main_gl_surface);
@@ -152,7 +163,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (isCanController && (HomeFragment.TAG.equals(mShowFragmentFlag) || EditFaceFragment.TAG.equals(mShowFragmentFlag))) {
+        if (isCanController && (HomeFragment.TAG.equals(mShowFragmentFlag)
+                || EditFaceFragment.TAG.equals(mShowFragmentFlag)
+                || AvatarFragment.TAG.equals(mShowFragmentFlag))
+        ) {
             if (event.getPointerCount() == 2) {
                 mScaleGestureDetector.onTouchEvent(event);
             } else if (event.getPointerCount() == 1)
@@ -221,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public void showHomeFragment() {
         if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK) {
-            mCameraRenderer.updateMTX();
             mCameraRenderer.changeCamera();
         }
 
@@ -242,11 +255,24 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void showBaseFragment(String tag) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (mHomeFragment != null) {
+        if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK
+                && !TakePhotoFragment.TAG.equals(tag) && !ARFilterFragment.TAG.equals(tag)) {
+            mCameraRenderer.changeCamera();
+        }
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        if (HomeFragment.TAG.equals(mShowFragmentFlag) && mHomeFragment != null) {
             transaction.hide(mHomeFragment);
         }
-        if (mBaseFragment == null) {
+        if (mBaseFragment != null) {
+            if (AvatarFragment.TAG.equals(mShowFragmentFlag)) {
+                transaction.hide(mBaseFragment);
+            } else {
+                transaction.remove(mBaseFragment);
+            }
+        }
+        Fragment fragment = manager.findFragmentByTag(tag);
+        if (fragment == null) {
             if (EditFaceFragment.TAG.equals(tag)) {
                 mBaseFragment = new EditFaceFragment();
             } else if (ARFilterFragment.TAG.equals(tag)) {
@@ -255,13 +281,14 @@ public class MainActivity extends AppCompatActivity implements
                 mBaseFragment = new TakePhotoFragment();
             } else if (GroupPhotoFragment.TAG.equals(tag)) {
                 mBaseFragment = new GroupPhotoFragment();
+            } else if (AvatarFragment.TAG.equals(tag)) {
+                mBaseFragment = new AvatarFragment();
             }
-            transaction.add(R.id.main_fragment_layout, mBaseFragment);
+            transaction.add(R.id.main_fragment_layout, mBaseFragment, tag);
         } else {
-            transaction.show(mBaseFragment);
+            transaction.show(mBaseFragment = (BaseFragment) fragment);
         }
         mShowFragmentFlag = tag;
-        mHomeFragment.setCheckGroupNoId();
         transaction.commit();
     }
 
@@ -269,12 +296,25 @@ public class MainActivity extends AppCompatActivity implements
         return mAvatarP2As;
     }
 
+    public void updateStyle(Runnable runnable) {
+        updateAvatarP2As();
+
+        mP2ACore.release();
+        mP2ACore = new P2ACore(this, mFUP2ARenderer);
+        mFUP2ARenderer.setFUCore(mP2ACore);
+        mAvatarHandle = mP2ACore.createAvatarHandle();
+        mAvatarHandle.setAvatar(getShowAvatarP2A(), runnable);
+    }
+
     public void updateAvatarP2As() {
         List<AvatarP2A> avatarP2AS = mDBHelper.getAllAvatarP2As();
         mAvatarP2As.clear();
         mAvatarP2As.addAll(avatarP2AS);
         setShowIndex(avatarP2AS.contains(mShowAvatarP2A) ? avatarP2AS.indexOf(mShowAvatarP2A) : 0);
-        mHomeFragment.notifyDataSetChanged();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(AvatarFragment.TAG);
+        if (fragment instanceof AvatarFragment) {
+            ((AvatarFragment) fragment).notifyDataSetChanged();
+        }
     }
 
     public void setShowIndex(int showIndex) {
@@ -305,4 +345,34 @@ public class MainActivity extends AppCompatActivity implements
     public void setCanController(boolean canController) {
         isCanController = canController;
     }
+
+    public void initDebug(View clickView) {
+        if (!Constant.is_debug) return;
+        try {
+            Log.e(TAG, "initDebug");
+            Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugLayout");
+            if (aClass != null) {
+                View debugLayout = null;
+                Constructor[] cons = aClass.getDeclaredConstructors();
+                for (Constructor con : cons) {
+                    Class<?>[] parameterTypes = con.getParameterTypes();
+                    Log.e(TAG, "initDebug " + parameterTypes.length);
+                    if (parameterTypes.length == 1 && parameterTypes[0] == Context.class) {
+                        Log.e(TAG, "initDebug " + parameterTypes[0]);
+                        debugLayout = (View) con.newInstance(new Object[]{this});
+                        break;
+                    }
+                }
+                Log.e(TAG, "initDebug " + debugLayout);
+                if (debugLayout != null) {
+                    Method initData = aClass.getMethod("initData", new Class[]{MainActivity.class, FUP2ARenderer.class, AvatarHandle.class, View.class});
+                    initData.invoke(debugLayout, new Object[]{this, mFUP2ARenderer, mAvatarHandle, clickView});
+                    mMainLayout.addView(debugLayout);
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
 }

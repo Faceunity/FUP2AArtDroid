@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.Constant;
-import com.faceunity.p2a_art.core.AvatarBuilder;
+import com.faceunity.p2a_art.core.client.AvatarBuilder;
 import com.faceunity.p2a_art.core.NamaCore;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.DBHelper;
@@ -112,9 +112,8 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 if (Constant.is_debug) {
                     createAvatarDebug(file);
                 } else {
-                    Bitmap bitmap = BitmapUtil.loadBitmap(filePath, 720);
-                    String dir = BitmapUtil.saveBitmap(bitmap, null);
-                    createAvatar(bitmap, dir);
+                    Bitmap bitmap = BitmapUtil.loadBitmap(file.getPath(), 720);
+                    createAvatar(bitmap, file.getName());
                 }
             } else {
                 ToastUtil.showCenterToast(mActivity, "所选图片文件不存在。");
@@ -149,11 +148,11 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         @Override
                         public void takePhotoCallBack(final Bitmap bmp) {
                             mCameraRenderer.setNeedStopDrawFrame(false);
-                            String dir = BitmapUtil.saveBitmap(bmp, isTracking == 1 ? faceRect : null);
+                            float[] faceRect = isTracking == 1 ? mFaceRect : null;
                             if (Constant.is_debug) {
-                                createAvatarDebug(bmp, dir);
+                                createAvatarDebug(bmp, faceRect);
                             } else {
-                                createAvatar(bmp, dir);
+                                createAvatar(bmp, faceRect);
                             }
                         }
                     });
@@ -178,20 +177,27 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         mFUP2ARenderer.setFUCore(mP2ACore);
         mNamaCore.release();
         if (createAvatarDialog != null) {
-            mCameraRenderer.updateMTX();
             mFUP2ARenderer.queueNextEvent(new Runnable() {
                 @Override
                 public void run() {
-                    mActivity.showHomeFragment();
+                    mActivity.showBaseFragment(AvatarFragment.TAG);
                     createAvatarDialog.dismiss();
                 }
             });
         } else {
-            mActivity.showHomeFragment();
+            mActivity.showBaseFragment(AvatarFragment.TAG);
         }
     }
 
-    public void createAvatar(final Bitmap bitmap, final String dir) {
+    public void createAvatar(Bitmap bitmap, float[] faceRect) {
+        createAvatar(bitmap, faceRect, null);
+    }
+
+    public void createAvatar(Bitmap bitmap, String name) {
+        createAvatar(bitmap, null, name);
+    }
+
+    public void createAvatar(final Bitmap bitmap, final float[] faceRect, final String name) {
         Log.e(TAG, "createAvatar");
         mActivity.runOnUiThread(new Runnable() {
             @Override
@@ -200,10 +206,13 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 mCreateAvatarDialog.setPhotoBitmap(bitmap);
                 mCreateAvatarDialog.show(mActivity.getSupportFragmentManager(), CreateAvatarDialog.TAG);
                 mCreateAvatarDialog.setSelectParamListener(new CreateAvatarDialog.SelectParamListener() {
+                    String dir;
 
                     @Override
-                    public void selectParamListener(int gender, int style) {
-                        createAvatar(dir, gender, style);
+                    public void selectParamListener(int gender) {
+                        dir = FileUtil.createFilePath(gender, name);
+                        BitmapUtil.saveBitmap(dir, bitmap, faceRect);
+                        createAvatar(dir, gender);
                     }
 
                     @Override
@@ -221,7 +230,10 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                     mCreateAvatarDialog.dismiss();
                                 mAvatarBuilder.cancel();
                                 OkHttpUtils.cancelAll();
-                                FileUtil.deleteDirAndFile(new File(dir));
+                                FileUtil.deleteDirAndFile(dir);
+                                if (mDownloadRunnable != null) {
+                                    mHandler.removeCallbacks(mDownloadRunnable);
+                                }
                             }
 
                             @Override
@@ -243,7 +255,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         });
     }
 
-    private void createAvatar(final String dir, final int gender, final int style) {
+    private void createAvatar(final String dir, final int gender) {
         OkHttpUtils.getAvatarToken(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -273,7 +285,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                     if (2 == jsonObject.getInt("code")) {
                                         JSONObject object = jsonObject.getJSONObject("data");
                                         final String taskid = object.getString("taskid");
-                                        download(token, taskid, dir, gender, style);
+                                        download(token, taskid, dir, gender);
                                         return;
                                     }
                                 } catch (Exception e) {
@@ -290,8 +302,10 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         });
     }
 
-    public void download(final String token, final String taskid, final String dir, final int gender, final int style) {
-        mHandler.postDelayed(new Runnable() {
+    private Runnable mDownloadRunnable;
+
+    public void download(final String token, final String taskid, final String dir, final int gender) {
+        mHandler.postDelayed(mDownloadRunnable = new Runnable() {
             @Override
             public void run() {
                 OkHttpUtils.downloadAvatarRequest(token, taskid, new Callback() {
@@ -312,13 +326,13 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                 if (2 == jsonObject.getInt("code")) {
                                     String data = jsonObject.getString("data");
                                     byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
-                                    final AvatarP2A avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, style);
+                                    final AvatarP2A avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender);
                                     if (avatarP2A != null) {
                                         showAvatar(avatarP2A, mCreateAvatarDialog);
                                         return;
                                     }
                                 } else if (1 == jsonObject.getInt("code")) {
-                                    download(token, taskid, dir, gender, style);
+                                    download(token, taskid, dir, gender);
                                     return;
                                 }
                             } catch (Exception e) {
@@ -328,8 +342,9 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                         } else {
                             CreateFailureToast.onCreateFailure(mActivity, response.code() == 500 ? response.body().string() : CreateFailureToast.CreateFailureNet);
                         }
-                        FileUtil.deleteDirAndFile(new File(dir));
-                        mCreateAvatarDialog.dismiss();
+                        FileUtil.deleteDirAndFile(dir);
+                        if (mCreateAvatarDialog != null)
+                            mCreateAvatarDialog.dismiss();
                     }
                 });
             }
@@ -342,7 +357,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
             if (mCreateAvatarDialog != null)
                 mCreateAvatarDialog.dismiss();
         }
-        FileUtil.deleteDirAndFile(new File(dir));
+        FileUtil.deleteDirAndFile(dir);
     }
 
     public void showAvatar(AvatarP2A avatarP2A, final CreateAvatarDialog createAvatarDialog) {
@@ -376,19 +391,19 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     };
 
     private int isTracking;
-    private float[] faceRect;
+    private float[] mFaceRect;
     private int mFrameId = 0;
 
     private void checkPic() {
         isTracking = mNamaCore.isTracking();
-        faceRect = mNamaCore.getFaceRectData();
+        mFaceRect = mNamaCore.getFaceRectData();
         if (mFrameId++ % 15 > 0)
             return;
         if (isTracking != 1) {
             showCheckPic("请保持1个人输入");
         } else if (FaceCheckUtil.checkRotation(mNamaCore.getRotationData())) {
             showCheckPic("请保持正面");
-        } else if (FaceCheckUtil.checkFaceRect(faceRect, mCameraRenderer.getCameraWidth(), mCameraRenderer.getCameraHeight())) {
+        } else if (FaceCheckUtil.checkFaceRect(mFaceRect, mCameraRenderer.getCameraWidth(), mCameraRenderer.getCameraHeight())) {
             showCheckPic("请将人脸对准虚线框");
         } else if (FaceCheckUtil.checkExpression(mNamaCore.getExpressionData())) {
             showCheckPic("请保持面部无夸张表情");
@@ -423,12 +438,12 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-    private void createAvatarDebug(Bitmap bitmap, String dir) {
+    private void createAvatarDebug(Bitmap bitmap, float[] faceRect) {
         try {
             Class aClass = Class.forName("com.faceunity.p2a_art.debug.DebugCreateAvatar");
             if (aClass != null) {
-                Method createAvatarDebug = aClass.getMethod("createAvatarDebug", new Class[]{TakePhotoFragment.class, Bitmap.class, String.class});
-                createAvatarDebug.invoke(null, new Object[]{TakePhotoFragment.this, bitmap, dir});
+                Method createAvatarDebug = aClass.getMethod("createAvatarDebug", new Class[]{TakePhotoFragment.class, Bitmap.class, float[].class});
+                createAvatarDebug.invoke(null, new Object[]{TakePhotoFragment.this, bitmap, faceRect});
             }
         } catch (Throwable t) {
             t.printStackTrace();

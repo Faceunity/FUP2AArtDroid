@@ -67,7 +67,7 @@ public class GroupPhotoFragment extends BaseFragment {
             File file = new File(filePath);
             if (file.exists()) {
                 if (mP2AMultipleCore != null) {
-                    mP2AMultipleCore.loadBackground(filePath);
+                    mP2AMultipleCore.loadBackgroundImage(filePath);
                     startGifEncoder();
                 }
             } else {
@@ -96,7 +96,7 @@ public class GroupPhotoFragment extends BaseFragment {
                 mScenes = scenes;
                 mAvatarLayout.setScenes(mScenes);
                 mActivity.setGLSurfaceViewSize(true);
-                mP2AMultipleCore = new P2AMultipleCore(mActivity, mFUP2ARenderer) {
+                mP2AMultipleCore = new P2AMultipleCore(mActivity, mFUP2ARenderer, mScenes.bg) {
 
                     @Override
                     public int onDrawFrame(byte[] img, int tex, int w, int h) {
@@ -144,8 +144,8 @@ public class GroupPhotoFragment extends BaseFragment {
             public void onAvatarSelectListener(AvatarP2A avatar, boolean isSelect) {
                 if (isSelect) {
                     for (int i = 0; i < mAvatarP2As.length; i++) {
-                        if (mAvatarP2As[i] == null && avatar.getGender() == mScenes.bundles[i].gender) {
-                            avatar.setExpressionFile(mScenes.bundles[i].path);
+                        if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && avatar.getGender() == mScenes.bundles[i].gender))) {
+                            avatar.setExpression(mScenes.bundles[i]);
                             final AvatarHandle avatarHandle = mAvatarHandleSparse.get(i);
                             avatarHandle.setAvatar(mAvatarP2As[i] = avatar, new Runnable() {
                                 @Override
@@ -283,7 +283,7 @@ public class GroupPhotoFragment extends BaseFragment {
             mP2AMultipleCore = null;
         }
 
-        FileUtil.deleteDirAndFile(new File(Constant.TmpPath));
+        FileUtil.deleteDirAndFile(Constant.TmpPath);
     }
 
     private void backToScenesLayout() {

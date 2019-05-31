@@ -9,6 +9,10 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+
+import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.entity.AvatarP2A;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,10 +21,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.faceunity.p2a_art.constant.Constant.filePath;
+
 /**
  * Created by tujh on 2018/8/24.
  */
 public abstract class FileUtil {
+
+    public static String createFilePath(int gender, String name) {
+        String dir = filePath + DateUtil.getCurrentDate();
+        dir += Constant.style == Constant.style_new ? "_new" : "_art";
+        dir += gender == AvatarP2A.gender_boy ? "_boy" : "_girl";
+        if (name != null) {
+            String[] n = name.split("\\.");
+            if (n.length > 0) {
+                dir += "_" + n[0];
+            }
+        }
+        return dir + File.separator;
+    }
+
     public static void createFile(String path) {
         File dir = new File(path);
         if (!dir.exists()) {
@@ -94,6 +114,12 @@ public abstract class FileUtil {
         fos.close();
         fis.close();
         return true;
+    }
+
+    public static void deleteDirAndFile(String dir) {
+        if (TextUtils.isEmpty(dir)) return;
+        File dirFile = new File(dir);
+        deleteDirAndFile(dirFile);
     }
 
     public static void deleteDirAndFile(File dir) {

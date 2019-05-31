@@ -19,8 +19,14 @@ public abstract class Constant {
     public static final boolean is_debug;
     public static final int is_q = 1;
 
+    public static final int style_basic = 0;
+    public static final int style_art = 1;
+    public static final int style_new = 2;
+    public static int style = style_new;
+
     public static final String web_url_get_token = "https://api2.faceunity.com:7070/token?company=faceunity";
-    public static final String p2a_client_version = "1.0.2";
+    public static final String p2a_client_version_art = "1.0.2";
+    public static final String p2a_client_version_new = "1.0.4";
     public static final String web_url_create_upload_image = "https://api.faceunity.com/api/p2a/upload";
     public static final String web_url_create_download = "https://api.faceunity.com/api/p2a/download";
 
@@ -44,7 +50,6 @@ public abstract class Constant {
             cameraFilePath = DICMFilePath + File.separator + "Video" + File.separator;
         } else if (Build.FINGERPRINT.contains("vivo")
                 || Pattern.compile("vivo", Pattern.CASE_INSENSITIVE).matcher(Build.DISPLAY).find()
-                || Build.MANUFACTURER.contains("vivo")
                 || Build.MANUFACTURER.contains("vivo")) {
             photoFilePath = cameraFilePath = Environment.getExternalStoragePublicDirectory("") + File.separator + "相机" + File.separator;
         } else {

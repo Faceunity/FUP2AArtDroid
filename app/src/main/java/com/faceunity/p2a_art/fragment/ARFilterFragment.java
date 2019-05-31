@@ -19,8 +19,8 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 
 import com.faceunity.p2a_art.R;
-import com.faceunity.p2a_art.constant.AvatarConstant;
 import com.faceunity.p2a_art.constant.Constant;
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.AvatarARHandle;
 import com.faceunity.p2a_art.core.P2AARCore;
 import com.faceunity.p2a_art.entity.AvatarP2A;
@@ -170,7 +170,7 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                             holder.mItemImg.setImageBitmap(BitmapFactory.decodeFile(AvatarP2A.getOriginPhotoThumbNail()));
                         }
                     } else {
-                        holder.mItemImg.setImageResource(selectPos[selectStatus] == position ? R.drawable.main_bottom_item_none_checked : R.drawable.main_bottom_item_none_normal);
+                        holder.mItemImg.setImageResource(selectPos[selectStatus] == position ? R.drawable.ar_filter_item_none_checked : R.drawable.ar_filter_item_none_normal);
                     }
                     holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -183,14 +183,14 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                     break;
                 case STATUS_FILTER:
                     if (position > 0) {
-                        holder.mItemImg.setImageResource(AvatarConstant.filterBundleRes()[position].resId);
+                        holder.mItemImg.setImageResource(FilePathFactory.filterBundleRes()[position].resId);
                     } else {
-                        holder.mItemImg.setImageResource(selectPos[selectStatus] == position ? R.drawable.main_bottom_item_none_checked : R.drawable.main_bottom_item_none_normal);
+                        holder.mItemImg.setImageResource(selectPos[selectStatus] == position ? R.drawable.ar_filter_item_none_checked : R.drawable.ar_filter_item_none_normal);
                     }
                     holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mAvatarARHandle.setFilter(AvatarConstant.filterBundleRes()[position].path);
+                            mAvatarARHandle.setFilter(FilePathFactory.filterBundleRes()[position].path);
                             notifySelectItemChanged(position);
                             scrollToPosition(position);
                         }
@@ -211,7 +211,7 @@ public class ARFilterFragment extends BaseFragment implements View.OnClickListen
                 case STATUS_HEAD:
                     return mAvatarP2AS.size() + 1;
                 case STATUS_FILTER:
-                    return AvatarConstant.filterBundleRes().length;
+                    return FilePathFactory.filterBundleRes().length;
             }
             return 0;
         }

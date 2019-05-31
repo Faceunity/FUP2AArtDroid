@@ -2,6 +2,7 @@ package com.faceunity.p2a_art.core;
 
 import android.content.Context;
 
+import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.wrapper.faceunity;
 
@@ -36,8 +37,8 @@ public class P2ACore extends BaseCore {
     public P2ACore(Context context, FUP2ARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
 
-        mItemsArray[ITEM_ARRAYS_EFFECT] = bgItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_default_bg);
-        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FUP2ARenderer.BUNDLE_fxaa);
+        mItemsArray[ITEM_ARRAYS_EFFECT] = bgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
     public AvatarHandle createAvatarHandle() {
@@ -45,7 +46,7 @@ public class P2ACore extends BaseCore {
             @Override
             public void run() {
                 faceunity.fuItemSetParam(avatarHandle.controllerItem, "arMode", (360 - mInputImageOrientation) / 90);
-                avatarHandle.resetAllMin();
+                avatarHandle.resetAll();
             }
         });
     }

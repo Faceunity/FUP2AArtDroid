@@ -29,8 +29,8 @@ public abstract class BaseCore {
     protected float[] expressionData = new float[56];
     protected float[] rotationData = new float[4];
     protected float[] pupilPosData = new float[2];
-    protected float[] rotationModeData = new float[1];
     protected float[] faceRectData = new float[4];
+    protected float[] rotationModeData = new float[1];
 
     public BaseCore(Context context, FUP2ARenderer fuP2ARenderer) {
         this.mContext = context.getApplicationContext();
