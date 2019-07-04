@@ -36,11 +36,13 @@ import com.faceunity.p2a_art.utils.LightSensorUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
 import com.faceunity.p2a_art.web.CreateFailureToast;
 import com.faceunity.p2a_art.web.OkHttpUtils;
+import com.faceunity.p2a_art.web.ProgressRequestBody;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import okhttp3.Call;
@@ -189,6 +191,23 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
+    private Class debugCreateInfo;
+    private Object debugCreateInfoObject;
+
+    public void createDebugCreateInfo() {
+        try {
+            debugCreateInfo = Class.forName("com.faceunity.p2a_art.debug.DebugCreateInfo");
+            debugCreateInfoObject = debugCreateInfo == null ?
+                    null : debugCreateInfo.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (java.lang.InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void createAvatar(Bitmap bitmap, float[] faceRect) {
         createAvatar(bitmap, faceRect, null);
     }
@@ -210,6 +229,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
                     @Override
                     public void selectParamListener(int gender) {
+                        createAvatarStart();
                         dir = FileUtil.createFilePath(gender, name);
                         BitmapUtil.saveBitmap(dir, bitmap, faceRect);
                         createAvatar(dir, gender);
@@ -280,11 +300,13 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                             Log.i(TAG, "updatePicRequest response message " + r.message() + " code " + r.code());
                             if (r.isSuccessful()) {
                                 String json = r.body().string();
+                                Log.i(TAG, "updatePicRequest response json " + json);
                                 try {
                                     JSONObject jsonObject = new JSONObject(json);
                                     if (2 == jsonObject.getInt("code")) {
                                         JSONObject object = jsonObject.getJSONObject("data");
                                         final String taskid = object.getString("taskid");
+                                        Log.i(TAG, "updatePicRequest response taskid " + taskid);
                                         download(token, taskid, dir, gender);
                                         return;
                                     }
@@ -293,6 +315,13 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                 }
                             }
                             requestFailure(c, dir);
+                        }
+                    }, new ProgressRequestBody.UploadProgressListener() {
+                        @Override
+                        public void onUploadRequestProgress(long byteWritten, long contentLength) {
+                            if (byteWritten == contentLength) {
+                                uploadDataComplete();
+                            }
                         }
                     });
                 } else {
@@ -319,6 +348,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                     public void onResponse(Call call, Response response) throws IOException {
                         Log.i(TAG, "downloadAvatarRequest response message " + response.message() + " code " + response.code());
                         if (response.isSuccessful()) {
+                            downloadAvatarStart();
                             String json = response.body().string();
                             Log.i(TAG, "json " + json);
                             try {
@@ -326,17 +356,30 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                 if (2 == jsonObject.getInt("code")) {
                                     String data = jsonObject.getString("data");
                                     byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
-                                    final AvatarP2A avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender);
+                                    downloadAvatarComplete();
+
+                                    final AvatarP2A avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            downFileComplete();
+                                        }
+                                    });
+                                    createAvatarComplete(dir, bytes);
                                     if (avatarP2A != null) {
                                         showAvatar(avatarP2A, mCreateAvatarDialog);
                                         return;
                                     }
-                                } else if (1 == jsonObject.getInt("code")) {
+                                } else if (1 == jsonObject.getInt("code")
+                                        && jsonObject.getString("message").equals("PROCESSING")) {
                                     download(token, taskid, dir, gender);
                                     return;
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                // 图片格式不对
+                                // if (jsonObject.getString("message").equals("FAILED") ||
+                                //jsonObject.getString("message").equals("Wrong task id or expire")) {
+                                //
                             }
                             CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
                         } else {
@@ -349,6 +392,15 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 });
             }
         }, 1000);
+    }
+
+    public void downFileComplete() {
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mActivity.getHairDownComplete().onComplete();
+            }
+        });
     }
 
     public void requestFailure(Call call, String dir) {
@@ -447,6 +499,86 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
             }
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    private void createAvatarStart() {
+        if (debugCreateInfo != null) {
+            Method createAvatarDebug = null;
+            try {
+                createAvatarDebug = debugCreateInfo.getMethod("createAvatarStart", new Class[]{});
+                createAvatarDebug.invoke(debugCreateInfoObject, new Object[]{});
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void createAvatarComplete(String dir, byte[] objData) {
+        if (debugCreateInfo != null) {
+            Method createAvatarDebug = null;
+            try {
+                createAvatarDebug = debugCreateInfo.getMethod("createAvatarComplete", new Class[]{String.class, byte[].class});
+                createAvatarDebug.invoke(debugCreateInfoObject, new Object[]{dir, objData});
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void uploadDataComplete() {
+        if (debugCreateInfo != null) {
+            Method createAvatarDebug = null;
+            try {
+                createAvatarDebug = debugCreateInfo.getMethod("uploadDataComplete", new Class[]{});
+                createAvatarDebug.invoke(debugCreateInfoObject, new Object[]{});
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void downloadAvatarStart() {
+        if (debugCreateInfo != null) {
+            Method createAvatarDebug = null;
+            try {
+                createAvatarDebug = debugCreateInfo.getMethod("downloadAvatarStart", new Class[]{});
+                createAvatarDebug.invoke(debugCreateInfoObject, new Object[]{});
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void downloadAvatarComplete() {
+        if (debugCreateInfo != null) {
+            Method createAvatarDebug = null;
+            try {
+                createAvatarDebug = debugCreateInfo.getMethod("downloadAvatarComplete", new Class[]{});
+                createAvatarDebug.invoke(debugCreateInfoObject, new Object[]{});
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

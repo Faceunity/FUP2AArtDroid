@@ -33,11 +33,11 @@ public class FUApplication extends Application {
         FUP2ARenderer.initFURenderer(this);
         long endInitNamaTime = System.currentTimeMillis();
 
-        //初始化P2A Helper
+        //初始化P2A Helper ----工具类
         FUAuthCheck.fuP2ASetAuth(authpack.A());
         long endInitP2ATime = System.currentTimeMillis();
 
-        //初始化 core data 数据
+        //初始化 core data 数据---捏脸
         P2AClientWrapper.setupData(this);
         long endInitCoreDataTime = System.currentTimeMillis();
 

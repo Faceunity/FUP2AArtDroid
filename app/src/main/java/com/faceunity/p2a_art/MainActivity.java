@@ -2,6 +2,7 @@ package com.faceunity.p2a_art;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -66,6 +67,13 @@ public class MainActivity extends AppCompatActivity implements
     private int mShowIndex;
     private AvatarP2A mShowAvatarP2A;
 
+    //头发文件下载完成回调
+    private HairDownComplete hairDownComplete;
+
+    public interface HairDownComplete {
+        void onComplete();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +89,15 @@ public class MainActivity extends AppCompatActivity implements
         mCameraRenderer.setOnCameraRendererStatusListener(this);
         mGLSurfaceView.setRenderer(mCameraRenderer);
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        hairDownComplete = new HairDownComplete() {
+            @Override
+            public void onComplete() {
+                if (mBaseFragment instanceof EditFaceFragment) {
+                    mBaseFragment.onComplete();
+                }
+            }
+        };
 
         mDBHelper = new DBHelper(this);
         mAvatarP2As = mDBHelper.getAllAvatarP2As();
@@ -175,6 +192,10 @@ public class MainActivity extends AppCompatActivity implements
         return super.onTouchEvent(event);
     }
 
+    public HairDownComplete getHairDownComplete() {
+        return hairDownComplete;
+    }
+
     public FUP2ARenderer getFUP2ARenderer() {
         return mFUP2ARenderer;
     }
@@ -201,16 +222,26 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mFUP2ARenderer.onSurfaceCreated();
-
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, final int width, int height) {
     }
 
+//    private volatile float[] expressionData = new float[56];
+
     @Override
     public int onDrawFrame(byte[] cameraNV21Byte, int cameraTextureId, int cameraWidth, int cameraHeight) {
         mCameraRenderer.refreshLandmarks(mP2ACore.getLandmarksData());
+//        expressionData = mP2ACore.getExpressionData();
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (HomeFragment.TAG.equals(mShowFragmentFlag) && mHomeFragment != null) {
+//                    mHomeFragment.setExpress(expressionData);
+//                }
+//            }
+//        });
         return mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight);
     }
 

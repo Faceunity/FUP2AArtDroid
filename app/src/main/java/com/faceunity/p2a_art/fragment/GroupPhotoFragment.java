@@ -4,14 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.opengl.EGL14;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.Constant;
@@ -19,6 +22,7 @@ import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.P2AMultipleCore;
 import com.faceunity.p2a_art.entity.AvatarP2A;
 import com.faceunity.p2a_art.entity.Scenes;
+import com.faceunity.p2a_art.gles.core.GlUtil;
 import com.faceunity.p2a_art.renderer.CameraRenderer;
 import com.faceunity.p2a_art.ui.GroupPhotoAvatar;
 import com.faceunity.p2a_art.ui.GroupPhotoScenes;
@@ -27,6 +31,10 @@ import com.faceunity.p2a_art.utils.DateUtil;
 import com.faceunity.p2a_art.utils.FileUtil;
 import com.faceunity.p2a_art.utils.ToastUtil;
 import com.faceunity.p2a_helper.gif.GifHardEncoderWrapper;
+import com.faceunity.p2a_helper.video.MediaAudioEncoder;
+import com.faceunity.p2a_helper.video.MediaEncoder;
+import com.faceunity.p2a_helper.video.MediaMuxerWrapper;
+import com.faceunity.p2a_helper.video.MediaVideoEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,8 +60,6 @@ public class GroupPhotoFragment extends BaseFragment {
 
     private Bitmap mShowBitmap;
 
-    private String mGifPath = "";
-    private GifHardEncoderWrapper mGifHardEncoder;
     static final int NONE_FRAME_ID = -100;
     int frameId = NONE_FRAME_ID;
 
@@ -101,14 +107,18 @@ public class GroupPhotoFragment extends BaseFragment {
                     @Override
                     public int onDrawFrame(byte[] img, int tex, int w, int h) {
                         int fuTex = super.onDrawFrame(img, tex, w, h);
+                        Log.i("wh", "w=" + w + "--h=" + h +
+                                "--mScenes=" + mScenes.bundles[0].path);
                         AvatarHandle avatarHandle = mAvatarHandleSparse.get(0);
-                        if (avatarHandle != null && mGifHardEncoder != null) {
+                        if (avatarHandle != null) {
                             int nowFrameId = avatarHandle.getNowFrameId();
                             if (frameId > nowFrameId) {
-                                releaseGifEncoder();
                                 frameId = NONE_FRAME_ID;
+                                stopRecording();
                             } else {
-                                mGifHardEncoder.encodeFrame(fuTex);
+                                if (mVideoEncoder != null) {
+                                    mVideoEncoder.frameAvailableSoon(fuTex, mActivity.getCameraRenderer().getMtx(), GlUtil.IDENTITY_MATRIX);
+                                }
                                 frameId = nowFrameId;
                             }
                         }
@@ -154,6 +164,12 @@ public class GroupPhotoFragment extends BaseFragment {
                                     if (++isLoadComplete == mAvatarHandleSparse.size()) {
                                         if (isAnimationScenes) {
                                             startGifEncoder();
+                                            mActivity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    startRecording();
+                                                }
+                                            });
                                         } else {
                                             mAvatarLayout.updateNextBtn(true);
                                         }
@@ -168,7 +184,7 @@ public class GroupPhotoFragment extends BaseFragment {
                 } else {
                     for (int i = 0; i < mAvatarP2As.length; i++) {
                         if (mAvatarP2As[i] != null && mAvatarP2As[i].equals(avatar)) {
-                            releaseGifEncoder();
+                            stopRecording();
                             mAvatarP2As[i] = null;
                             mAvatarHandleSparse.get(i).setAvatar(new AvatarP2A());
                             isLoadComplete--;
@@ -187,7 +203,8 @@ public class GroupPhotoFragment extends BaseFragment {
                         public void run() {
                             mAvatarLayout.setVisibility(View.GONE);
                             mShowLayout.setVisibility(View.VISIBLE);
-                            mShowLayout.setShowGIF(mGifPath);
+//                            mShowLayout.setShowGIF(mGifPath);
+                            mShowLayout.playVideo(mOutFile.getAbsolutePath());
                         }
                     });
                 } else {
@@ -211,6 +228,11 @@ public class GroupPhotoFragment extends BaseFragment {
         mAvatarLayout.setBackgroundRunnable(new Runnable() {
             @Override
             public void run() {
+                if (mAvatarLayout.nextEnable() || mAvatarLayout.isCreateAnimate()) {
+                    Toast.makeText(mActivity,
+                            "请先取消选择的模型", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Intent intent2 = new Intent();
                 intent2.addCategory(Intent.CATEGORY_OPENABLE);
                 intent2.setType("image/*");
@@ -242,11 +264,11 @@ public class GroupPhotoFragment extends BaseFragment {
             @Override
             public void run() {
                 if (isAnimationScenes) {
-                    String resultPath = Constant.photoFilePath + Constant.APP_NAME + "_" + DateUtil.getCurrentDate() + ".gif";
+                    String resultVideoPath = Constant.photoFilePath + Constant.APP_NAME + "_" + DateUtil.getCurrentDate() + ".mp4";
                     try {
-                        FileUtil.copyFileTo(new File(mGifPath), new File(resultPath));
-                        getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(resultPath))));
-                        ToastUtil.showCenterToast(getContext(), "动图已保存到相册");
+                        FileUtil.copyFileTo(mOutFile, new File(resultVideoPath));
+                        getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(resultVideoPath))));
+                        ToastUtil.showCenterToast(getContext(), "视频已保存到相册");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -271,6 +293,30 @@ public class GroupPhotoFragment extends BaseFragment {
             backToScenesLayout();
         } else {
             backToHome();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mShowLayout != null) {
+            mShowLayout.onPause();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mShowLayout != null && mShowLayout.getVisibility() == View.VISIBLE) {
+            mShowLayout.playVideo(mOutFile.getAbsolutePath());
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mShowLayout != null) {
+            mShowLayout.release();
         }
     }
 
@@ -309,17 +355,13 @@ public class GroupPhotoFragment extends BaseFragment {
         mShowLayout.setVisibility(View.GONE);
         mShowLayout.setShowImg(null);
         mShowLayout.setShowGIF("");
+        mShowLayout.onPause();
     }
 
     private void startGifEncoder() {
         mP2AMultipleCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                if (mGifHardEncoder != null) {
-                    mGifHardEncoder.release();
-                }
-                mGifHardEncoder = new GifHardEncoderWrapper(mGifPath = Constant.TmpPath + DateUtil.getCurrentDate() + "_tmp.gif",
-                        mCameraRenderer.getCameraHeight() / 2, mCameraRenderer.getCameraWidth() / 2);
                 for (int i = 0; i < mAvatarP2As.length; i++) {
                     if (mAvatarHandleSparse.get(i) != null) {
                         mAvatarHandleSparse.get(i).seekToAnimFrameId(1);
@@ -332,10 +374,66 @@ public class GroupPhotoFragment extends BaseFragment {
         });
     }
 
-    private void releaseGifEncoder() {
-        if (mGifHardEncoder != null) {
-            mGifHardEncoder.release();
-            mGifHardEncoder = null;
+    private File mOutFile;
+    private MediaVideoEncoder mVideoEncoder;
+
+    /**
+     * 录制封装回调
+     */
+    private final MediaEncoder.MediaEncoderListener mMediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
+        @Override
+        public void onPrepared(final MediaEncoder encoder) {
+            if (encoder instanceof MediaVideoEncoder) {
+                final MediaVideoEncoder videoEncoder = (MediaVideoEncoder) encoder;
+                mP2AMultipleCore.queueEvent(new Runnable() {
+                    @Override
+                    public void run() {
+                        videoEncoder.setEglContext(EGL14.eglGetCurrentContext());
+                        mVideoEncoder = videoEncoder;
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onStopped(final MediaEncoder encoder) {
+            if (encoder instanceof MediaVideoEncoder) {
+                mVideoEncoder = null;
+                Log.e(TAG, "stop encoder success");
+            }
+        }
+    };
+
+    private MediaMuxerWrapper mMuxer;
+
+    /**
+     * 开始录制
+     */
+    private void startRecording() {
+//        try {
+        stopRecording();
+        String videoFileName = DateUtil.getCurrentDate() + "_tmp.mp4";
+        mOutFile = new File(Constant.TmpPath, videoFileName);
+        mMuxer = new MediaMuxerWrapper(mOutFile.getAbsolutePath());
+
+        // for video capturing
+        new MediaVideoEncoder(mMuxer, mMediaEncoderListener, mCameraRenderer.getCameraHeight(), mCameraRenderer.getCameraWidth());
+        //new MediaAudioEncoder(mMuxer, mMediaEncoderListener);//去除音频录制
+
+        mMuxer.prepare();
+        mMuxer.startRecording();
+//        } catch (final IOException e) {
+//            Log.e(TAG, "startCapture:", e);
+//        }
+    }
+
+    /**
+     * 停止录制
+     */
+    private void stopRecording() {
+        if (mMuxer != null) {
+            mMuxer.stopRecording();
+            mMuxer = null;
             mAvatarLayout.updateNextBtn(true);
         }
     }

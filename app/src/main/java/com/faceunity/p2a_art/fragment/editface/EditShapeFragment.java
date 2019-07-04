@@ -97,7 +97,12 @@ public class EditShapeFragment extends EditFaceBaseFragment {
     public void initDate(List<ParamRes> paramRes, EditFaceStatusChaneListener editFaceStatusChaneListener, int selectPos, double[][] colorList, double values, ColorValuesChangeListener colorValueListener) {
         initDate(paramRes, editFaceStatusChaneListener, selectPos);
 
-        mColorList = colorList;
+        mColorList = new double[colorList.length-1][colorList[0].length];
+        for (int i = 0; i < colorList.length - 1; i++) {
+            System.arraycopy(colorList[i], 0, mColorList[i],
+                    0, colorList[i].length);
+        }
+//        mColorList = colorList;
         mDefaultValues = values;
         mSelectPos = (int) mDefaultValues;
         mValues = mDefaultValues - mSelectPos;

@@ -59,9 +59,18 @@ public class P2ACore extends BaseCore {
         return mItemsArray;
     }
 
+    /**
+     * fuAvatarToTexture 用于人脸驱动
+     * @param img 图片buffer
+     * @param tex 图片纹理
+     * @param w   图片宽
+     * @param h   图片高
+     * @return
+     */
     @Override
     public int onDrawFrame(byte[] img, int tex, int w, int h) {
         int isTracking = 0;
+        //是否开启人脸驱动
         if (isNeedTrackFace && img != null) {
             faceunity.fuTrackFaceWithTongue(img, 0, w, h);
             isTracking = faceunity.fuIsTracking();

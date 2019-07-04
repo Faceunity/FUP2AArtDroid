@@ -140,6 +140,7 @@ public class AvatarFragment extends BaseFragment
             final AvatarP2A avatarP2A = mAvatarP2AS.get(position);
             if (avatarP2A.getOriginPhotoRes() > 0) {
                 holder.mItemImg.setImageResource(avatarP2A.getOriginPhotoRes());
+                Log.e("img", avatarP2A.getOriginPhotoRes() + "");
             } else {
                 holder.mItemImg.setImageBitmap(BitmapFactory.decodeFile(avatarP2A.getOriginPhotoThumbNail()));
             }

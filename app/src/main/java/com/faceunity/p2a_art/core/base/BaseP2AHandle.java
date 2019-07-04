@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 基础的P2A Controller
  * Created by tujh on 2018/12/18.
  */
 public abstract class BaseP2AHandle extends BaseHandle {

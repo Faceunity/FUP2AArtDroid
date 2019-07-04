@@ -1,5 +1,7 @@
 package com.faceunity.p2a_art.fragment;
 
+import android.graphics.Color;
+import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,6 +28,7 @@ public class HomeFragment extends BaseFragment
 
     private View mGuideView;
     private TextView mVersionText;
+    private String text;
 
     @Nullable
     @Override
@@ -54,7 +57,9 @@ public class HomeFragment extends BaseFragment
         mGuideView.bringToFront();
         mGuideView.setVisibility(View.VISIBLE);
         mVersionText = view.findViewById(R.id.main_version_text);
-        mVersionText.setText(String.format("DigiMe Art v%s\nSDK v%s", BuildConfig.VERSION_NAME, FUP2AClient.getVersion()));
+
+        text = String.format("DigiMe Art v%s\nSDK v%s", BuildConfig.VERSION_NAME, FUP2AClient.getVersion());
+        mVersionText.setText(text);
         Log.e(TAG, "FUP2AClient.Version " + FUP2AClient.getVersion());
 
         mTrackBtn = view.findViewById(R.id.avatar_track_image_btn);
@@ -73,6 +78,15 @@ public class HomeFragment extends BaseFragment
         view.findViewById(R.id.main_group_photo_image_btn).setOnClickListener(this);
 
     }
+
+//    public void setExpress(float[] express) {
+//        String t1 = String.format("%.2f", express[14]);
+//        String t2 = String.format("%.2f", express[15]);
+//        String t3 = String.format("%.2f", express[42]);
+//        Log.e("express", t1 + "--" + t2 + "--" + t3 + "");
+//        mVersionText.setTextColor(Color.RED);
+//        mVersionText.setText(text + String.format("\nExpression 15:%s 16:%s  43:%s", t1 + "", t2 + "", t3 + ""));
+//    }
 
     public void checkGuide() {
         if (mGuideView.getVisibility() == View.VISIBLE) {

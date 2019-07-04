@@ -6,6 +6,7 @@ import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.wrapper.faceunity;
 
 /**
+ * nama场景
  * Created by tujh on 2018/12/17.
  */
 public class NamaCore extends BaseCore {

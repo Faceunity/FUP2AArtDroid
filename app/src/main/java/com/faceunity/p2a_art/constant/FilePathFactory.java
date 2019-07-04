@@ -120,33 +120,39 @@ public abstract class FilePathFactory {
             p2AS.add(0, new AvatarP2A("art/head/head_1/", R.drawable.head_1_male, AvatarP2A.gender_boy, "art/head/head_1/head.bundle", 2, 0, 0, 0));
             p2AS.add(1, new AvatarP2A("art/head/head_2/", R.drawable.head_2_female, AvatarP2A.gender_girl, "art/head/head_2/head.bundle", 8, 0, 0, 0));
         } else {
-            p2AS.add(0, new AvatarP2A("new/head/head_1/", R.drawable.head_1_male, AvatarP2A.gender_boy, "new/head/head_1/head.bundle", 1, 0, 0, 0));
-            p2AS.add(1, new AvatarP2A("new/head/head_2/", R.drawable.head_2_female, AvatarP2A.gender_girl, "new/head/head_2/head.bundle", 9, 0, 0, 0));
+            p2AS.add(0, new AvatarP2A("new/head/head_1/", R.drawable.head_1_male, AvatarP2A.gender_boy, "new/head/head_1/head.bundle", 4, 0, 0, 0));
+            p2AS.add(1, new AvatarP2A("new/head/head_2/", R.drawable.head_2_female, AvatarP2A.gender_girl, "new/head/head_2/head.bundle", 20, 0, 0, 0));
         }
         return p2AS;
     }
 
     /**
-     * 头发
+     * 头发 （-1默认头发，男女各一个）--z 风格--q版   L风格--写实--老版
      */
     private static final BundleRes[] HAIR_NEW = {
             new BundleRes(AvatarP2A.gender_mid, "", R.drawable.new_hair_none, new Integer[]{}),
             new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_0.bundle", R.drawable.new_male_hair_0, new Integer[]{0}),
             new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_1.bundle", R.drawable.new_male_hair_1, new Integer[]{1, -1}),
-            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_2.bundle", R.drawable.new_male_hair_2, new Integer[]{2, 3, 4}),
+            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_2.bundle", R.drawable.new_male_hair_2, new Integer[]{2}),
+            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_3.bundle", R.drawable.new_male_hair_3, new Integer[]{3}),
+            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_4.bundle", R.drawable.new_male_hair_4, new Integer[]{4}),
             new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_5.bundle", R.drawable.new_male_hair_5, new Integer[]{5}),
             new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_6.bundle", R.drawable.new_male_hair_6, new Integer[]{6}),
-            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_t_7.bundle", R.drawable.new_male_hair_t_7, new Integer[]{}),
-            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_t_8.bundle", R.drawable.new_male_hair_t_8, new Integer[]{}),
-            new BundleRes(AvatarP2A.gender_boy, "new/hair/male_hair_t_9.bundle", R.drawable.new_male_hair_t_9, new Integer[]{}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_7.bundle", R.drawable.new_female_hair_7, new Integer[]{7, 8}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_9.bundle", R.drawable.new_female_hair_9, new Integer[]{9, 10, 16, 17, 13, 14, 18, 24}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_11.bundle", R.drawable.new_female_hair_11, new Integer[]{11}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_12.bundle", R.drawable.new_female_hair_12, new Integer[]{12, 19}, false),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_7.bundle", R.drawable.new_female_hair_7, new Integer[]{7}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_8.bundle", R.drawable.new_female_hair_8, new Integer[]{8}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_9.bundle", R.drawable.new_female_hair_9, new Integer[]{9}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_10.bundle", R.drawable.new_female_hair_10, new Integer[]{10}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_11.bundle", R.drawable.new_female_hair_11, new Integer[]{11, -1}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_12.bundle", R.drawable.new_female_hair_12, new Integer[]{12}, false),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_13.bundle", R.drawable.new_female_hair_13, new Integer[]{13}),
             new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_15.bundle", R.drawable.new_female_hair_15, new Integer[]{15}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_23.bundle", R.drawable.new_female_hair_23, new Integer[]{23, 20, 21, 22}),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_t_1.bundle", R.drawable.new_female_hair_t_1, new Integer[]{-1}, false),
-            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_t_5.bundle", R.drawable.new_female_hair_t_5, new Integer[]{}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_16.bundle", R.drawable.new_female_hair_16, new Integer[]{16}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_17.bundle", R.drawable.new_female_hair_17, new Integer[]{17,18}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_19.bundle", R.drawable.new_female_hair_19, new Integer[]{19}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_20.bundle", R.drawable.new_female_hair_20, new Integer[]{20}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_21.bundle", R.drawable.new_female_hair_21, new Integer[]{21}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_22.bundle", R.drawable.new_female_hair_22, new Integer[]{22}),
+            new BundleRes(AvatarP2A.gender_girl, "new/hair/female_hair_23.bundle", R.drawable.new_female_hair_23, new Integer[]{23,24}),
     };
 
     private static final BundleRes[] HAIR_ART = {
@@ -237,11 +243,11 @@ public abstract class FilePathFactory {
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_8.bundle", R.drawable.glass_8, new Integer[]{1, 1}),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_9.bundle", R.drawable.glass_9),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_10.bundle", R.drawable.glass_10),
-            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_11.bundle", R.drawable.glass_11, new Integer[]{1, 2}),
+            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_11.bundle", R.drawable.glass_11),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_12.bundle", R.drawable.glass_12),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_13.bundle", R.drawable.glass_13),
-            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_14.bundle", R.drawable.glass_14),
-            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_15.bundle", R.drawable.glass_15),
+            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_14.bundle", R.drawable.glass_14,new Integer[]{1, 0}),
+            new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_15.bundle", R.drawable.glass_15,new Integer[]{1, 2}),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_16.bundle", R.drawable.glass_16),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_17.bundle", R.drawable.glass_17),
             new BundleRes(AvatarP2A.gender_mid, "new/glasses/glass_18.bundle", R.drawable.glass_18),
@@ -262,7 +268,7 @@ public abstract class FilePathFactory {
                 return i;
             }
         }
-        return 1;
+        return 13;
     }
 
     /**
@@ -481,6 +487,13 @@ public abstract class FilePathFactory {
     };
     public static final Scenes[] SCENES_NEW_SINGLE = {
             new Scenes(R.drawable.new_expression_single_5, new BundleRes[]{new BundleRes("new/expression/pose_danren_01.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_danshoubixin, new BundleRes[]{new BundleRes("new/expression/pose_5ren_1.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_guzhang, new BundleRes[]{new BundleRes("new/expression/pose_5ren_2.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_hi, new BundleRes[]{new BundleRes("new/expression/pose_5ren_3.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_ok, new BundleRes[]{new BundleRes("new/expression/pose_5ren_4.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_rock, new BundleRes[]{new BundleRes("new/expression/pose_5ren_5.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_shuangshoubixin, new BundleRes[]{new BundleRes("new/expression/pose_shaungren_03_1.bundle")}),
+//            new Scenes(R.drawable.new_expression_single_shuangshoubixin, new BundleRes[]{new BundleRes("new/expression/pose_shaungren_03_2.bundle")}),
     };
     public static final Scenes[] SCENES_NEW_MULTIPLE = {
             new Scenes(R.drawable.new_expression_many_1, new BundleRes[]{new BundleRes("new/expression/pose_shaungren_03_1.bundle"), new BundleRes("new/expression/pose_shaungren_03_2.bundle")}),

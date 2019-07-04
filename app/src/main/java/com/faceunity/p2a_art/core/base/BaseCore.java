@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 场景
  * Created by tujh on 2018/12/18.
  */
 public abstract class BaseCore {
@@ -38,10 +39,30 @@ public abstract class BaseCore {
         this.mFUItemHandler = fuP2ARenderer.getFUItemHandler();
     }
 
+    /**
+     * 获取所有道具句柄
+     *
+     * @return
+     */
     public abstract int[] itemsArray();
 
+    /**
+     * 图片渲染
+     *
+     * @param img 图片buffer
+     * @param tex 图片纹理
+     * @param w   图片宽
+     * @param h   图片高
+     * @return
+     */
     public abstract int onDrawFrame(byte[] img, int tex, int w, int h);
 
+    /**
+     * 切换相机
+     *
+     * @param currentCameraType     相机方向
+     * @param inputImageOrientation 相机获取的图片旋转角度
+     */
     public void onCameraChange(final int currentCameraType, final int inputImageOrientation) {
         queueEvent(new Runnable() {
             @Override
@@ -80,16 +101,23 @@ public abstract class BaseCore {
         mFUP2ARenderer.queueNextEvent(r);
     }
 
+    //******************nama SDK中的人脸信息相关参数*****************************//
     public int isTracking() {
         return faceunity.fuIsTracking();
     }
 
+    /**
+     * landmarks 2D人脸特征点，返回值为75个二维坐标，长度75*2
+     */
     public float[] getLandmarksData() {
         Arrays.fill(landmarksData, 0.0f);
         faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
         return landmarksData;
     }
 
+    /**
+     *rotation 人脸三维旋转，返回值为旋转四元数，长度4
+     */
     public float[] getRotationData() {
         Arrays.fill(rotationData, 0.0f);
         faceunity.fuGetFaceInfo(0, "rotation", rotationData);
@@ -102,6 +130,9 @@ public abstract class BaseCore {
         return faceRectData;
     }
 
+    /**
+     * expression  表情系数，长度46
+     */
     public float[] getExpressionData() {
         Arrays.fill(expressionData, 0.0f);
         faceunity.fuGetFaceInfo(0, "expression", expressionData);

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,6 +21,7 @@ import android.widget.RadioGroup;
 
 import com.faceunity.p2a_art.R;
 import com.faceunity.p2a_art.constant.ColorConstant;
+import com.faceunity.p2a_art.constant.Constant;
 import com.faceunity.p2a_art.constant.FilePathFactory;
 import com.faceunity.p2a_art.core.AvatarHandle;
 import com.faceunity.p2a_art.core.P2ACore;
@@ -43,6 +45,7 @@ import com.faceunity.p2a_art.ui.LoadingDialog;
 import com.faceunity.p2a_art.ui.NormalDialog;
 import com.faceunity.p2a_art.utils.ToastUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -421,12 +424,30 @@ public class EditFaceFragment extends BaseFragment
             }
         }
     };
+
+    private LoadingDialog mLoadingDialogHair;
+    private boolean isStartLoading = false;
+
     ItemChangeListener mItemChangeListener = new ItemChangeListener() {
         @Override
         public void itemChangeListener(int id, int pos) {
             switch (id) {
                 case TITLE_HAIR_INDEX:
                     mAvatarP2A.setHairIndex(pos);
+
+                    if (mAvatarP2A.getHairFile().contains(Constant.filePath)) {
+                        File file = new File(mAvatarP2A.getHairFile());
+                        if (!file.exists() || file.length() <= 0) {
+                            if (mLoadingDialogHair == null) {
+                                mLoadingDialogHair = new LoadingDialog();
+                                mLoadingDialogHair.setLoadingStr("头发下载中...");
+                            }
+                            mLoadingDialogHair.show(getChildFragmentManager(), LoadingDialog.TAG);
+                            isStartLoading = true;
+                            return;
+                        }
+                    }
+                    //Log.e("ssss", "file=" + mAvatarP2A.getHairFile());
                     break;
                 case TITLE_BEARD_INDEX:
                     mAvatarP2A.setBeardIndex(pos);
@@ -454,6 +475,17 @@ public class EditFaceFragment extends BaseFragment
             updateSaveBtn();
         }
     };
+
+    @Override
+    public void onComplete() {
+        if (mLoadingDialogHair != null && isStartLoading) {
+            mLoadingDialogHair.dismiss();
+            isStartLoading = false;
+            mAvatarHandle.setAvatar(mAvatarP2A);
+            updateSaveBtn();
+        }
+    }
+
     ColorValuesChangeListener mColorValuesChangeListener = new ColorValuesChangeListener() {
         @Override
         public void colorValuesChangeListener(int id, int index, double values) {

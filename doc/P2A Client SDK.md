@@ -10,12 +10,11 @@
 
 ## 快速开始
 
-下载工程后需要先获取三个证书：
+下载工程后需要先获取一个证书：
 
 - authpack.h：Nama SDK鉴权证书，用于在客户端，使用Nama SDK 绘制的鉴权。
-- p2a.p12、p2a.pem：https 网络请求的鉴权证书，工程中提供的域名为测试域名，该证书仅用于连接测试服务器的鉴权。真实对接中，需要客户自己搭建服务端，并设计自己的鉴权机制，关于服务端的搭建请参考[P2A Server API 说明文档](P2A%20Server%20API.pdf)。
 
-将authpack.h拷贝到[core](app/src/main/java/com/faceunity/p2a_art/core/)文件夹下，将p2a.p12及p2a.pem拷贝到[assets](app/src/main/assets)文件夹，然后直接运行工程即可。
+将authpack.h拷贝到[core](app/src/main/java/com/faceunity/p2a_art/core/)文件夹下，然后直接运行工程即可。
 
 ## 资源说明
 
@@ -542,7 +541,7 @@ FUP2ARenderer 是在Demo中实现风格化形象的渲染与切换、位置控�
 形象应用功能包括：单人场景、多人场景、动画场景。
 
 - 单人场景和多人场景可以分别对单个形象和多个形象进行动作编辑，并保存场景图像到手机系统相册。
-- 动画场景可以对形象进行动画编辑，导出形象动画为 GIF动图，并保存到手机系统相册。
+- 动画场景可以对形象进行动画编辑，导出形象动画为 GIF动图和MP4视频，默认保存为MP4视频，并保存到手机系统相册。
 
 具体功能接入可以参考 Demo 代码
 

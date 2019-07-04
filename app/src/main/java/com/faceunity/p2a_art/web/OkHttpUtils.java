@@ -17,13 +17,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
@@ -41,7 +43,8 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
     private static final String TAG = OkHttpUtils.class.getSimpleName();
-    public static final String P12_PATH = "p2a.p12";
+    //    public static final String P12_PATH = "p2a.p12";
+    public static final String PEM_PATH = "p2a.pem";
 
     private volatile static OkHttpUtils sOkHttpUtils;
 
@@ -50,13 +53,26 @@ public class OkHttpUtils {
     public static OkHttpClient initOkHttpClient(Context context) {
         SSLSocketFactory sslSocketFactory = null;
         try {
-            InputStream p12 = context.getAssets().open(P12_PATH);
-            byte[] p12Bytes = new byte[p12.available()];
-            p12.read(p12Bytes);
-            p12.close();
-            sslSocketFactory = new CustomSslSocketFactory(OkHttpUtils.getKeyManagerFactory(p12Bytes).getKeyManagers(), new TrustManager[]{new TrustAllCerts()});
+//            InputStream p12 = context.getAssets().open(P12_PATH);
+//            byte[] p12Bytes = new byte[p12.available()];
+//            p12.read(p12Bytes);
+//            p12.close();
+
+
+            //p2a服务器需要的ca，手动传避免部分机型ca不全
+            InputStream ca = context.getAssets().open(PEM_PATH);
+            byte[] caBytes = new byte[ca.available()];
+            ca.read(caBytes);
+            ca.close();
+
+            TrustManagerFactory tmf = OkHttpUtils.getTrustManagerFactory(caBytes);
+//            sslSocketFactory = new CustomSslSocketFactory(OkHttpUtils.getKeyManagerFactory(p12Bytes).getKeyManagers(),
+//                    tmf == null ? null : tmf.getTrustManagers());
+            sslSocketFactory = new CustomSslSocketFactory(null,
+                    tmf == null ? null : tmf.getTrustManagers());
         } catch (Exception e) {
         }
+
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(60000L, TimeUnit.MILLISECONDS)
                 .writeTimeout(60000L, TimeUnit.MILLISECONDS)
@@ -212,6 +228,46 @@ public class OkHttpUtils {
     }
 
     /**
+     * 请求服务器，上传图片
+     *
+     * @param uploadFile 图片路径
+     * @param gender     性别 0：男 1：女
+     * @param callback
+     */
+    public static void updatePicRequest(String token, final String uploadFile, int gender, final Callback callback, ProgressRequestBody.UploadProgressListener uploadProgressListener) {
+        String url = Constant.web_url_create_upload_image + "?access_token=" + token;
+        Log.i(TAG, "createAvatarRequest url " + url);
+        Log.i(TAG, "createAvatarRequest uploadFile " + uploadFile);
+        Bitmap bitmap = BitmapUtil.loadBitmap(uploadFile);
+        String tmp = Constant.filePath + "tmp.png";
+        FileUtil.saveBitmapToFile(tmp, bitmap);
+        final File reallyUploadFile = new File(tmp);
+        RequestBody requestBody = (new okhttp3.MultipartBody.Builder())
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("gender", String.valueOf(gender))
+                .addFormDataPart("version", Constant.style == Constant.style_new ? Constant.p2a_client_version_new : Constant.p2a_client_version_art)
+                .addFormDataPart("image", "filename", RequestBody.create(MediaType.parse("image/png"), reallyUploadFile))
+                .build();
+        if (uploadProgressListener != null) {
+            requestBody = new ProgressRequestBody(requestBody, uploadProgressListener);
+        }
+        getInstance().getOkHttpClient().newCall(new Request.Builder().url(url).post(requestBody).build()).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onFailure(call, e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!reallyUploadFile.equals(uploadFile)) {
+                    reallyUploadFile.delete();
+                }
+                callback.onResponse(call, response);
+            }
+        });
+    }
+
+    /**
      * 请求服务器，下载生成数据
      *
      * @param taskId   任务ID
@@ -247,5 +303,38 @@ public class OkHttpUtils {
         for (Call call : getInstance().getOkHttpClient().dispatcher().runningCalls()) {
             call.cancel();
         }
+    }
+
+    /**
+     * 这里配置初始化ca，拿到trustmanager
+     */
+    public static TrustManagerFactory getTrustManagerFactory(byte[] caBytes) {
+        if (caBytes == null) return null;
+        TrustManagerFactory tmf = null;
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream caInput = new ByteArrayInputStream(caBytes);
+            Certificate ca = null;
+            try {
+                ca = cf.generateCertificate(caInput);
+                System.out.println("ca=" + ((X509Certificate) ca).getSubjectDN());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                caInput.close();
+            }
+            // Create a KeyStore containing our trusted CAs
+            String keyStoreType = KeyStore.getDefaultType();
+            KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("ca", ca);
+            // Create a TrustManager that trusts the CAs in our KeyStore
+            String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+            tmf.init(keyStore);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return tmf;
     }
 }

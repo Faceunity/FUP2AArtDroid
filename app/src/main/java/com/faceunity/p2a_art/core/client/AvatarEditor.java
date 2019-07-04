@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.util.List;
 
 /**
+ * 捏脸
  * Created by tujh on 2019/2/22.
  */
 public class AvatarEditor {

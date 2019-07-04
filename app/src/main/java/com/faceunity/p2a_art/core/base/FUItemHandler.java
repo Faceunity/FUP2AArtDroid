@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * 异步消息的处理
+ * <p>
  * Created by tujh on 2018/12/17.
  */
 public class FUItemHandler extends Handler {
@@ -35,6 +37,14 @@ public class FUItemHandler extends Handler {
         this.mContext = mContext;
     }
 
+    /**
+     * 接收到消息进行处理
+     * <p>
+     * 只处理LoadFUItemListener类型的消息
+     * 返回FUItem
+     *
+     * @param msg
+     */
     @Override
     public void handleMessage(Message msg) {
         if (msg.obj instanceof LoadFUItemListener) {
@@ -43,6 +53,12 @@ public class FUItemHandler extends Handler {
         }
     }
 
+    /**
+     * 发送加载道具bundle的消息
+     *
+     * @param what
+     * @param loadFUItemListener
+     */
     public void loadFUItem(int what, LoadFUItemListener loadFUItemListener) {
         sendMessage(Message.obtain(this, what, loadFUItemListener));
     }
@@ -79,6 +95,9 @@ public class FUItemHandler extends Handler {
         return item;
     }
 
+    /**
+     * 道具创建完成的回调
+     */
     public abstract static class LoadFUItemListener {
 
         private String name;

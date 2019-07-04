@@ -1,12 +1,13 @@
 package com.faceunity.p2a_art.core.base;
 
 /**
+ * 道具封装
  * Created by tujh on 2018/12/17.
  */
 public class FUItem {
 
-    public String name = "";
-    public int handle;
+    public String name = "";//道具名（bundle名）
+    public int handle;//道具句柄
 
     public FUItem() {
     }

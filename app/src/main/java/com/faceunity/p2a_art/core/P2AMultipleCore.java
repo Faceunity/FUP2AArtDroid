@@ -13,6 +13,7 @@ import com.faceunity.wrapper.faceunity;
 import java.util.Arrays;
 
 /**
+ * 多人合照场景
  * Created by tujh on 2018/12/17.
  */
 public class P2AMultipleCore extends BaseCore {

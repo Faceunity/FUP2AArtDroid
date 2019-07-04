@@ -283,4 +283,13 @@ public class GroupPhotoAvatar extends RelativeLayout {
             }
         });
     }
+
+    public boolean nextEnable() {
+        return mNextBtn.isEnabled();
+    }
+
+    public boolean isCreateAnimate() {
+        return mAvatarPoint.getText().toString().equals(str_create_complete)
+                || mAvatarPoint.getText().toString().equals(str_creating);
+    }
 }

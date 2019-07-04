@@ -350,6 +350,10 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         return mCameraHeight;
     }
 
+    public float[] getMtx() {
+        return mtx;
+    }
+
     public void setNeedStopDrawFrame(boolean needStopDrawFrame) {
         isNeedStopDrawFrame = needStopDrawFrame;
         if (!isNeedStopDrawFrame)

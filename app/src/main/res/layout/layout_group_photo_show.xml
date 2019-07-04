@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/colorWhite">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
 
     <ImageButton
         android:id="@+id/group_photo_show_back"
@@ -14,7 +14,7 @@
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_back"/>
+        android:src="@drawable/group_photo_back" />
 
     <ImageButton
         android:id="@+id/group_photo_show_home"
@@ -25,7 +25,7 @@
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_home"/>
+        android:src="@drawable/group_photo_home" />
 
     <ImageView
         android:id="@+id/group_photo_show_img"
@@ -33,16 +33,37 @@
         android:layout_height="@dimen/x716"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/x238"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
     <View
+        android:id="@+id/v_group_photo_show_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/group_photo_show_img"
         android:layout_alignTop="@+id/group_photo_show_img"
         android:layout_alignRight="@+id/group_photo_show_img"
         android:layout_alignBottom="@+id/group_photo_show_img"
-        android:background="@drawable/group_photo_round"/>
+        android:background="@drawable/group_photo_round"
+        android:visibility="gone"/>
+
+    <SurfaceView
+        android:id="@+id/surfaceview"
+        android:layout_width="@dimen/x403"
+        android:layout_height="@dimen/x716"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/x238" />
+
+    <!--<View-->
+        <!--android:id="@+id/v_surfaceview"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignLeft="@+id/surfaceview"-->
+        <!--android:layout_alignTop="@+id/surfaceview"-->
+        <!--android:layout_alignRight="@+id/surfaceview"-->
+        <!--android:layout_alignBottom="@+id/surfaceview"-->
+        <!--android:background="@drawable/group_photo_round" />-->
+
 
     <Button
         android:id="@+id/group_photo_show_save"
@@ -54,5 +75,5 @@
         android:background="@drawable/group_photo_save_background"
         android:text="保存"
         android:textColor="@color/colorWhite"
-        android:textSize="@dimen/text_size_34"/>
+        android:textSize="@dimen/text_size_34" />
 </RelativeLayout>

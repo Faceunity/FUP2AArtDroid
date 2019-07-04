@@ -15,6 +15,7 @@ import com.faceunity.wrapper.faceunity;
 import java.util.Arrays;
 
 /**
+ * AR Controller
  * Created by tujh on 2018/12/17.
  */
 public class AvatarARHandle extends BaseP2AHandle {

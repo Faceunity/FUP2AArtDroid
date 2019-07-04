@@ -1,6 +1,7 @@
 package com.faceunity.p2a_art.core.base;
 
 /**
+ * Controller
  * Created by tujh on 2018/12/18.
  */
 public abstract class BaseHandle {

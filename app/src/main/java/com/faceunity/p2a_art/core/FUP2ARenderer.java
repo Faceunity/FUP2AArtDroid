@@ -199,7 +199,7 @@ public class FUP2ARenderer {
         //queueEvent的Runnable在此处被调用
         while (mEventQueue != null && !mEventQueue.isEmpty()) {
             Runnable r = mEventQueue.remove(0);
-            if (r != null)
+            if (r != null)  
                 r.run();
         }
         mEventQueue.addAll(mNextEventQueue);

@@ -7,6 +7,7 @@ import com.faceunity.p2a_art.core.base.BaseCore;
 import com.faceunity.wrapper.faceunity;
 
 /**
+ * AR场景
  * Created by tujh on 2018/12/17.
  */
 public class P2AARCore extends BaseCore {
