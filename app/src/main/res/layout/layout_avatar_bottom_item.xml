@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/x140">
 
-    <com.faceunity.p2a_art.ui.RoundImageView
+    <com.faceunity.pta_art.ui.RoundImageView
         android:id="@+id/bottom_item_img"
         android:layout_width="@dimen/x136"
         android:layout_height="@dimen/x136"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.faceunity.p2a_art">
+    package="com.faceunity.pta_art">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -15,14 +15,14 @@
         android:required="true" />
 
     <application
-        android:name=".FUApplication"
+        android:name="com.faceunity.pta_art.FUApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".GuideActivity"
+            android:name="com.faceunity.pta_art.GuideActivity"
             android:screenOrientation="portrait"
             android:theme="@style/GuideTheme">
             <intent-filter>
@@ -32,18 +32,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.faceunity.pta_art.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/FullScreenTheme" />
         <activity
-            android:name=".SelectStyleActivity"
+            android:name="com.faceunity.pta_art.SelectStyleActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ActivityBaseTheme" />
         <activity
-            android:name=".AvatarP2ADeleteActivity"
+            android:name="com.faceunity.pta_art.AvatarPTADeleteActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ActivityBaseTheme" />
+        <activity
+            android:name="com.faceunity.pta_art.VideoAndImageActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/FullScreenTheme" />
     </application>
 
 </manifest>

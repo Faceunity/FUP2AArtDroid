@@ -7,7 +7,7 @@
               android:animateLayoutChanges="true"
               android:orientation="vertical">
 
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x120"
@@ -17,7 +17,7 @@
         android:scrollbars="none"
         android:visibility="gone"/>
 
-    <com.faceunity.p2a_art.fragment.editface.core.item.ItemSelectView
+    <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/color_item_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x362"

@@ -7,7 +7,7 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x170"

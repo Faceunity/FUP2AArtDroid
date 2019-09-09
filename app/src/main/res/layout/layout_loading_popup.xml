@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#88050C15">
 
-    <com.faceunity.p2a_art.ui.LoadingLayout
+    <com.faceunity.pta_art.ui.LoadingLayout
         android:id="@+id/dialog_loading_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

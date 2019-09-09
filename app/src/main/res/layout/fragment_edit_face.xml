@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.faceunity.p2a_art.fragment.editface.core.shape.EditPointLayout
+    <com.faceunity.pta_art.fragment.editface.core.shape.EditPointLayout
         android:id="@+id/point_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,13 +23,83 @@
         android:checked="true"
         android:visibility="gone" />
 
+    <LinearLayout
+        android:id="@+id/ll_redo"
+        android:layout_width="@dimen/x200"
+        android:layout_height="@dimen/x76"
+        android:layout_alignBottom="@id/edit_shape_position"
+        android:layout_marginLeft="@dimen/x20"
+        android:background="@drawable/white_bg"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_redo_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/sl_redo_left" />
+
+        <View
+            android:layout_width="@dimen/x1"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/x16"
+            android:layout_marginBottom="@dimen/x16"
+            android:background="#0D000000" />
+
+        <ImageView
+            android:id="@+id/iv_redo_right"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/sl_redo_right" />
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/edit_face_bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x600"
+        android:layout_height="wrap_content"
         android:layout_above="@+id/edit_face_bottom_title"
         android:layout_marginBottom="@dimen/x2" />
 
+    <LinearLayout
+        android:id="@+id/ll_model_redo"
+        android:layout_width="@dimen/x200"
+        android:layout_height="@dimen/x76"
+        android:layout_alignBottom="@id/edit_shape_position"
+        android:layout_marginLeft="@dimen/x20"
+        android:background="@drawable/white_bg"
+        android:gravity="center"
+        android:layout_above="@id/edit_face_bottom_layout"
+        android:layout_marginBottom="@dimen/x20"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_model_redo_left"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/sl_redo_left" />
+
+        <View
+            android:layout_width="@dimen/x1"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/x16"
+            android:layout_marginBottom="@dimen/x16"
+            android:background="#0D000000" />
+
+        <ImageView
+            android:id="@+id/iv_model_redo_right"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerInside"
+            android:src="@drawable/sl_redo_right" />
+    </LinearLayout>
     <ImageButton
         android:id="@+id/edit_face_back"
         android:layout_width="@dimen/x108"
@@ -60,7 +130,7 @@
         android:layout_above="@+id/edit_face_bottom_title"
         android:background="#E5E5E5" />
 
-    <com.faceunity.p2a_art.ui.BottomTitleGroup
+    <com.faceunity.pta_art.ui.BottomTitleGroup
         android:id="@+id/edit_face_bottom_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"

@@ -4,7 +4,7 @@
              android:layout_width="@dimen/x80"
              android:layout_height="match_parent">
 
-    <com.faceunity.p2a_art.ui.CircleImageView
+    <com.faceunity.pta_art.ui.CircleImageView
         android:id="@+id/bottom_item_img"
         android:layout_width="@dimen/x80"
         android:layout_height="@dimen/x80"
