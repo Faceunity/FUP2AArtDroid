@@ -19,7 +19,7 @@
         android:textColor="#666666"
         android:textSize="@dimen/text_size_24"/>
 
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/glasses_frame_color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x92"
@@ -36,7 +36,7 @@
         android:textColor="#666666"
         android:textSize="@dimen/text_size_24"/>
 
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/glasses_color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x92"

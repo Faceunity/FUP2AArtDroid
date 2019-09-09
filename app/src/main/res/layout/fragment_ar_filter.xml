@@ -56,7 +56,7 @@
         android:layout_above="@+id/ar_filter_bottom_title"
         android:background="#E5E5E5"/>
 
-    <com.faceunity.p2a_art.ui.BottomTitleGroup
+    <com.faceunity.pta_art.ui.BottomTitleGroup
         android:id="@+id/ar_filter_bottom_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"

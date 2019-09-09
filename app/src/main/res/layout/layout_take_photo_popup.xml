@@ -65,7 +65,7 @@
             android:scaleType="centerInside"
             android:src="@drawable/take_photo_gender_girl" />
 
-        <com.faceunity.p2a_art.ui.LoadingLayout
+        <com.faceunity.pta_art.ui.LoadingLayout
             android:id="@+id/create_dialog_loading_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

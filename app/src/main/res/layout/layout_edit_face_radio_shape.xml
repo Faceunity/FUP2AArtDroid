@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal">
 
-    <com.faceunity.p2a_art.ui.CircleImageView
+    <com.faceunity.pta_art.ui.CircleImageView
         android:id="@+id/radio_img"
         android:layout_width="@dimen/x90"
         android:layout_height="@dimen/x90"

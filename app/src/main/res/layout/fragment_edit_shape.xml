@@ -10,38 +10,42 @@
     <FrameLayout
         android:id="@+id/color_seek_bar_layout"
         android:layout_width="match_parent"
+        android:background="@color/colorF7F7F7"
         android:layout_height="@dimen/x120">
 
-        <com.faceunity.p2a_art.ui.seekbar.DiscreteSeekBar
+        <com.faceunity.pta_art.ui.seekbar.DiscreteSeekBar
             android:id="@+id/color_seek_bar"
-            android:layout_width="@dimen/x500"
-            android:layout_height="@dimen/x34"
+            android:layout_width="@dimen/x690"
+            android:layout_height="@dimen/x60"
             android:layout_gravity="center"
-            app:dsb_indicatorColor="#4C96FF"
+            app:dsb_bg_thumbSize="@dimen/x60"
+            app:dsb_indicatorColor="#EBBBA4"
             app:dsb_indicatorElevation="0dp"
             app:dsb_indicatorPopupEnabled="true"
-            app:dsb_max="99"
+            app:dsb_max="100"
             app:dsb_min="0"
-            app:dsb_progressColor="#4C96FF"
-            app:dsb_rippleColor="@color/colorWhite"
+            app:dsb_progressColor="@color/translate"
+            app:dsb_bg_thumbColor="@color/colorWhite"
+            app:dsb_thumbColor="#EBBBA4"
+            app:dsb_rippleColor="@color/translate"
             app:dsb_scrubberHeight="@dimen/x6"
-            app:dsb_thumbSize="@dimen/x32"
+            app:dsb_thumbSize="@dimen/x52"
             app:dsb_trackBaseHeight="@dimen/x16"
-            app:dsb_trackColor="#EEEEEE"
-            app:dsb_trackHeight="@dimen/x6"
+            app:dsb_trackColor="#000000"
+            app:dsb_trackHeight="@dimen/x30"
             app:dsb_value="0" />
     </FrameLayout>
 
-    <com.faceunity.p2a_art.fragment.editface.core.color.ColorSelectView
+    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x120"
         android:background="@color/colorF7F7F7"
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
-        android:scrollbars="none" />
+        android:scrollbars="none"/>
 
-    <com.faceunity.p2a_art.fragment.editface.core.item.ItemSelectView
+    <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/shape_item_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x362"

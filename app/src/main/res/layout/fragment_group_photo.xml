@@ -3,19 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.faceunity.p2a_art.ui.GroupPhotoScenes
+    <com.faceunity.pta_art.ui.GroupPhotoScenes
         android:id="@+id/group_photo_scenes"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.faceunity.p2a_art.ui.GroupPhotoAvatar
+    <com.faceunity.pta_art.ui.GroupPhotoAvatar
         android:id="@+id/group_photo_avatar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <com.faceunity.p2a_art.ui.GroupPhotoShow
-        android:id="@+id/group_photo_show"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
