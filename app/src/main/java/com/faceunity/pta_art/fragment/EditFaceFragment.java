@@ -131,6 +131,7 @@ public class EditFaceFragment extends BaseFragment
     private EditFaceParameter mEditFaceParameter;
     private CheckBox mIsFrontBox;
     private boolean isFront = true;
+    private boolean isResetFront = false;
     private PTACore mEditP2ACore;
     //捏脸撤销按钮
     private LinearLayout ll_redo;
@@ -238,7 +239,11 @@ public class EditFaceFragment extends BaseFragment
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 isFront = isChecked;
-                updateEditPoint();
+                if (!isResetFront) {
+                    updateEditPoint(true);
+                } else {
+                    isResetFront = false;
+                }
             }
         });
 
@@ -271,7 +276,12 @@ public class EditFaceFragment extends BaseFragment
     public void onBackPressed() {
         EditFaceBaseFragment editFaceBaseFragment = mEditFaceBaseFragments.get(mEditFaceSelectBottomId);
         if (mFragmentLayout.getVisibility() == View.GONE && editFaceBaseFragment instanceof EditShapeFragment) {
-            setEditFacePoints(null);
+            if (!isFront) {
+                isResetFront = true;
+                mIsFrontBox.setChecked(true);
+            }
+            setEditFacePoints(null, false);
+
             EditShapeFragment shapeFragment = (EditShapeFragment) editFaceBaseFragment;
             shapeFragment.resetSelect();
             mEditFaceParameter.resetToTemp();
@@ -323,7 +333,11 @@ public class EditFaceFragment extends BaseFragment
                 break;
             case R.id.edit_face_save:
                 if (mFragmentLayout.getVisibility() == View.GONE) {
-                    setEditFacePoints(null);
+                    if (!isFront) {
+                        isResetFront = true;
+                        mIsFrontBox.setChecked(true);
+                    }
+                    setEditFacePoints(null, false);
                 } else {
                     saveAvatar();
                 }
@@ -481,7 +495,7 @@ public class EditFaceFragment extends BaseFragment
                 transaction.show(show);
             }
             transaction.commit();
-            setEditFacePoints(null);
+            setEditFacePoints(null,false);
 
             if (id == -1 || id == TITLE_FACE_INDEX) {
             } else if (id == TITLE_CLOTHES_INDEX) {
@@ -520,7 +534,7 @@ public class EditFaceFragment extends BaseFragment
         @Override
         public void editFacePointChaneListener(int id, int lastPos, int pos, ParamRes res) {
             if (pos == 0) {
-                updateEditPoint();
+                updateEditPoint(false);
             } else {
                 iv_model_redo_left.setEnabled(true);
                 switch (id) {
@@ -813,7 +827,7 @@ public class EditFaceFragment extends BaseFragment
         });
     }
 
-    private void setEditFacePoints(EditFacePoint[] editFacePoints) {
+    private void setEditFacePoints(EditFacePoint[] editFacePoints,final boolean isStateChange) {
         mEditFacePoints = editFacePoints;
         if (mEditPointLayout == null) return;
         if (mEditFacePoints == null) {
@@ -825,7 +839,8 @@ public class EditFaceFragment extends BaseFragment
             public void run() {
                 updateSaveBtn();
                 if (mEditFacePoints != null) {
-                    mEditFaceParameter.copy();
+                    if (!isStateChange)
+                        mEditFaceParameter.copy();
                 }
                 mEditPointLayout.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
                 mIsFrontBox.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
@@ -840,14 +855,21 @@ public class EditFaceFragment extends BaseFragment
         });
     }
 
-    private void updateEditPoint() {
-        setEditFacePoints(EditFacePointFactory.getEditPoints(mEditFaceSelectBottomId, mAvatarP2A.getGender(), isFront));
+    /**
+     * 是否是点击切换显示状态
+     *
+     * @param isStateChange
+     */
+    private void updateEditPoint(boolean isStateChange) {
+        setEditFacePoints(EditFacePointFactory.getEditPoints(mEditFaceSelectBottomId, mAvatarP2A.getGender(), isFront),
+                isStateChange);
         if (isFront) {
             mAvatarHandle.resetAllFront();
         } else {
             mAvatarHandle.resetAllSide();
         }
     }
+
 
     private void parsePoint(EditFacePoint[] editFacePoints, int width, int height, int widthView, int heightView) {
         for (EditFacePoint point : editFacePoints) {
