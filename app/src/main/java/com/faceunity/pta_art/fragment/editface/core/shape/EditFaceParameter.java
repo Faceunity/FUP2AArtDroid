@@ -33,80 +33,92 @@ public class EditFaceParameter {
     public static final String Head_narrow = "Head_narrow";
     public static final String head_shrink = "head_shrink";
     public static final String head_stretch = "head_stretch";
+    private String[] jsons = new String[]{
+            "HeadBone_stretch",
+            "HeadBone_shrink",
+            "HeadBone_wide",
+            "HeadBone_narrow",
+            "Head_wide",
+            "Head_narrow",
+            "head_shrink",
+            "head_stretch",
+            "head_fat",
+            "head_thin",
+            "cheek_wide",
+            "cheekbone_narrow",
+            "jawbone_Wide",
+            "jawbone_Narrow",
+            "jaw_m_wide",
+            "jaw_M_narrow",
+            "jaw_wide",
+            "jaw_narrow",
+            "jaw_up",
+            "jaw_lower",
+            "upperLip_Thick",
+            "upperLipSide_Thick",
+            "lowerLip_Thick",
+            "lowerLipSide_Thin",
+            "lowerLipSide_Thick",
+            "upperLip_Thin",
+            "lowerLip_Thin",
+            "mouth_magnify",
+            "mouth_shrink",
+            "lipCorner_Out",
+            "lipCorner_In",
+            "lipCorner_up",
+            "lipCorner_down",
+            "mouth_m_down",
+            "mouth_m_up",
+            "mouth_Up",
+            "mouth_Down",
+            "nostril_Out",
+            "nostril_In",
+            "nostril_up",
+            "nostril_down",
+            "noseTip_Up",
+            "noseTip_Down",
+            "noseTip_shrink",
+            "noseTip_magnify",
+            "nose_shrink",
+            "nose_wide",
+            "nose_Up",
+            "nose_tall",
+            "nose_low",
+            "nose_Down",
+            "Eye_wide",
+            "Eye_shrink",
+            "Eye_up",
+            "Eye_down",
+            "Eye_in",
+            "Eye_out",
+            "Eye_close",
+            "Eye_open",
+            "Eye_upper_up",
+            "Eye_upper_down",
+            "Eye_upperBend_in",
+            "Eye_upperBend_out",
+            "Eye_downer_up",
+            "Eye_downer_dn",
+            "Eye_downerBend_in",
+            "Eye_downerBend_out",
+            "Eye_outter_in",
+            "Eye_outter_out",
+            "Eye_outter_up",
+            "Eye_outter_down",
+            "Eye_inner_in",
+            "Eye_inner_out",
+            "Eye_inner_up",
+            "Eye_inner_down"
+    };
+
 
     public EditFaceParameter(AvatarHandle avatarHandle) {
         mAvatarHandle = avatarHandle;
         mMap = new LinkedHashMap<>();
         mDefaultMap = new LinkedHashMap<>();
-        mMap.put(HeadBone_stretch, 0F);
-        mMap.put(HeadBone_shrink, 0F);
-        mMap.put(HeadBone_wide, 0F);
-        mMap.put(HeadBone_narrow, 0F);
-        mMap.put(Head_wide, 0F);
-        mMap.put(Head_narrow, 0F);
-        mMap.put(head_shrink, 0F);
-        mMap.put(head_stretch, 0F);
-        mMap.put("head_fat", 0F);
-        mMap.put("head_thin", 0F);
-        mMap.put("cheek_wide", 0F);
-        mMap.put("cheekbone_narrow", 0F);
-        mMap.put("jawbone_Wide", 0F);
-        mMap.put("jawbone_Narrow", 0F);
-        mMap.put("jaw_m_wide", 0F);
-        mMap.put("jaw_M_narrow", 0F);
-        mMap.put("jaw_wide", 0F);
-        mMap.put("jaw_narrow", 0F);
-        mMap.put("jaw_up", 0F);
-        mMap.put("jaw_lower", 0F);
-        mMap.put("upperLip_Thick", 0F);
-        mMap.put("upperLipSide_Thick", 0F);
-        mMap.put("lowerLip_Thick", 0F);
-        mMap.put("lowerLipSide_Thin", 0F);
-        mMap.put("lowerLipSide_Thick", 0F);
-        mMap.put("upperLip_Thin", 0F);
-        mMap.put("lowerLip_Thin", 0F);
-        mMap.put("mouth_magnify", 0F);
-        mMap.put("mouth_shrink", 0F);
-        mMap.put("lipCorner_Out", 0F);
-        mMap.put("lipCorner_In", 0F);
-        mMap.put("lipCorner_up", 0F);
-        mMap.put("lipCorner_down", 0F);
-        mMap.put("mouth_m_down", 0F);
-        mMap.put("mouth_m_up", 0F);
-        mMap.put("mouth_Up", 0F);
-        mMap.put("mouth_Down", 0F);
-        mMap.put("nostril_Out", 0F);
-        mMap.put("nostril_In", 0F);
-        mMap.put("noseTip_Up", 0F);
-        mMap.put("noseTip_Down", 0F);
-        mMap.put("nose_Up", 0F);
-        mMap.put("nose_tall", 0F);
-        mMap.put("nose_low", 0F);
-        mMap.put("nose_Down", 0F);
-        mMap.put("Eye_wide", 0F);
-        mMap.put("Eye_shrink", 0F);
-        mMap.put("Eye_up", 0F);
-        mMap.put("Eye_down", 0F);
-        mMap.put("Eye_in", 0F);
-        mMap.put("Eye_out", 0F);
-        mMap.put("Eye_close", 0F);
-        mMap.put("Eye_open", 0F);
-        mMap.put("Eye_upper_up", 0F);
-        mMap.put("Eye_upper_down", 0F);
-        mMap.put("Eye_upperBend_in", 0F);
-        mMap.put("Eye_upperBend_out", 0F);
-        mMap.put("Eye_downer_up", 0F);
-        mMap.put("Eye_downer_dn", 0F);
-        mMap.put("Eye_downerBend_in", 0F);
-        mMap.put("Eye_downerBend_out", 0F);
-        mMap.put("Eye_outter_in", 0F);
-        mMap.put("Eye_outter_out", 0F);
-        mMap.put("Eye_outter_up", 0F);
-        mMap.put("Eye_outter_down", 0F);
-        mMap.put("Eye_inner_in", 0F);
-        mMap.put("Eye_inner_out", 0F);
-        mMap.put("Eye_inner_up", 0F);
-        mMap.put("Eye_inner_down", 0F);
+        for (String s : jsons) {
+            mMap.put(s, 0F);
+        }
 
         recordBackStack = new Stack<>();
         recordGoHeadStack = new Stack<>();
@@ -127,15 +139,15 @@ public class EditFaceParameter {
         for (Map.Entry<String, Float> entry : map.entrySet()) {
             if (isNeedCopy)
                 mLastMap.put(entry.getKey(), mAvatarHandle.fuItemGetParamShape(entry.getKey()));
-            mMap.put(entry.getKey(), entry.getValue());
-            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), entry.getValue());
+            mMap.put(entry.getKey(), entry.getValue() == null ? 0F : entry.getValue());
+            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), entry.getValue() == null ? 0F : entry.getValue());
         }
     }
 
     public void resetParamMap() {
         for (Map.Entry<String, Float> entry : mLastMap.entrySet()) {
-            mMap.put(entry.getKey(), entry.getValue());
-            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), entry.getValue());
+            mMap.put(entry.getKey(), entry.getValue() == null ? 0F : entry.getValue());
+            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), entry.getValue() == null ? 0F : entry.getValue());
         }
         mLastMap.clear();
         mLastMap = null;
@@ -152,6 +164,7 @@ public class EditFaceParameter {
         }
         float positiveValue = mMap.get(positiveKey);
         float negativeValue = mMap.get(negativeKey);
+
         float value = positiveValue > 0 ? positiveValue : -negativeValue;
         value += distance;
         value = value > 1 ? 1 : (value < -1 ? -1 : value);
@@ -184,7 +197,9 @@ public class EditFaceParameter {
     public boolean isShapeChangeValues() {
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
-            if (!mDefaultMap.get(entry.getKey()).equals(entry.getValue())) {
+            float mDefault = mDefaultMap.get(entry.getKey()) == null ? 0F : mDefaultMap.get(entry.getKey());
+            float mValues = entry.getValue() == null ? 0F : entry.getValue();
+            if (mDefault != mValues) {
                 return true;
             }
         }
@@ -207,7 +222,7 @@ public class EditFaceParameter {
         int i = 0;
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); i++) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
-            ret[i] = entry.getValue();
+            ret[i] = entry.getValue() == null ? 0F : entry.getValue();
         }
         return ret;
     }
@@ -234,25 +249,25 @@ public class EditFaceParameter {
             case EditFacePoint.DIRECTION_HORIZONTAL:
                 this.leftKey = point.leftKey;
                 this.rightKey = point.rightKey;
-                this.leftValue = mMap.get(leftKey);
-                this.rightValue = mMap.get(rightKey);
+                this.leftValue = mMap.get(leftKey) == null ? 0F : mMap.get(leftKey);
+                this.rightValue = mMap.get(rightKey) == null ? 0F : mMap.get(rightKey);
                 break;
             case EditFacePoint.DIRECTION_VERTICAL:
                 this.upKey = point.upKey;
                 this.downKey = point.downKey;
-                this.upValue = mMap.get(upKey);
-                this.downValue = mMap.get(downKey);
+                this.upValue = mMap.get(upKey) == null ? 0F : mMap.get(upKey);
+                this.downValue = mMap.get(downKey) == null ? 0F : mMap.get(downKey);
                 break;
             case EditFacePoint.DIRECTION_ALL:
                 this.leftKey = point.leftKey;
                 this.rightKey = point.rightKey;
-                this.leftValue = mMap.get(leftKey);
-                this.rightValue = mMap.get(rightKey);
+                this.leftValue = mMap.get(leftKey) == null ? 0F : mMap.get(leftKey);
+                this.rightValue = mMap.get(rightKey) == null ? 0F : mMap.get(rightKey);
 
                 this.upKey = point.upKey;
                 this.downKey = point.downKey;
-                this.upValue = mMap.get(upKey);
-                this.downValue = mMap.get(downKey);
+                this.upValue = mMap.get(upKey) == null ? 0F : mMap.get(upKey);
+                this.downValue = mMap.get(downKey) == null ? 0F : mMap.get(downKey);
                 break;
         }
     }
@@ -326,9 +341,9 @@ public class EditFaceParameter {
         switch (recordBean.getDirection()) {
             case EditFacePoint.DIRECTION_HORIZONTAL:
                 goAheadBean.setLeftKey(recordBean.getLeftKey());
-                goAheadBean.setLeftValue(mMap.get(recordBean.getLeftKey()));
+                goAheadBean.setLeftValue(mMap.get(recordBean.getLeftKey()) == null ? 0F : mMap.get(recordBean.getLeftKey()));
                 goAheadBean.setRightKey(recordBean.getRightKey());
-                goAheadBean.setRightValue(mMap.get(recordBean.getRightKey()));
+                goAheadBean.setRightValue(mMap.get(recordBean.getRightKey()) == null ? 0F : mMap.get(recordBean.getRightKey()));
 
                 mMap.put(recordBean.getLeftKey(), recordBean.getLeftValue());
                 mMap.put(recordBean.getRightKey(), recordBean.getRightValue());
@@ -337,9 +352,9 @@ public class EditFaceParameter {
                 break;
             case EditFacePoint.DIRECTION_VERTICAL:
                 goAheadBean.setUpKey(recordBean.getUpKey());
-                goAheadBean.setUpValue(mMap.get(recordBean.getUpKey()));
+                goAheadBean.setUpValue(mMap.get(recordBean.getUpKey()) == null ? 0F : mMap.get(recordBean.getUpKey()));
                 goAheadBean.setDownKey(recordBean.getDownKey());
-                goAheadBean.setDownValue(mMap.get(recordBean.getDownKey()));
+                goAheadBean.setDownValue(mMap.get(recordBean.getDownKey()) == null ? 0F : mMap.get(recordBean.getDownKey()));
 
                 mMap.put(recordBean.getUpKey(), recordBean.getUpValue());
                 mMap.put(recordBean.getDownKey(), recordBean.getDownValue());
@@ -348,14 +363,14 @@ public class EditFaceParameter {
                 break;
             case EditFacePoint.DIRECTION_ALL:
                 goAheadBean.setLeftKey(recordBean.getLeftKey());
-                goAheadBean.setLeftValue(mMap.get(recordBean.getLeftKey()));
+                goAheadBean.setLeftValue(mMap.get(recordBean.getLeftKey()) == null ? 0F : mMap.get(recordBean.getLeftKey()));
                 goAheadBean.setRightKey(recordBean.getRightKey());
-                goAheadBean.setRightValue(mMap.get(recordBean.getRightKey()));
+                goAheadBean.setRightValue(mMap.get(recordBean.getRightKey()) == null ? 0F : mMap.get(recordBean.getRightKey()));
 
                 goAheadBean.setUpKey(recordBean.getUpKey());
-                goAheadBean.setUpValue(mMap.get(recordBean.getUpKey()));
+                goAheadBean.setUpValue(mMap.get(recordBean.getUpKey()) == null ? 0F : mMap.get(recordBean.getUpKey()));
                 goAheadBean.setDownKey(recordBean.getDownKey());
-                goAheadBean.setDownValue(mMap.get(recordBean.getDownKey()));
+                goAheadBean.setDownValue(mMap.get(recordBean.getDownKey()) == null ? 0F : mMap.get(recordBean.getDownKey()));
 
                 mMap.put(recordBean.getLeftKey(), recordBean.getLeftValue());
                 mMap.put(recordBean.getRightKey(), recordBean.getRightValue());
@@ -402,7 +417,7 @@ public class EditFaceParameter {
         }
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
-            entry.setValue(mMap.get(entry.getKey()));
+            entry.setValue(getValue(mMap.get(entry.getKey())));
             tempMap.put(entry.getKey(), entry.getValue());
         }
     }
@@ -413,9 +428,17 @@ public class EditFaceParameter {
     public void resetToTemp() {
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
-            float v = tempMap.get(entry.getKey());
+            float v = getValue(tempMap.get(entry.getKey()));
             entry.setValue(v);
             mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), v);
+        }
+    }
+
+    public float getValue(Object v) {
+        if (v == null || (float) v < 0) {
+            return 0.0f;
+        } else {
+            return (float) v;
         }
     }
 }
