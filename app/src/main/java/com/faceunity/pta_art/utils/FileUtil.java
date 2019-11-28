@@ -73,6 +73,25 @@ public abstract class FileUtil {
         }
     }
 
+    public static byte[] readBytes(String path) {
+        File file = new File(path);
+        if (!file.exists()) {
+            return null;
+        }
+        try {
+            FileInputStream inputStream = new FileInputStream(file);
+            byte[] bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+            inputStream.close();
+            return bytes;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * 写入文件
      *

@@ -126,8 +126,8 @@
 # ----------------------------- 反射 -----------------------------
 #
 
--keep class com.faceunity.p2a_art.debug.DebugCreateAvatar { *;}
--keep class com.faceunity.p2a_art.debug.DebugLayout { *;}
+-keep class com.faceunity.pta_art.debug.DebugCreateAvatar { *;}
+-keep class com.faceunity.pta_art.debug.DebugLayout { *;}
 
 #
 # ----------------------------- 第三方 -----------------------------
@@ -137,7 +137,7 @@
 -keep class okhttp3.** { *;}
 -dontwarn okio.**
 
--keep class  com.faceunity.p2a_art.web.CustomSslSocketFactory {*;}
+-keep class  com.faceunity.pta_art.web.CustomSslSocketFactory {*;}
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
 -keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
@@ -150,4 +150,4 @@
 #
 
 -keep class com.faceunity.p2a_client.** { *;}
--keep class com.faceunity.p2a_helper.** { *;}
+-keep class com.faceunity.pta_helper.** { *;}

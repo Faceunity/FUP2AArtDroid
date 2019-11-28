@@ -7,7 +7,7 @@ import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.pta_art.core.client.PTAClientWrapper;
 import com.faceunity.pta_art.core.authpack;
 import com.faceunity.pta_art.web.OkHttpUtils;
-import com.faceunity.p2a_helper.FUAuthCheck;
+import com.faceunity.pta_helper.FUAuthCheck;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -24,7 +24,8 @@ public class FUApplication extends Application {
     public void onCreate() {
         super.onCreate();
         closeAndroidPDialog();
-        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this));
+        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this),
+                OkHttpUtils.initOkHttpClient2(this));
 
         //TODO 初始化部分
 

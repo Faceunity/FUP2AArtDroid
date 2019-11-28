@@ -40,17 +40,6 @@ public class AvatarBuilder {
         try {
             isCancel = false;
             final AvatarPTA avatarP2A = PTAClientWrapper.initializeAvatarP2A(dir, gender);
-            JSONObject jsonObject = new JSONObject();
-            try {
-                jsonObject.put("down_hair_end", 0);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                FileUtil.writeToFile(avatarP2A.getBundleDir() + "hair_down.json", jsonObject.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             if (isCancel) return null;
             isCreateIndex = 2;
             AsyncTask.execute(new Runnable() {
@@ -71,28 +60,6 @@ public class AvatarBuilder {
                                 avatarP2A.wait();
                         }
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        for (int i = 0; i < hairBundles.size(); i++) {
-                            if (isCancel) return;
-                            BundleRes hair = hairBundles.get(i);
-                            if (!TextUtils.isEmpty(hair.path) && i != avatarP2A.getHairIndex()) {
-                                PTAClientWrapper.deformHairByServer(mContext, objData, hair.path, avatarP2A.getBundleDir() + hair.name);
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("down_hair_end", 1);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        FileUtil.writeToFile(avatarP2A.getBundleDir() + "hair_down.json", jsonObject.toString());
-                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                     if (createComplete != null)

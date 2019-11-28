@@ -28,7 +28,9 @@ import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.AvatarHandle;
 import com.faceunity.pta_art.core.PTACore;
 import com.faceunity.pta_art.core.client.AvatarEditor;
+import com.faceunity.pta_art.core.client.PTAClientWrapper;
 import com.faceunity.pta_art.entity.AvatarPTA;
+import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.entity.RecordEditBean;
 import com.faceunity.pta_art.fragment.editface.EditFaceColorItemFragment;
 import com.faceunity.pta_art.fragment.editface.EditFaceGlassesFragment;
@@ -54,9 +56,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -585,10 +590,11 @@ public class EditFaceFragment extends BaseFragment
                         if (!file.exists() || file.length() <= 0) {
                             if (mLoadingDialogHair == null) {
                                 mLoadingDialogHair = new LoadingDialog();
-                                mLoadingDialogHair.setLoadingStr("头发下载中...");
+                                mLoadingDialogHair.setLoadingStr("头发生成中...");
                             }
                             mLoadingDialogHair.show(getChildFragmentManager(), LoadingDialog.TAG);
                             isStartLoading = true;
+                            downHair(pos);
                             return;
                         }
                     }
@@ -632,26 +638,37 @@ public class EditFaceFragment extends BaseFragment
         }
     };
 
-    @Override
-    public void onComplete() {
-        if (mLoadingDialogHair != null && isStartLoading) {
-            File file = new File(mAvatarP2A.getBundleDir() + "hair_down.json");
-            if (file.exists()) {
+    /**
+     * 本地deform头发
+     *
+     * @param pos
+     */
+    private void downHair(final int pos) {
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                byte[] objData = FileUtil.readBytes(mAvatarP2A.getHeadFile());
+                if (objData == null)
+                    return;
+                List<BundleRes> hairBundles = FilePathFactory.hairBundleRes(mAvatarP2A.getGender());
+                BundleRes hair = hairBundles.get(pos);
                 try {
-                    String info = FileUtil.readTextFile(mAvatarP2A.getBundleDir() + "hair_down.json");
-                    JSONObject jsonObject = new JSONObject(info);
-                    int hair_down_state = jsonObject.getInt("down_hair_end");
-                    if (hair_down_state == 1) {
+                    PTAClientWrapper.deformHairByServer(mActivity, objData, hair.path, mAvatarP2A.getBundleDir() + hair.name);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
                         mLoadingDialogHair.dismiss();
                         isStartLoading = false;
                         mAvatarHandle.setAvatar(mAvatarP2A);
                         updateSaveBtn();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                });
             }
-        }
+        });
     }
 
     ColorValuesChangeListener mColorValuesChangeListener = new ColorValuesChangeListener() {

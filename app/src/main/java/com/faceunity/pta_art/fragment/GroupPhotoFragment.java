@@ -28,11 +28,12 @@ import com.faceunity.pta_art.ui.GroupPhotoScenes;
 import com.faceunity.pta_art.utils.DateUtil;
 import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.utils.ToastUtil;
-import com.faceunity.p2a_helper.video.MediaEncoder;
-import com.faceunity.p2a_helper.video.MediaMuxerWrapper;
-import com.faceunity.p2a_helper.video.MediaVideoEncoder;
+import com.faceunity.pta_helper.video.MediaEncoder;
+import com.faceunity.pta_helper.video.MediaMuxerWrapper;
+import com.faceunity.pta_helper.video.MediaVideoEncoder;
 
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -373,6 +374,11 @@ public class GroupPhotoFragment extends BaseFragment {
                 Log.e(TAG, "stop encoder success");
             }
         }
+
+        @Override
+        public void onError(String s) {
+
+        }
     };
 
     private MediaMuxerWrapper mMuxer;
@@ -381,7 +387,7 @@ public class GroupPhotoFragment extends BaseFragment {
      * 开始录制
      */
     private void startRecording() {
-//        try {
+        try {
         stopRecording();
         String videoFileName = DateUtil.getCurrentDate() + "_tmp.mp4";
         mOutFile = new File(Constant.TmpPath, videoFileName);
@@ -393,9 +399,9 @@ public class GroupPhotoFragment extends BaseFragment {
 
         mMuxer.prepare();
         mMuxer.startRecording();
-//        } catch (final IOException e) {
-//            Log.e(TAG, "startCapture:", e);
-//        }
+        } catch (final IOException e) {
+            Log.e(TAG, "startCapture:", e);
+        }
     }
 
     /**
