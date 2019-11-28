@@ -2,6 +2,7 @@ package com.faceunity.pta_art;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.faceunity.pta_art.constant.Constant;
@@ -69,13 +71,6 @@ public class MainActivity extends AppCompatActivity implements
     private int mShowIndex;
     private AvatarPTA mShowAvatarP2A;
 
-    //头发文件下载完成回调
-    private HairDownComplete hairDownComplete;
-
-    public interface HairDownComplete {
-        void onComplete();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,33 +87,9 @@ public class MainActivity extends AppCompatActivity implements
         mGLSurfaceView.setRenderer(mCameraRenderer);
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        hairDownComplete = new HairDownComplete() {
-            @Override
-            public void onComplete() {
-                if (mBaseFragment instanceof EditFaceFragment) {
-                    mBaseFragment.onComplete();
-                }
-            }
-        };
-
         mDBHelper = new DBHelper(this);
         mAvatarP2As = mDBHelper.getAllAvatarP2As();
         mShowAvatarP2A = mAvatarP2As.get(mShowIndex = 0);
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
-        for (int i = 2; i < mAvatarP2As.size(); i++) {
-            AvatarPTA avatarP2A = mAvatarP2As.get(i);
-            DownLoadUtils.downAllHair(this, executorService, avatarP2A, new Runnable() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            hairDownComplete.onComplete();
-                        }
-                    });
-                }
-            });
-        }
 
         mFUP2ARenderer = new FUPTARenderer(this);
         mP2ACore = new PTACore(this, mFUP2ARenderer);
@@ -209,10 +180,6 @@ public class MainActivity extends AppCompatActivity implements
         return super.onTouchEvent(event);
     }
 
-    public HairDownComplete getHairDownComplete() {
-        return hairDownComplete;
-    }
-
     public FUPTARenderer getFUP2ARenderer() {
         return mFUP2ARenderer;
     }
@@ -239,10 +206,10 @@ public class MainActivity extends AppCompatActivity implements
             isToHome = intent.getBooleanExtra("isToHome", false);
         }
         if (isToHome) {
-            if (mBaseFragment instanceof GroupPhotoFragment){
+            if (mBaseFragment instanceof GroupPhotoFragment) {
                 mP2ACore.bind();
                 mFUP2ARenderer.setFUCore(mP2ACore);
-                ((GroupPhotoFragment)mBaseFragment).backToHome();
+                ((GroupPhotoFragment) mBaseFragment).backToHome();
             }
         }
     }
@@ -289,7 +256,10 @@ public class MainActivity extends AppCompatActivity implements
             mBaseFragment.onBackPressed();
             return;
         }
-        super.onBackPressed();
+//        super.onBackPressed();
+        finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
+        Runtime.getRuntime().gc();
     }
 
     public void showHomeFragment() {

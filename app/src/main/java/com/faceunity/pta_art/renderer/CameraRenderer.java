@@ -11,14 +11,16 @@ import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.faceunity.pta_art.gles.ProgramLandmarks;
 import com.faceunity.pta_art.gles.ProgramTexture2d;
 import com.faceunity.pta_art.gles.ProgramTextureOES;
 import com.faceunity.pta_art.gles.core.GlUtil;
+import com.faceunity.pta_art.utils.BitmapUtil;
 import com.faceunity.pta_art.utils.CameraUtils;
 import com.faceunity.pta_art.utils.FPSUtil;
-import com.faceunity.p2a_helper.pic.PictureEncoder;
+import com.faceunity.pta_helper.pic.PictureEncoder;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -162,7 +164,6 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 return;
             }
         }
-
         if (!isNeedStopDrawFrame)
             mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mCameraNV21Byte, mCameraTextureId, mCameraWidth, mCameraHeight);
         drawToScreen();
@@ -391,6 +392,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         }
         mIsNeedTakePic = false;
         setNeedStopDrawFrame(true);
+
         PictureEncoder.encoderPicture(textureId, mtx, GlUtil.IDENTITY_MATRIX, texWidth, texHeight, new PictureEncoder.OnEncoderPictureListener() {
             @Override
             public void onEncoderPictureListener(Bitmap bitmap) {

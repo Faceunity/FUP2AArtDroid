@@ -53,10 +53,4 @@ public class BaseFragment extends Fragment {
         return mCameraRenderer;
     }
 
-    /**
-     * 头发文件下载完成
-     */
-    public void onComplete() {
-
-    }
 }

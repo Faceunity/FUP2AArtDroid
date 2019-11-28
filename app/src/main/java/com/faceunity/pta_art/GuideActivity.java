@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,10 +19,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.faceunity.pta_art.constant.Constant;
+import com.faceunity.pta_art.entity.DBHelper;
+import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.web.OkHttpUtils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -136,6 +141,47 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void startFUMainActivity() {
+        File file = new File(Constant.filePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        File versionFile = new File(Constant.versionPath);
+        boolean isNeedClear = true;//是否需要清除数据库
+        PackageInfo packageInfo = null;
+        try {
+            packageInfo = getPackageManager()
+                    .getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        //获取APP版本versionName
+        String buuildVersionName = packageInfo.versionName;
+        if (versionFile.exists()) {
+            try {
+                String info = FileUtil.readTextFile(Constant.versionPath);
+                JSONObject jsonObject = new JSONObject(info);
+                String versionName = jsonObject.optString("versionName");
+                if (!TextUtils.isEmpty(versionName) && buuildVersionName.equals(versionName)) {
+                    isNeedClear = false;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        if (isNeedClear) {
+            FileUtil.deleteDirAndFile(file);
+            file.mkdirs();
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("versionName", buuildVersionName);
+                FileUtil.writeToFile(Constant.versionPath, jsonObject.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         startActivity(new Intent(GuideActivity.this, SelectStyleActivity.class));
         finish();
         overridePendingTransition(0, 0);

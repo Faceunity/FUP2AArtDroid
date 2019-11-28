@@ -362,7 +362,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                     final AvatarPTA avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, new Runnable() {
                                         @Override
                                         public void run() {
-                                            downFileComplete();
                                         }
                                     });
                                     createAvatarComplete(dir, bytes);
@@ -393,15 +392,6 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 });
             }
         }, 1000);
-    }
-
-    public void downFileComplete() {
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.getHairDownComplete().onComplete();
-            }
-        });
     }
 
     public void requestFailure(Call call, String dir) {
