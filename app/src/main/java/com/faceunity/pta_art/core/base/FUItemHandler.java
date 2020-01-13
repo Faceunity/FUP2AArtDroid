@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.faceunity.pta_art.constant.Constant;
+import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.wrapper.faceunity;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public class FUItemHandler extends Handler {
                 item = 0;
             } else {
                 InputStream is;
-                File testBundle = new File(Constant.TestFilePath + bundle);
+                File testBundle = new File(Constant.TestFilePath + FileUtil.getLastName(bundle));
                 if (testBundle.exists()) {
                     is = new FileInputStream(testBundle);
                     Log.i(TAG, "~~~~~~~~~~~~~~~~~~使用本地测试bundle : " + Constant.TestFilePath + bundle);

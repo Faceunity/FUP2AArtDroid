@@ -52,5 +52,4 @@ public class BaseFragment extends Fragment {
     public CameraRenderer getCameraRenderer() {
         return mCameraRenderer;
     }
-
 }

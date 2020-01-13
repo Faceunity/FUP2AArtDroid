@@ -12,11 +12,12 @@ import com.faceunity.pta_art.gles.core.GlUtil;
  */
 public class BackgroundUtil {
 
-    public static final float[] imgDataMatrix = {0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
+    public static float[] imgDataMatrix = new float[16];
     public static final float[] ROTATE_90 = {0.0F, 1.0F, 0.0F, 0.0F, -1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F};
     private ProgramTexture2d mProgramTexture2d;
     private int width, height;
-    private int fboId, fboTex;
+    private int[] fboTexs;
+    private int[] fboIds;
 
     private int backgroundTexId;
     private float[] backgroundMVP;
@@ -24,18 +25,18 @@ public class BackgroundUtil {
     public BackgroundUtil(int width, int height) {
         this.width = width;
         this.height = height;
-        int[] fboIds = new int[1];
-        int[] fboTexs = new int[1];
+        fboIds = new int[1];
+        fboTexs = new int[1];
         GlUtil.createFBO(fboTexs, fboIds, width, height);
-        fboId = fboIds[0];
-        fboTex = fboTexs[0];
         mProgramTexture2d = new ProgramTexture2d();
+        Matrix.setIdentityM(imgDataMatrix, 0);
+        Matrix.scaleM(imgDataMatrix, 0, 1, -1, 1);
     }
 
     public void loadBackground(String path) {
         Bitmap src = BitmapUtil.loadBitmap(path, 720);
         backgroundTexId = GlUtil.createImageTexture(src);
-        backgroundMVP = changeMVPMatrix(GlUtil.IDENTITY_MATRIX, width, height, src.getHeight(), src.getWidth());
+        backgroundMVP = changeMVPMatrix(GlUtil.IDENTITY_MATRIX, width, height, src.getWidth(), src.getHeight());
     }
 
     public int drawBackground(int texId) {
@@ -44,7 +45,7 @@ public class BackgroundUtil {
         GLES20.glGetIntegerv(GLES20.GL_FRAMEBUFFER_BINDING, fboIdNow, 0);
         int[] viewPortNow = new int[4];
         GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, viewPortNow, 0);
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboIds[0]);
         GLES20.glViewport(0, 0, width, height);
         mProgramTexture2d.drawFrame(backgroundTexId, imgDataMatrix, backgroundMVP);
 
@@ -55,7 +56,7 @@ public class BackgroundUtil {
 
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboIdNow[0]);
         GLES20.glViewport(viewPortNow[0], viewPortNow[1], viewPortNow[2], viewPortNow[3]);
-        return fboTex;
+        return fboTexs[0];
     }
 
     private float[] changeMVPMatrix(float[] mvpMatrix, float viewWidth, float viewHeight, float textureWidth, float textureHeight) {
@@ -74,5 +75,9 @@ public class BackgroundUtil {
 
     public boolean isHasBackground() {
         return backgroundTexId > 0;
+    }
+
+    public void release() {
+        GlUtil.deleteFBO(fboTexs, fboIds);
     }
 }

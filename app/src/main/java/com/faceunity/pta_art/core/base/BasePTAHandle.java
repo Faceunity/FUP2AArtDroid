@@ -48,7 +48,24 @@ public abstract class BasePTAHandle extends BaseHandle {
         }
     }
 
+    protected void loadItemNew(FUItem fuItem, String name, boolean needDestroy) {
+        if (name == null) return;
+        if (!name.equals(fuItem.name)) {
+            int item = mFUItemHandler.loadFUItem(name);
+            bindEvents.add(mBaseCore.avatarBindItem(controllerItem, fuItem.handle, item));
+            if (needDestroy) {
+                destroyEvents.add(mBaseCore.destroyItem(fuItem.handle));
+            }
+            fuItem.name = name;
+            fuItem.handle = item;
+        }
+    }
+
     private AvatarPTA mAvatarP2A;
+
+    public void setAvatarP2A(AvatarPTA avatarP2A) {
+        this.mAvatarP2A = avatarP2A;
+    }
 
     protected void commitItem(AvatarPTA avatar) {
         mBaseCore.queueEvent(bindEvents);
@@ -65,7 +82,6 @@ public abstract class BasePTAHandle extends BaseHandle {
             public void run() {
                 if (mAvatarP2A.getSkinColorValue() >= 0) {
                     fuItemSetParam(PARAM_KEY_skin_color, ColorConstant.getRadioColor(mAvatarP2A.getSkinColorValue()));
-                    Log.i("ssss", "setAvatarColor=" + mAvatarP2A.getSkinColorValue());
                 }
                 if (mAvatarP2A.getLipColorValue() >= 0) {
                     fuItemSetParam(PARAM_KEY_lip_color, ColorConstant.getColor(ColorConstant.lip_color, mAvatarP2A.getLipColorValue()));

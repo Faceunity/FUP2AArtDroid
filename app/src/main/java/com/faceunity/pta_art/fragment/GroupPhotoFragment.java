@@ -34,6 +34,7 @@ import com.faceunity.pta_helper.video.MediaVideoEncoder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -52,10 +53,9 @@ public class GroupPhotoFragment extends BaseFragment {
 
     private AvatarPTA[] mAvatarP2As;
     private AvatarPTA mCurrentAvatar;
+    private int currentRoleId;//当前角色id
+    private AvatarHandle mCurrentAvatarHandler;
     private int isLoadComplete;
-
-    static final int NONE_FRAME_ID = -100;
-    int frameId = NONE_FRAME_ID;
 
     private static final int IMAGE_REQUEST_CODE = 0x102;
 
@@ -92,44 +92,21 @@ public class GroupPhotoFragment extends BaseFragment {
             }
         });
         mScenesLayout.setScenesSelectListener(new GroupPhotoScenes.ScenesSelectListener() {
+
             @Override
             public void onScenesSelectListener(boolean isAnim, Scenes scenes) {
+                mScenesLayout.setBackBtnEnable(false);
                 isAnimationScenes = isAnim;
+                mCurrentAvatarHandler = null;
                 mScenes = scenes;
+                mCurrentAvatar = null;
+                currentRoleId = -1;
                 mAvatarLayout.setScenes(mScenes);
                 mActivity.setGLSurfaceViewSize(true);
-                mP2AMultipleCore = new PTAMultipleCore(mActivity, mFUP2ARenderer, mScenes.bg) {
-
-                    @Override
-                    public int onDrawFrame(byte[] img, int tex, int w, int h) {
-                        int fuTex = super.onDrawFrame(img, tex, w, h);
-                        Log.i("wh", "w=" + w + "--h=" + h +
-                                "--mScenes=" + mScenes.bundles[0].path);
-                        AvatarHandle avatarHandle = mAvatarHandleSparse.get(0);
-                        if (avatarHandle != null) {
-                            int nowFrameId = avatarHandle.getNowFrameId();
-                            if (frameId > nowFrameId) {
-                                frameId = NONE_FRAME_ID;
-                                stopRecording();
-                                mActivity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mAvatarLayout.updateNextBtn(true);
-                                    }
-                                });
-                            } else {
-                                if (mVideoEncoder != null) {
-                                    mVideoEncoder.frameAvailableSoon(fuTex, mActivity.getCameraRenderer().getMtx(), GlUtil.IDENTITY_MATRIX);
-                                }
-                                frameId = nowFrameId;
-                            }
-                        }
-                        return fuTex;
-                    }
-                };
+                mP2AMultipleCore = createPTAMultipleCore();
                 mP2ACore.unBind();
                 mFUP2ARenderer.setFUCore(mP2AMultipleCore);
-                mAvatarHandleSparse = mP2AMultipleCore.createAvatarMultiple(mScenes);
+                mAvatarHandleSparse = mP2AMultipleCore.createAvatarMultiple(mScenes, mAvatarHandle.controllerItem);
                 mAvatarP2As = new AvatarPTA[mScenes.bundles.length];
                 isLoadComplete = 0;
 
@@ -138,9 +115,12 @@ public class GroupPhotoFragment extends BaseFragment {
                     public void run() {
                         mScenesLayout.setVisibility(View.GONE);
                         mAvatarLayout.setVisibility(View.VISIBLE);
+                        mScenesLayout.setBackBtnEnable(true);
                     }
                 }, 100);
             }
+
+
         });
 
         mAvatarLayout = view.findViewById(R.id.group_photo_avatar);
@@ -153,44 +133,20 @@ public class GroupPhotoFragment extends BaseFragment {
         mAvatarLayout.setAvatarSelectListener(new GroupPhotoAvatar.AvatarSelectListener() {
 
             @Override
-            public void onAvatarSelectListener(AvatarPTA avatar, boolean isSelect) {
+            public void onAvatarSelectListener(AvatarPTA avatar, boolean isSelect, int roleId) {
                 if (isSelect) {
                     mCurrentAvatar = avatar;
-                    for (int i = 0; i < mAvatarP2As.length; i++) {
-                        if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && avatar.getGender() == mScenes.bundles[i].gender))) {
-                            avatar.setExpression(mScenes.bundles[i]);
-                            final AvatarHandle avatarHandle = mAvatarHandleSparse.get(i);
-                            avatarHandle.setAvatar(mAvatarP2As[i] = avatar, new Runnable() {
-                                @Override
-                                public void run() {
-                                    mAvatarLayout.updateAvatarPoint();
-                                    if (++isLoadComplete == mAvatarHandleSparse.size()) {
-                                        if (isAnimationScenes) {
-                                            startGifEncoder();
-                                            mActivity.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    startRecording();
-                                                }
-                                            });
-                                        } else {
-                                            mAvatarLayout.updateNextBtn(true);
-                                        }
-                                    }
-                                    avatarHandle.seekToAnimFrameId(1);
-                                    avatarHandle.setAnimState(2);
-                                }
-                            });
-                            break;
-                        }
-                    }
+                    currentRoleId = roleId;
+                    syncPlayAnim(avatar, roleId);
                 } else {
                     mCurrentAvatar = null;
+                    currentRoleId = -1;
+                    mCurrentAvatarHandler = null;
                     for (int i = 0; i < mAvatarP2As.length; i++) {
                         if (mAvatarP2As[i] != null && mAvatarP2As[i].equals(avatar)) {
                             stopRecording();
                             mAvatarP2As[i] = null;
-                            mAvatarHandleSparse.get(i).setAvatar(new AvatarPTA());
+                            mP2AMultipleCore.unBindInstancceId(roleId);
                             isLoadComplete--;
                             break;
                         }
@@ -251,6 +207,43 @@ public class GroupPhotoFragment extends BaseFragment {
         return view;
     }
 
+
+    private PTAMultipleCore createPTAMultipleCore() {
+        if (mP2AMultipleCore == null) {
+            mP2AMultipleCore = new PTAMultipleCore(mActivity, mFUP2ARenderer, mScenes.bg) {
+
+                @Override
+                public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
+                    int fuTex = super.onDrawFrame(img, tex, w, h, rotation);
+                    //avatarHandle为空，则生成场景图像
+                    if (mCurrentAvatarHandler != null) {
+                        float nowFrameId = mCurrentAvatarHandler.getAnimateProgress(mCurrentAvatarHandler.expressionItem.handle);
+                        if (nowFrameId >= 1.0f) {
+                            //录制mp4完成
+                            stopRecording();
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mAvatarLayout.updateNextBtn(true);
+                                }
+                            });
+                        } else {
+                            if (mVideoEncoder != null) {
+                                //录制mp4
+                                mVideoEncoder.frameAvailableSoon(fuTex, GlUtil.IDENTITY_MATRIX, GlUtil.IDENTITY_MATRIX);
+                            }
+                        }
+                    }
+                    return fuTex;
+                }
+            };
+        } else {
+            mP2AMultipleCore.updateBg(mScenes.bg);
+        }
+        return mP2AMultipleCore;
+    }
+
+
     @Override
     public void onBackPressed() {
         if (mAvatarLayout.getVisibility() == View.VISIBLE) {
@@ -261,75 +254,78 @@ public class GroupPhotoFragment extends BaseFragment {
     }
 
     public void backToHome() {
-        mActivity.showHomeFragment();
-        mActivity.setGLSurfaceViewSize(false);
-        if (mP2AMultipleCore != null) {
+        stopRecording();
+         if (mP2AMultipleCore != null) {
             mP2AMultipleCore.release();
             mP2AMultipleCore = null;
         }
+        mActivity.showHomeFragment();
+        mActivity.setGLSurfaceViewSize(false);
         FileUtil.deleteDirAndFile(Constant.TmpPath);
     }
 
     private void backToScenesLayout() {
         mScenesLayout.setVisibility(View.VISIBLE);
         mAvatarLayout.setVisibility(View.GONE);
+        mActivity.setCanClick(false, true);
 
         mAvatarLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mActivity.setGLSurfaceViewSize(false);
-                mP2ACore.bind();
-                mFUP2ARenderer.setFUCore(mP2ACore);
                 if (mP2AMultipleCore != null) {
                     mP2AMultipleCore.release();
-                    mP2AMultipleCore = null;
                 }
+                mP2ACore.setCurrentInstancceId(0);
+                mP2ACore.bind();
+                mFUP2ARenderer.setFUCore(mP2ACore);
+                mActivity.setCanClick(true, true);
             }
         }, 100);
     }
 
-    private void startGifEncoder() {
-        mP2AMultipleCore.queueEvent(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < mAvatarP2As.length; i++) {
-                    if (mAvatarHandleSparse.get(i) != null) {
-                        mAvatarHandleSparse.get(i).seekToAnimFrameId(1);
-                        mAvatarHandleSparse.get(i).setAnimState(1);
-                    }
-                }
-                frameId = NONE_FRAME_ID;
-                mAvatarLayout.updateNextBtn(false);
-            }
-        });
-    }
-
     private void startVideoEncoder() {
+        mAvatarLayout.updateNextBtn(false);
         for (int i = 0; i < mAvatarP2As.length; i++) {
             if (mAvatarP2As[i] != null && mCurrentAvatar != null && mAvatarP2As[i].equals(mCurrentAvatar)) {
                 stopRecording();
                 mAvatarP2As[i] = null;
-                mAvatarHandleSparse.get(i).setAvatar(new AvatarPTA());
+                mCurrentAvatarHandler = null;
+//                mP2AMultipleCore.unBindInstancceId(currentRoleId);
                 isLoadComplete--;
                 break;
             }
         }
         if (mCurrentAvatar == null)
             return;
+        syncPlayAnim(mCurrentAvatar, currentRoleId);
+    }
+
+    /**
+     * 同步播放动画
+     *
+     * @param avatar
+     * @param roleId
+     */
+    private void syncPlayAnim(AvatarPTA avatar, int roleId) {
         for (int i = 0; i < mAvatarP2As.length; i++) {
-            if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && mCurrentAvatar.getGender() == mScenes.bundles[i].gender))) {
-                mCurrentAvatar.setExpression(mScenes.bundles[i]);
-                final AvatarHandle avatarHandle = mAvatarHandleSparse.get(i);
-                avatarHandle.setAvatar(mAvatarP2As[i] = mCurrentAvatar, new Runnable() {
+            if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && avatar.getGender() == mScenes.bundles[i].gender))) {
+                avatar.setExpression(mScenes.bundles[i]);
+                final AvatarHandle avatarHandle = mAvatarHandleSparse.get(roleId);
+                mP2AMultipleCore.setCurrentInstancceId(roleId);
+                mActivity.setCanClick(false, true);
+                avatarHandle.setAvatar(mAvatarP2As[i] = avatar, new Runnable() {
                     @Override
                     public void run() {
+                        mActivity.setCanClick(true, false);
                         mAvatarLayout.updateAvatarPoint();
                         if (++isLoadComplete == mAvatarHandleSparse.size()) {
                             if (isAnimationScenes) {
-                                startGifEncoder();
+                                //startGifEncoder();
                                 mActivity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        mCurrentAvatarHandler = avatarHandle;
                                         startRecording();
                                     }
                                 });
@@ -337,8 +333,36 @@ public class GroupPhotoFragment extends BaseFragment {
                                 mAvatarLayout.updateNextBtn(true);
                             }
                         }
-                        avatarHandle.seekToAnimFrameId(1);
-                        avatarHandle.setAnimState(2);
+                        if (isAnimationScenes) {
+                            Map<Integer, Integer> usedRole = mAvatarLayout.getUsedRoleId();
+                            boolean[] isSels = mAvatarLayout.getIsSelectList();
+                            for (int j = 0; j < isSels.length; j++) {
+                                if (isSels[j]) {
+                                    int f_roleId = usedRole.get(j);
+                                    if (f_roleId != roleId) {
+                                        mAvatarHandleSparse.get(usedRole.get(j)).setAnimState(3, usedRole.get(j));
+                                        mAvatarHandleSparse.get(usedRole.get(j)).seekToAnimBegin(mAvatarHandleSparse.get(usedRole.get(j)).expressionItem.handle);
+                                        if (mAvatarHandleSparse.get(usedRole.get(j)).otherItem[1] != null) {
+                                            mAvatarHandleSparse.get(usedRole.get(j)).seekToAnimBegin(mAvatarHandleSparse.get(usedRole.get(j)).otherItem[1].handle);
+                                        }
+                                    }
+                                }
+                            }
+                            mAvatarHandleSparse.get(roleId).setAnimState(3, roleId);
+                            mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).expressionItem.handle);
+                            mAvatarHandleSparse.get(roleId).setCameraAnim(2);
+                            mAvatarHandleSparse.get(roleId).setCameraAnim(1);
+
+                            if (mAvatarHandleSparse.get(roleId).otherItem[1] != null) {
+                                /**
+                                 *  道具动画逻辑修改
+                                 *  需要加载道具模型和道具动画（图形自动寻找对应的动画）
+                                 *  需要和人物动画一起开始（保持同步）
+                                 *  注意：配置json信息的时候，需要将道具动画放在第二个位置
+                                 */
+                                mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).otherItem[1].handle);
+                            }
+                        }
                     }
                 });
                 break;
@@ -377,7 +401,7 @@ public class GroupPhotoFragment extends BaseFragment {
 
         @Override
         public void onError(String s) {
-
+            Log.e(TAG, "error:" + s);
         }
     };
 
@@ -388,17 +412,17 @@ public class GroupPhotoFragment extends BaseFragment {
      */
     private void startRecording() {
         try {
-        stopRecording();
-        String videoFileName = DateUtil.getCurrentDate() + "_tmp.mp4";
-        mOutFile = new File(Constant.TmpPath, videoFileName);
-        mMuxer = new MediaMuxerWrapper(mOutFile.getAbsolutePath());
+            stopRecording();
+            String videoFileName = DateUtil.getCurrentDate() + "_tmp.mp4";
+            mOutFile = new File(Constant.TmpPath, videoFileName);
+            mMuxer = new MediaMuxerWrapper(mOutFile.getAbsolutePath());
 
-        // for video capturing
-        new MediaVideoEncoder(mMuxer, mMediaEncoderListener, mCameraRenderer.getCameraHeight(), mCameraRenderer.getCameraWidth());
-        //new MediaAudioEncoder(mMuxer, mMediaEncoderListener);//去除音频录制
+            // for video capturing
+            new MediaVideoEncoder(mMuxer, mMediaEncoderListener, mCameraRenderer.getCameraHeight(), mCameraRenderer.getCameraWidth());
+            //new MediaAudioEncoder(mMuxer, mMediaEncoderListener);//去除音频录制
 
-        mMuxer.prepare();
-        mMuxer.startRecording();
+            mMuxer.prepare();
+            mMuxer.startRecording();
         } catch (final IOException e) {
             Log.e(TAG, "startCapture:", e);
         }

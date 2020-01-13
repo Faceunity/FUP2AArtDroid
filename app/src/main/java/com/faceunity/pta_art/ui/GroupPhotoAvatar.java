@@ -21,9 +21,13 @@ import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.entity.DBHelper;
 import com.faceunity.pta_art.entity.Scenes;
+import com.faceunity.pta_art.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by tujh on 2018/12/18.
@@ -45,6 +49,8 @@ public class GroupPhotoAvatar extends RelativeLayout {
     private static final String str_create_complete = "完美";
 
     private boolean[] isSelectList;
+    private List<Integer> remainRoleId;//剩余的可用角色
+    private Map<Integer, Integer> usedRoleId;//已使用的角色
 
     private Scenes mScenes;
     private int maxBoy, maxGirl;
@@ -65,18 +71,24 @@ public class GroupPhotoAvatar extends RelativeLayout {
         LayoutInflater.from(context).inflate(R.layout.layout_group_photo_avatar, this, true);
         mAvatarP2As = new DBHelper(context).getAllAvatarP2As();
         isSelectList = new boolean[mAvatarP2As.size()];
+        remainRoleId = new ArrayList<>();
+        usedRoleId = new HashMap<>();
         findViewById(R.id.group_photo_avatar_back).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mBackRunnable != null) {
                     mBackRunnable.run();
                 }
+
             }
         });
         mNextBtn = findViewById(R.id.group_photo_avatar_next);
         mNextBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!Utils.isNoFastClick()) {
+                    return;
+                }
                 if (mNextRunnable != null) {
                     mNextRunnable.run();
                 }
@@ -143,7 +155,15 @@ public class GroupPhotoAvatar extends RelativeLayout {
                         mAvatarPoint.setText(str_creating);
                     }
                     if (mAvatarSelectListener != null) {
-                        mAvatarSelectListener.onAvatarSelectListener(avatarP2A, isSelectList[position]);
+                        int roleId;
+                        if (isSelectList[position]) {
+                            roleId = remainRoleId.remove(0);
+                            usedRoleId.put(position, roleId);
+                        } else {
+                            roleId = usedRoleId.remove(position);
+                            remainRoleId.add(roleId);
+                        }
+                        mAvatarSelectListener.onAvatarSelectListener(avatarP2A, isSelectList[position], roleId);
                     }
                 }
             });
@@ -190,7 +210,7 @@ public class GroupPhotoAvatar extends RelativeLayout {
     }
 
     public interface AvatarSelectListener {
-        void onAvatarSelectListener(AvatarPTA avatar, boolean isSelect);
+        void onAvatarSelectListener(AvatarPTA avatar, boolean isSelect, int roleId);
     }
 
     private boolean checkIsEnable(int gender) {
@@ -251,6 +271,11 @@ public class GroupPhotoAvatar extends RelativeLayout {
     public void setScenes(Scenes scenes) {
         Arrays.fill(isSelectList, false);
         mScenes = scenes;
+        usedRoleId.clear();
+        remainRoleId.clear();
+        for (int i = 0; i < mScenes.bundles.length; i++) {
+            remainRoleId.add(i);
+        }
         if (Constant.style == Constant.style_art) {
             maxBoy = maxGirl = 0;
             for (BundleRes b : mScenes.bundles) {
@@ -282,6 +307,15 @@ public class GroupPhotoAvatar extends RelativeLayout {
                 }
             }
         });
+    }
+
+
+    public Map<Integer, Integer> getUsedRoleId() {
+        return usedRoleId;
+    }
+
+    public boolean[] getIsSelectList() {
+        return isSelectList;
     }
 
     public boolean nextEnable() {

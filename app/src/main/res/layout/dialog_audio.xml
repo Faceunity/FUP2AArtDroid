@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_record_dialog"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_record_cancel"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_record_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x12"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/x24"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/dialog_icon"
+        android:layout_width="@dimen/x54"
+        android:layout_height="@dimen/x80"
+        android:layout_marginTop="@dimen/x12"
+        android:src="@drawable/icon_speak_start"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/cancel_icon"
+        android:layout_width="@dimen/x54"
+        android:layout_height="@dimen/x70"
+        android:layout_marginTop="@dimen/x36"
+        android:layout_marginBottom="@dimen/x32"
+        android:src="@drawable/icon_speak_cancel"
+        android:visibility="gone" />
+
+
+    <TextView
+        android:id="@+id/dialog_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/x8"
+        android:layout_marginTop="@dimen/x18"
+        android:layout_marginRight="@dimen/x8"
+        android:layout_marginBottom="@dimen/x12"
+        android:text="松开发送，上滑取消"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

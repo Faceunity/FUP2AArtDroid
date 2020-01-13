@@ -21,91 +21,185 @@ public class PTAMultipleCore extends BaseCore {
 
     private final SparseArray<AvatarHandle> mAvatarHandles = new SparseArray<>();
 
+    public static final int ITEM_ARRAYS_BG = 0;
+    public static final int ITEM_ARRAYS_CONTROLLER = 1;
+    public static final int ITEM_ARRAYS_EFFECT = 2;
+    public static final int ITEM_ARRAYS_FXAA = 3;
+    public static final int ITEM_ARRAYS_COUNT = 4;
+    private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
+
     private BackgroundUtil mBackgroundUtil;
     public int fxaaItem, bgItem;
+    private int[] bgItems = new int[1];
+    public int cameraItem;//相机轨迹
+    private int controllerItem;
 
     public PTAMultipleCore(Context context, FUPTARenderer fuP2ARenderer, String bg) {
         super(context, fuP2ARenderer);
         bgItem = mFUItemHandler.loadFUItem(TextUtils.isEmpty(bg) ? FilePathFactory.BUNDLE_default_bg : bg);
-        fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
+        if (TextUtils.isEmpty(bg)) {
+            bgItems[0] = bgItem;
+        }
+        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
-    public SparseArray<AvatarHandle> createAvatarMultiple(Scenes scenes) {
+    public void updateBg(String bg) {
+        bgItem = mFUItemHandler.loadFUItem(TextUtils.isEmpty(bg) ? FilePathFactory.BUNDLE_default_bg : bg);
+        if (TextUtils.isEmpty(bg)) {
+            bgItems[0] = bgItem;
+        }
+        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
+    }
+
+    public SparseArray<AvatarHandle> createAvatarMultiple(Scenes scenes, int controller) {
         for (int i = 0; i < scenes.bundles.length; i++) {
-            final int finalI = i;
-            AvatarHandle avatarHandle = new AvatarHandle(this, mFUItemHandler, new Runnable() {
-                @Override
-                public void run() {
-                    AvatarHandle handle = mAvatarHandles.get(finalI);
-                    if (handle != null)
-                        handle.resetAllMinGroup();
-                }
-            });
+            AvatarHandle avatarHandle = new AvatarHandle(this, mFUItemHandler, controller);
+            avatarHandle.setPose(false);
             mAvatarHandles.put(i, avatarHandle);
         }
+        cameraItem = mFUItemHandler.loadFUItem(scenes.camera);
+        this.controllerItem = controller;
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (cameraItem > 0) {
+                    int[] items = new int[]{cameraItem};
+                    faceunity.fuBindItems(controllerItem, items);
+                }
+                faceunity.fuBindItems(controllerItem, bgItems);
+            }
+        });
+        mItemsArray[ITEM_ARRAYS_CONTROLLER] = controllerItem;
         return mAvatarHandles;
     }
 
     @Override
     public int[] itemsArray() {
-        int[] itemsArray = new int[mAvatarHandles.size() + 2];
-        for (int i = 0; i < mAvatarHandles.size(); i++) {
-            itemsArray[i] = mAvatarHandles.get(mAvatarHandles.keyAt(i)).controllerItem;
-        }
-        itemsArray[itemsArray.length - 1] = fxaaItem;
-        if (mBackgroundUtil != null && !mBackgroundUtil.isHasBackground())
-            itemsArray[itemsArray.length - 2] = bgItem;
-        return itemsArray;
+        return mItemsArray;
     }
 
     @Override
-    public int onDrawFrame(byte[] img, int tex, int w, int h) {
+    public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
         if (mBackgroundUtil == null) {
             mBackgroundUtil = new BackgroundUtil(w, h);
         }
         Arrays.fill(landmarksData, 0.0f);
-        Arrays.fill(rotationData, 0.0f);
-        Arrays.fill(expressionData, 0.0f);
-        Arrays.fill(pupilPosData, 0.0f);
-        Arrays.fill(rotationModeData, 0.0f);
-        rotationModeData[0] = (360 - mInputImageOrientation) / 90;
+        Arrays.fill(avatarInfo.mRotation, 0.0f);
+        Arrays.fill(avatarInfo.mExpression, 0.0f);
+        Arrays.fill(avatarInfo.mPupilPos, 0.0f);
+        Arrays.fill(avatarInfo.mRotationMode, 0.0f);
+        avatarInfo.mRotationMode[0] = (360 - mInputImageOrientation) / 90;
+        avatarInfo.mIsValid = false;
 
-        int fuTex = faceunity.fuAvatarToTexture(pupilPosData, expressionData, rotationData, rotationModeData,
-                faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray(), 0);
+        int fuTex = faceunity.fuRenderBundles(avatarInfo,
+                faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray());
         return mBackgroundUtil.drawBackground(fuTex);
+    }
+
+    /**
+     * 解绑相机
+     */
+    public void unBindCamera() {
+        if (cameraItem > 0) {
+            int[] items = new int[]{cameraItem};
+            faceunity.fuUnBindItems(this.controllerItem, items);
+        }
     }
 
     @Override
     public void unBind() {
         for (int i = 0; i < mAvatarHandles.size(); i++) {
-            AvatarHandle avatarHandle = mAvatarHandles.get(mAvatarHandles.keyAt(i));
-            avatarHandle.unBindAll();
+            unBindInstancceId(i);
         }
     }
 
     @Override
     public void bind() {
         for (int i = 0; i < mAvatarHandles.size(); i++) {
-            AvatarHandle avatarHandle = mAvatarHandles.get(mAvatarHandles.keyAt(i));
-            avatarHandle.bindAll();
+            bindInstancceId(i);
         }
     }
 
     @Override
     public void release() {
         for (int i = 0; i < mAvatarHandles.size(); i++) {
-            AvatarHandle avatarHandle = mAvatarHandles.get(mAvatarHandles.keyAt(i));
-            avatarHandle.release();
+            unBindInstancceId(i);
         }
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mBackgroundUtil.release();
+                faceunity.fuUnBindItems(controllerItem, bgItems);
+                unBindCamera();
+            }
+        });
         mAvatarHandles.clear();
         queueEvent(destroyItem(fxaaItem));
         queueEvent(destroyItem(bgItem));
+        queueEvent(destroyItem(cameraItem));
+        setCurrentInstancceId(0);
+    }
+
+    /**
+     * 设置当前controller控制的人物id（默认：0）
+     *
+     * @param id
+     */
+    public void setCurrentInstancceId(int id) {
+        if (controllerItem > 0) {
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuItemSetParam(controllerItem,
+                            "current_instance_id", id);
+                    faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0, 0, 0});//必须重新设置初始值
+                    faceunity.fuItemSetParam(controllerItem, "reset_all", 1.0f);//必须设置后生效
+                }
+            });
+        }
+    }
+
+    /**
+     * 解绑当前controller控制的人物id（默认：0）
+     *
+     * @param id
+     */
+    public void unBindInstancceId(int id) {
+        if (controllerItem > 0) {
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuItemSetParam(controllerItem,
+                            "current_instance_id", id);
+                }
+            });
+            mAvatarHandles.get(id).releaseNoController();
+        }
+    }
+
+    /**
+     * 绑定当前controller控制的人物id（默认：0）
+     *
+     * @param id
+     */
+    public void bindInstancceId(int id) {
+        if (controllerItem > 0) {
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuItemSetParam(controllerItem,
+                            "current_instance_id", id);
+                }
+            });
+            mAvatarHandles.get(id).bindAll();
+        }
     }
 
     public void loadBackgroundImage(final String path) {
         queueEvent(new Runnable() {
             @Override
             public void run() {
+                faceunity.fuUnBindItems(controllerItem, bgItems);
                 mBackgroundUtil.loadBackground(path);
             }
         });

@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.faceunity.pta_art.BuildConfig;
 import com.faceunity.pta_art.R;
-import com.faceunity.p2a_client.FUP2AClient;
+import com.faceunity.pta_art.constant.FUPTAClient;
 
 /**
  * Created by tujh on 2018/8/22.
@@ -56,35 +56,29 @@ public class HomeFragment extends BaseFragment
         mGuideView.setVisibility(View.VISIBLE);
         mVersionText = view.findViewById(R.id.main_version_text);
 
-        text = String.format("DigiMe Art v%s\nSDK v%s", BuildConfig.VERSION_NAME, FUP2AClient.getVersion());
+        text = String.format("DigiMe Art v%s\nSDK v%s", BuildConfig.VERSION_NAME, FUPTAClient.getVersion());
         mVersionText.setText(text);
-        Log.e(TAG, "FUP2AClient.Version " + FUP2AClient.getVersion());
+        Log.e(TAG, "FUPTAClient.Version " + FUPTAClient.getVersion());
 
         mTrackBtn = view.findViewById(R.id.avatar_track_image_btn);
         mTrackBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mP2ACore.setNeedTrackFace(isChecked);
-                mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
-                mCameraRenderer.setShowCamera(isChecked);
+                if (mP2ACore != null && mAvatarHandle != null && mCameraRenderer != null) {
+                    mP2ACore.setNeedTrackFace(isChecked);
+                    mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
+                    mCameraRenderer.setShowCamera(isChecked);
+                    mCameraRenderer.setShowLandmarks(isChecked);
+                }
             }
         });
 
         view.findViewById(R.id.main_avatar_image_btn).setOnClickListener(this);
         view.findViewById(R.id.main_edit_image_btn).setOnClickListener(this);
-        view.findViewById(R.id.main_ar_filter_image_btn).setOnClickListener(this);
+        view.findViewById(R.id.main_avatar_body_btn).setOnClickListener(this);
         view.findViewById(R.id.main_group_photo_image_btn).setOnClickListener(this);
-
     }
 
-//    public void setExpress(float[] express) {
-//        String t1 = String.format("%.2f", express[14]);
-//        String t2 = String.format("%.2f", express[15]);
-//        String t3 = String.format("%.2f", express[42]);
-//        Log.e("express", t1 + "--" + t2 + "--" + t3 + "");
-//        mVersionText.setTextColor(Color.RED);
-//        mVersionText.setText(text + String.format("\nExpression 15:%s 16:%s  43:%s", t1 + "", t2 + "", t3 + ""));
-//    }
 
     public void checkGuide() {
         if (mGuideView.getVisibility() == View.VISIBLE) {
@@ -107,8 +101,8 @@ public class HomeFragment extends BaseFragment
                 mActivity.showBaseFragment(EditFaceFragment.TAG);
                 mTrackBtn.setChecked(false);
                 break;
-            case R.id.main_ar_filter_image_btn:
-                mActivity.showBaseFragment(ARFilterFragment.TAG);
+            case R.id.main_avatar_body_btn:
+                mActivity.showBaseFragment(BodyDriveFragment.TAG);
                 mTrackBtn.setChecked(false);
                 break;
             case R.id.main_group_photo_image_btn:
@@ -116,5 +110,11 @@ public class HomeFragment extends BaseFragment
                 mTrackBtn.setChecked(false);
                 break;
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mActivity.stopRecording();
     }
 }

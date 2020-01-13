@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.faceunity.pta_art.constant.Constant;
-import com.faceunity.pta_art.entity.DBHelper;
 import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.web.OkHttpUtils;
 

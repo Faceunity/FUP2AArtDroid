@@ -2,7 +2,6 @@ package com.faceunity.pta_art;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 
 import com.faceunity.pta_art.constant.Constant;
@@ -27,21 +25,22 @@ import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.pta_art.core.PTACore;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.DBHelper;
-import com.faceunity.pta_art.fragment.ARFilterFragment;
 import com.faceunity.pta_art.fragment.AvatarFragment;
 import com.faceunity.pta_art.fragment.BaseFragment;
+import com.faceunity.pta_art.fragment.BodyDriveFragment;
 import com.faceunity.pta_art.fragment.EditFaceFragment;
 import com.faceunity.pta_art.fragment.GroupPhotoFragment;
 import com.faceunity.pta_art.fragment.HomeFragment;
 import com.faceunity.pta_art.fragment.TakePhotoFragment;
+import com.faceunity.pta_art.gles.core.GlUtil;
 import com.faceunity.pta_art.renderer.CameraRenderer;
-import com.faceunity.pta_art.utils.DownLoadUtils;
+import com.faceunity.pta_art.utils.ToastUtil;
+import com.faceunity.pta_art.utils.VideoUtil;
+import com.faceunity.pta_helper.video.MediaEncoder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -71,6 +70,15 @@ public class MainActivity extends AppCompatActivity implements
     private int mShowIndex;
     private AvatarPTA mShowAvatarP2A;
 
+    /**
+     * 是否可以点击
+     */
+    private View v_is_canClick;
+    private boolean isCanClick = true;
+
+    private double maxScale = -26.77;//最大缩放值
+    private double minScale = -1400;//最小缩放值
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +86,16 @@ public class MainActivity extends AppCompatActivity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mMainLayout = findViewById(R.id.main_layout);
+        v_is_canClick = findViewById(R.id.v_is_canClick);
+        v_is_canClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isCanClick) {
+                    ToastUtil.showCenterToast(MainActivity.this, "模型载入中，请稍后...");
+                    return;
+                }
+            }
+        });
 
         mGroupPhotoRound = findViewById(R.id.group_photo_round);
         mGLSurfaceView = findViewById(R.id.main_gl_surface);
@@ -86,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements
         mCameraRenderer.setOnCameraRendererStatusListener(this);
         mGLSurfaceView.setRenderer(mCameraRenderer);
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        videoUtil = new VideoUtil(mGLSurfaceView);
 
         mDBHelper = new DBHelper(this);
         mAvatarP2As = mDBHelper.getAllAvatarP2As();
@@ -125,6 +145,9 @@ public class MainActivity extends AppCompatActivity implements
                     touchMode = 1;
                     return false;
                 }
+                if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
+                    return false;
+                }
                 float rotDelta = -distanceX / screenWidth;
                 float translateDelta = distanceY / screenHeight;
                 mAvatarHandle.setRotDelta(rotDelta);
@@ -140,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
                     return false;
                 }
                 float scale = detector.getScaleFactor() - 1;
-                mAvatarHandle.setScaleDelta(scale);
+                mAvatarHandle.setScaleDelta(scale, maxScale, minScale);
                 return scale != 0;
             }
         });
@@ -176,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements
                 mScaleGestureDetector.onTouchEvent(event);
             } else if (event.getPointerCount() == 1)
                 mGestureDetector.onTouchEvent(event);
+        } else if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
+            if (event.getPointerCount() == 1)
+                mGestureDetector.onTouchEvent(event);
         }
         return super.onTouchEvent(event);
     }
@@ -199,20 +225,67 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        updateAvatarP2As();
-        mAvatarHandle.setAvatar(getShowAvatarP2A());
         boolean isToHome = false;
+        boolean isNeedLoad = true;
         if (intent != null && intent.getExtras() != null) {
             isToHome = intent.getBooleanExtra("isToHome", false);
+            isNeedLoad = false;
+        }
+        if (isNeedLoad) {
+            updateAvatarP2As();
+            mAvatarHandle.setAvatar(getShowAvatarP2A());
         }
         if (isToHome) {
             if (mBaseFragment instanceof GroupPhotoFragment) {
+                ((GroupPhotoFragment) mBaseFragment).backToHome();
+                mP2ACore.setCurrentInstancceId(0);
                 mP2ACore.bind();
                 mFUP2ARenderer.setFUCore(mP2ACore);
-                ((GroupPhotoFragment) mBaseFragment).backToHome();
+                mAvatarHandle.resetAllMin();
             }
         }
     }
+
+    /**
+     * 控制切换模型时，不能点击
+     *
+     * @param isCanClick
+     */
+    public void setCanClick(boolean isCanClick, boolean isUIThread) {
+        this.isCanClick = isCanClick;
+        if (isUIThread) {
+            v_is_canClick.setVisibility(isCanClick ? View.GONE : View.VISIBLE);
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    v_is_canClick.setVisibility(isCanClick ? View.GONE : View.VISIBLE);
+                }
+            });
+        }
+    }
+
+    //视频录制
+    private VideoUtil videoUtil;
+
+
+    public void startRecording(MediaEncoder.TimeListener timeListener) {
+    }
+
+    private long startTime, startRecord, endRecord;
+
+    public void initReordTime() {
+        startTime = System.currentTimeMillis();
+    }
+
+    public void cancelRecording() {
+        videoUtil.cancelRecording();
+    }
+
+    public void stopRecording() {
+        videoUtil.stopRecording();
+    }
+
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -223,21 +296,16 @@ public class MainActivity extends AppCompatActivity implements
     public void onSurfaceChanged(GL10 gl, final int width, int height) {
     }
 
-//    private volatile float[] expressionData = new float[56];
-
     @Override
-    public int onDrawFrame(byte[] cameraNV21Byte, int cameraTextureId, int cameraWidth, int cameraHeight) {
-        mCameraRenderer.refreshLandmarks(mP2ACore.getLandmarksData());
-//        expressionData = mP2ACore.getExpressionData();
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (HomeFragment.TAG.equals(mShowFragmentFlag) && mHomeFragment != null) {
-//                    mHomeFragment.setExpress(expressionData);
-//                }
-//            }
-//        });
-        return mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight);
+    public int onDrawFrame(byte[] cameraNV21Byte, int cameraTextureId, int cameraWidth, int cameraHeight, int rotation) {
+        if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
+            mCameraRenderer.refreshLandmarks(((BodyDriveFragment) mBaseFragment).getLandmarksData());
+        } else {
+            mCameraRenderer.refreshLandmarks(mP2ACore.getLandmarksData());
+        }
+        int fuTextureId = mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight, rotation);
+        videoUtil.sendRecordingData(fuTextureId, GlUtil.IDENTITY_MATRIX);
+        return fuTextureId;
     }
 
     @Override
@@ -253,10 +321,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         if (mBaseFragment != null) {
+            if (!isCanClick) {
+                ToastUtil.showCenterToast(MainActivity.this, "模型载入中，请稍后...");
+                return;
+            }
             mBaseFragment.onBackPressed();
             return;
         }
-//        super.onBackPressed();
         finish();
         android.os.Process.killProcess(android.os.Process.myPid());
         Runtime.getRuntime().gc();
@@ -285,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void showBaseFragment(String tag) {
         if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK
-                && !TakePhotoFragment.TAG.equals(tag) && !ARFilterFragment.TAG.equals(tag)) {
+                && !TakePhotoFragment.TAG.equals(tag)) {
             mCameraRenderer.changeCamera();
         }
         FragmentManager manager = getSupportFragmentManager();
@@ -304,8 +375,8 @@ public class MainActivity extends AppCompatActivity implements
         if (fragment == null) {
             if (EditFaceFragment.TAG.equals(tag)) {
                 mBaseFragment = new EditFaceFragment();
-            } else if (ARFilterFragment.TAG.equals(tag)) {
-                mBaseFragment = new ARFilterFragment();
+            } else if (BodyDriveFragment.TAG.equals(tag)) {
+                mBaseFragment = new BodyDriveFragment();
             } else if (TakePhotoFragment.TAG.equals(tag)) {
                 mBaseFragment = new TakePhotoFragment();
             } else if (GroupPhotoFragment.TAG.equals(tag)) {

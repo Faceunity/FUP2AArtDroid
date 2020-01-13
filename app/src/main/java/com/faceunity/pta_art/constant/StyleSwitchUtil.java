@@ -14,7 +14,7 @@ public abstract class StyleSwitchUtil {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                //TODO 风格选择后初始化 P2A client
+                //风格选择后初始化 P2A client
                 ColorConstant.init(context);
                 //初始化P2A Client
                 PTAClientWrapper.setupStyleData(context);

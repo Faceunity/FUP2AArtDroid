@@ -5,7 +5,7 @@ import android.text.TextUtils;
 /**
  * Created by tujh on 2018/12/17.
  */
-public class BundleRes extends FURes{
+public class BundleRes extends FURes {
 
     public String path;
     public int gender;
@@ -41,6 +41,10 @@ public class BundleRes extends FURes{
 
     public BundleRes(int gender, String path) {
         this(gender, path, 0, null, true, null);
+    }
+
+    public BundleRes(int gender, String path, String[] others) {
+        this(gender, path, 0, null, true, others);
     }
 
     public BundleRes(String path, int resId, Integer[] labels) {

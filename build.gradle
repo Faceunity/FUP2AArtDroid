@@ -21,6 +21,7 @@ allprojects {
         google()
         jcenter()
         maven{url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url 'https://www.jitpack.io' }
     }
 }
 

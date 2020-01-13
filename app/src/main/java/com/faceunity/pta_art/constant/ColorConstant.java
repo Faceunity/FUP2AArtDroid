@@ -1,9 +1,10 @@
 package com.faceunity.pta_art.constant;
 
 import android.content.Context;
-import android.util.Log;
 
+import com.faceunity.pta_art.entity.StaBsBlendBean;
 import com.faceunity.pta_art.ui.seekbar.ColorPickGradient;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -26,6 +27,7 @@ public abstract class ColorConstant {
     public static double[][] glass_frame_color;
     public static double[][] glass_color;
     public static double[][] hat_color;
+    public static StaBsBlendBean sta_bs_blend;
 
     public static void init(Context context) {
         try {
@@ -46,6 +48,16 @@ public abstract class ColorConstant {
             hat_color = parseJson(jsonObject, "hat_color");
 
             ColorPickGradient.init(skin_color);
+            /**
+             * sta bs blend json
+             */
+            InputStream isSta = context.getAssets().open("new/sta_bs_blend_weight.json");
+            byte[] itemStaData = new byte[isSta.available()];
+            isSta.read(itemStaData);
+            isSta.close();
+            String jsonSta = new String(itemStaData);
+            Gson gson = new Gson();
+            sta_bs_blend = gson.fromJson(jsonSta, StaBsBlendBean.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,7 +72,7 @@ public abstract class ColorConstant {
             int g = color.getInt("g");
             int b = color.getInt("b");
             if (color.has("intensity")) {
-                int intensity = color.getInt("intensity");
+                double intensity = color.getDouble("intensity");
                 colors.add(new double[]{r, g, b, intensity});
             } else {
                 colors.add(new double[]{r, g, b});
@@ -68,7 +80,6 @@ public abstract class ColorConstant {
         }
         double[][] doubles = new double[colors.size()][];
         colors.toArray(doubles);
-//        Log.e(TAG, key + Arrays.toString(doubles));
         return doubles;
     }
 
@@ -90,7 +101,6 @@ public abstract class ColorConstant {
      * @return
      */
     public static double[] getRadioColor(double radio) {
-        Log.i("ssss", Arrays.toString(ColorPickGradient.getColor(radio)));
         return ColorPickGradient.getColor(radio);
     }
 }

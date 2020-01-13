@@ -6,8 +6,8 @@
 
     <com.faceunity.pta_art.ui.RoundImageView
         android:id="@+id/bottom_item_img"
-        android:layout_width="@dimen/x136"
-        android:layout_height="@dimen/x136"
+        android:layout_width="@dimen/x120"
+        android:layout_height="@dimen/x120"
         android:layout_gravity="center"
         android:background="@drawable/main_item_select"
         android:cropToPadding="true"

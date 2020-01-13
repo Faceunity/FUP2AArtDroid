@@ -53,6 +53,10 @@ public abstract class Program {
         drawFrame(textureId, texMatrix, GlUtil.IDENTITY_MATRIX);
     }
 
+    public void drawFrameMVP(int textureId, float[] mvp) {
+        drawFrame(textureId, GlUtil.IDENTITY_MATRIX, mvp);
+    }
+
     public void drawFrame(int textureId, float[] texMatrix, float[] mvpMatrix, int x, int y, int width, int height) {
         int[] originalViewport = new int[4];
         GLES20.glGetIntegerv(GLES20.GL_VIEWPORT, originalViewport, 0);

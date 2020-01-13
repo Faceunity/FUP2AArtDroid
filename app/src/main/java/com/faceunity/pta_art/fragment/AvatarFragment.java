@@ -21,8 +21,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.faceunity.pta_art.AvatarPTADeleteActivity;
 import com.faceunity.pta_art.R;
-import com.faceunity.pta_art.constant.Constant;
-import com.faceunity.pta_art.constant.StyleSwitchUtil;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.ui.LoadingDialog;
 
@@ -58,6 +56,7 @@ public class AvatarFragment extends BaseFragment
                 mP2ACore.setNeedTrackFace(isChecked);
                 mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
                 mCameraRenderer.setShowCamera(isChecked);
+                mCameraRenderer.setShowLandmarks(isChecked);
             }
         });
         mTrackBtn.setChecked(mCameraRenderer.isShowCamera());
@@ -65,12 +64,14 @@ public class AvatarFragment extends BaseFragment
         view.findViewById(R.id.avatar_bottom_item_delete).setOnClickListener(this);
         view.findViewById(R.id.avatar_bottom_item_create).setOnClickListener(this);
         view.findViewById(R.id.avatar_bottom_item_switch).setOnClickListener(this);
+        view.findViewById(R.id.avatar_bottom_item_switch).setAlpha(0.5f);
+        view.findViewById(R.id.avatar_bottom_item_switch).setEnabled(false);
 
         mEditRecycler = view.findViewById(R.id.avatar_bottom_recycler);
         mEditRecycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(mActivity, spanCount, GridLayoutManager.VERTICAL, false));
         mEditRecycler.setAdapter(mEditAdapter = new EditAdapter());
         ((SimpleItemAnimator) mEditRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
-        mAvatarHandle.resetAll();
+        mAvatarHandle.resetAvatar();
 
         mEditAdapter.scrollToPosition(mActivity.getShowIndex());
     }
@@ -86,24 +87,6 @@ public class AvatarFragment extends BaseFragment
                 mActivity.showBaseFragment(TakePhotoFragment.TAG);
                 break;
             case R.id.avatar_bottom_item_switch:
-                mTrackBtn.setChecked(false);
-                isUpdateStyleCompile = 0;
-                final LoadingDialog loadingDialog = new LoadingDialog();
-                loadingDialog.setLoadingStr("切换风格中");
-                loadingDialog.show(getChildFragmentManager(), LoadingDialog.TAG);
-                Constant.style = Constant.style == Constant.style_new ? Constant.style_art : Constant.style_new;
-                StyleSwitchUtil.switchStyle(mActivity.getApplicationContext(), new Runnable() {
-                    @Override
-                    public void run() {
-                        updateStyleCompile(loadingDialog);
-                    }
-                });
-                mActivity.updateStyle(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateStyleCompile(loadingDialog);
-                    }
-                });
                 break;
         }
     }
@@ -142,7 +125,7 @@ public class AvatarFragment extends BaseFragment
         @NonNull
         @Override
         public EditHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new EditAdapter.EditHolder(LayoutInflater.from(mActivity).inflate(R.layout.layout_avatar_bottom_item, parent, false));
+            return new EditHolder(LayoutInflater.from(mActivity).inflate(R.layout.layout_avatar_bottom_item, parent, false));
         }
 
         @Override
@@ -152,16 +135,20 @@ public class AvatarFragment extends BaseFragment
             final AvatarPTA avatarP2A = mAvatarP2AS.get(position);
             if (avatarP2A.getOriginPhotoRes() > 0) {
                 holder.mItemImg.setImageResource(avatarP2A.getOriginPhotoRes());
-                Log.e("img", avatarP2A.getOriginPhotoRes() + "");
             } else {
                 Glide.with(mActivity).load(new File(avatarP2A.getOriginPhoto())).
                         apply(requestOptions).into(holder.mItemImg);
-//                holder.mItemImg.setImageBitmap(BitmapUtil.getYaSuoBitmapFromImagePath(avatarP2A.getOriginPhoto(), 100, 100));
             }
             holder.mItemImg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mAvatarHandle.setAvatar(avatarP2A);
+                    mActivity.setCanClick(false, true);
+                    mAvatarHandle.setAvatar(avatarP2A, new Runnable() {
+                        @Override
+                        public void run() {
+                            mActivity.setCanClick(true, false);
+                        }
+                    });
                     notifySelectItemChanged(position);
                     scrollToPosition(position);
                 }

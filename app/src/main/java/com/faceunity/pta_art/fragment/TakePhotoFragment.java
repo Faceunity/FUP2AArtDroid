@@ -1,6 +1,7 @@
 package com.faceunity.pta_art.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
@@ -13,7 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Base64;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +23,8 @@ import android.widget.TextView;
 
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.constant.Constant;
-import com.faceunity.pta_art.core.client.AvatarBuilder;
 import com.faceunity.pta_art.core.NamaCore;
+import com.faceunity.pta_art.core.client.AvatarBuilder;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.DBHelper;
 import com.faceunity.pta_art.renderer.CameraRenderer;
@@ -38,6 +39,7 @@ import com.faceunity.pta_art.web.CreateFailureToast;
 import com.faceunity.pta_art.web.OkHttpUtils;
 import com.faceunity.pta_art.web.ProgressRequestBody;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -86,9 +88,12 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
         mNamaCore = new NamaCore(getContext(), mFUP2ARenderer) {
             @Override
-            public int onDrawFrame(byte[] img, int tex, int w, int h) {
-                int fu = super.onDrawFrame(img, tex, w, h);
-                checkPic();
+            public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
+                //因为已经对双输入的cpu buffer进行旋转、镜像，使其与texture对齐
+                //所以这边不需要其他处理
+                int fu = super.onDrawFrame(img, tex, w,
+                        h, rotation);
+                checkPic(w, h);
                 return fu;
             }
         };
@@ -275,7 +280,14 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         });
     }
 
+    private long startGetToken, endGetToken;//获取token的时间
+    private long endUploadImage;//上传图片的时间
+    private long endPollDownload;//轮询下载的时间
+    private long startDown, endDown;//下载bundle的时间
+    private long endCreateAvatar;//生成avatar时间
+
     private void createAvatar(final String dir, final int gender) {
+        startGetToken = System.currentTimeMillis();
         OkHttpUtils.getAvatarToken(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -285,9 +297,45 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
             @Override
             public void onResponse(final Call call, final Response response) throws IOException {
-                final String token = response.body().string();
-                Log.i(TAG, "getAvatarToken response message " + response.message() + " code " + response.code() + " token " + token);
+                final String tokenStr = response.body().string();
+                endGetToken = System.currentTimeMillis();
+                Log.i(TAG, "time: getTokenTime=" + (endGetToken - startGetToken) + "ms");
+                Log.i(TAG, "getAvatarToken response message " + response.message() + " code " + response.code() + " serverjson " + tokenStr);
                 if (response.isSuccessful()) {
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(tokenStr);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    String token = jsonObject.optString("token");
+                    Object latest = jsonObject.opt("latest");
+                    Object type = jsonObject.opt("type");
+                    if (latest != null && type != null) {
+                        Log.i(TAG, "latest=" + latest + "--type=" + type);
+                        if (!((String) latest).equals(Constant.pta_client_version_new)) {
+                            if (mCreateAvatarDialog != null)
+                                mCreateAvatarDialog.dismiss();
+                            FileUtil.deleteDirAndFile(dir);
+                            mActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    new AlertDialog.Builder(mActivity)
+                                            .setTitle("警告")
+                                            .setCancelable(false)
+                                            .setMessage("当前版本与服务器版本不一致，无法生成")
+                                            .setNegativeButton("确定", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                }
+                                            })
+                                            .show();
+                                }
+                            });
+                            return;
+                        }
+                    }
                     OkHttpUtils.updatePicRequest(token, dir + AvatarPTA.FILE_NAME_CLIENT_DATA_ORIGIN_PHOTO, gender, new Callback() {
                         @Override
                         public void onFailure(Call c, IOException e) {
@@ -297,6 +345,8 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
                         @Override
                         public void onResponse(Call c, Response r) throws IOException {
+                            endUploadImage = System.currentTimeMillis();
+                            Log.i(TAG, "time: UploadImageTime=" + (endUploadImage - endGetToken) + "ms");
                             Log.i(TAG, "updatePicRequest response message " + r.message() + " code " + r.code());
                             if (r.isSuccessful()) {
                                 String json = r.body().string();
@@ -353,35 +403,78 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                             Log.i(TAG, "json " + json);
                             try {
                                 JSONObject jsonObject = new JSONObject(json);
-                                //String msg=jsonObject.getString("")
                                 if (2 == jsonObject.getInt("code")) {
+                                    endPollDownload = System.currentTimeMillis();
+                                    Log.i(TAG, "time: PollDownloadTime=" + (endPollDownload - endUploadImage) + "ms");
                                     String data = jsonObject.getString("data");
-                                    byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
-                                    downloadAvatarComplete();
-
-                                    final AvatarPTA avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, new Runnable() {
+                                    startDown = System.currentTimeMillis();
+                                    Log.i(TAG, "time: ParsingJsonTime=" + (startDown - endPollDownload) + "ms");
+                                    //下载bundle
+                                    OkHttpUtils.downServiceBundle(data, dir, new OkHttpUtils.OnDownloadListener() {
                                         @Override
-                                        public void run() {
+                                        public void onDownloadStart() {
+                                        }
+
+                                        @Override
+                                        public void onDownProgress(long currentLen, long allLen) {
+
+                                        }
+
+                                        @Override
+                                        public void onDownloadSuccess(byte[] bytes) {
+                                            endDown = System.currentTimeMillis();
+                                            Log.i(TAG, "time: downBundleTime=" + (endDown - startDown) + "ms");
+                                            mActivity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    final AvatarPTA avatarP2A = mAvatarBuilder.createAvatar(bytes, dir, gender, new Runnable() {
+                                                        @Override
+                                                        public void run() {
+
+                                                        }
+                                                    });
+                                                    endCreateAvatar = System.currentTimeMillis();
+                                                    Log.i(TAG, "time: createAvatarTime=" + (endCreateAvatar - endDown) + "ms");
+                                                    Log.i(TAG, "time: createAvatarAllTime=" + (endCreateAvatar - startGetToken) + "ms");
+                                                    createAvatarComplete(dir, bytes);
+                                                    if (avatarP2A != null) {
+                                                        showAvatar(avatarP2A, mCreateAvatarDialog);
+                                                        return;
+                                                    }
+                                                }
+                                            });
+                                        }
+
+                                        @Override
+                                        public void onDownloadFailed() {
+                                            mActivity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
+                                                    FileUtil.deleteDirAndFile(dir);
+                                                    if (mCreateAvatarDialog != null)
+                                                        mCreateAvatarDialog.dismiss();
+                                                }
+                                            });
                                         }
                                     });
-                                    createAvatarComplete(dir, bytes);
-                                    if (avatarP2A != null) {
-                                        showAvatar(avatarP2A, mCreateAvatarDialog);
-                                        return;
-                                    }
+                                    return;
+                                    //byte[] bytes = Base64.decode(data, Base64.NO_WRAP);
+//                                    downloadAvatarComplete();
                                 } else if (1 == jsonObject.getInt("code")
                                         && jsonObject.getString("message").equals("PROCESSING")) {
                                     download(token, taskid, dir, gender);
                                     return;
+                                } else {
+                                    JSONObject object = jsonObject.optJSONObject("data");
+                                    Log.i(TAG, "error_code=" + object.getInt("err_code"));
+                                    CreateFailureToast.onCreateFailure(mActivity, object.getInt("err_code") + "");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 // 图片格式不对
-                                // if (jsonObject.getString("message").equals("FAILED") ||
-                                //jsonObject.getString("message").equals("Wrong task id or expire")) {
-                                //
+                                CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
                             }
-                            CreateFailureToast.onCreateFailure(mActivity, CreateFailureToast.CreateFailureFile);
                         } else {
                             CreateFailureToast.onCreateFailure(mActivity, response.code() == 500 ? response.body().string() : CreateFailureToast.CreateFailureNet);
                         }
@@ -437,7 +530,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
     private float[] mFaceRect;
     private int mFrameId = 0;
 
-    private void checkPic() {
+    private void checkPic(int w, int h) {
         isTracking = mNamaCore.isTracking();
         mFaceRect = mNamaCore.getFaceRectData();
         if (mFrameId++ % 15 > 0)
@@ -445,11 +538,11 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         if (isTracking != 1) {
             showCheckPic("请保持1个人输入");
         } else if (FaceCheckUtil.checkRotation(mNamaCore.getRotationData())) {
-            showCheckPic("请保持正面");
-        } else if (FaceCheckUtil.checkFaceRect(mFaceRect, mCameraRenderer.getCameraWidth(), mCameraRenderer.getCameraHeight())) {
-            showCheckPic("请将人脸对准虚线框");
+            showCheckPic("识别失败，需要人物正脸完整出镜哦~");
+        } else if (FaceCheckUtil.checkFaceRect(mFaceRect, w, h)) {
+            showCheckPic("识别失败，请再试一次~");
         } else if (FaceCheckUtil.checkExpression(mNamaCore.getExpressionData())) {
-            showCheckPic("请保持面部无夸张表情");
+            showCheckPic("识别失败，需要人物正脸完整出镜哦~");
         } else if (mLight < 5) {
             showCheckPic("光线不充足");
         } else {

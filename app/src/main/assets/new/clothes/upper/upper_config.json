@@ -1,0 +1,44 @@
+{
+  "clothUpperList": [
+    {
+      "gender": 2,
+      "path": "",
+      "icon": "edit_face_item_none"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/shangyi_chushi.bundle",
+      "icon": "shangyi_chushi"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/shangyi_chenshan_6_female.bundle",
+      "icon": "shangyi_chenshan_6"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/shangyi_maoyi_2.bundle",
+      "icon": "shangyi_maoyi_2"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/shangyi_maoyi_3_female.bundle",
+      "icon": "shangyi_maoyi_3"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/waitao_2_female.bundle",
+      "icon": "waitao_2"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/waitao_3.bundle",
+      "icon": "waitao_3"
+    },
+    {
+      "gender": 2,
+      "path": "new/clothes/upper/waitao_4.bundle",
+      "icon": "waitao_4"
+    }
+  ]
+}

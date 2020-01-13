@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import static com.faceunity.pta_art.constant.Constant.filePath;
 
@@ -57,22 +58,6 @@ public abstract class FileUtil {
         fos.close();
     }
 
-    public static void saveBitmapToFile(final String path, final Bitmap bitmap) {
-        try {
-            File file = new File(path);
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public static byte[] readBytes(String path) {
         File file = new File(path);
         if (!file.exists()) {
@@ -90,6 +75,63 @@ public abstract class FileUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    public static void saveBitmapToFile(final String path, final Bitmap bitmap) {
+        try {
+            File file = new File(path);
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void byteToFile(byte[] bytes, String path) {
+        try {
+            // 根据绝对路径初始化文件
+            File localFile = new File(path);
+            if (!localFile.exists()) {
+                localFile.createNewFile();
+            }
+            // 输出流
+            OutputStream os = new FileOutputStream(localFile);
+            os.write(bytes);
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取文件的名称
+     *
+     * @param name
+     * @return
+     */
+    public static String getLastName(String name) {
+        if (TextUtils.isEmpty(name)) {
+            return "";
+        }
+        String lastName = name.substring(name.lastIndexOf("/") + 1);
+        return lastName;
+    }
+
+    /**
+     * 截取字符串前 16 个字符作为缩略
+     *
+     * @param s
+     * @return
+     */
+    public static String getStringThumbnail(String s) {
+        return s.length() > 16 ? s.substring(0, 16) + "_" : s;
     }
 
     /**
@@ -205,8 +247,19 @@ public abstract class FileUtil {
                 }
             } else if (isDownloadsDocument(fileUri)) {
                 String id = DocumentsContract.getDocumentId(fileUri);
-                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
-                return getDataColumn(context, contentUri, null, null);
+                 if (!TextUtils.isEmpty(id)) {
+                    if (id.startsWith("raw:")) {
+                        //fix 播放部分华为视频路径报错
+                        return id.replaceFirst("raw:", "");
+                    }
+                    try {
+                        final Uri contentUri = ContentUris.withAppendedId(
+                                Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                        return getDataColumn(context, contentUri, null, null);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                }
             } else if (isMediaDocument(fileUri)) {
                 String docId = DocumentsContract.getDocumentId(fileUri);
                 String[] split = docId.split(":");

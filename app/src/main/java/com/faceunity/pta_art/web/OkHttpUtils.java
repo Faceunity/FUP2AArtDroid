@@ -9,11 +9,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.faceunity.pta_art.constant.Constant;
+import com.faceunity.pta_art.constant.JsonUtils;
 import com.faceunity.pta_art.utils.BitmapUtil;
 import com.faceunity.pta_art.utils.FileUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -43,6 +46,7 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
     private static final String TAG = OkHttpUtils.class.getSimpleName();
+    //    public static final String P12_PATH = "p2a.p12";
     public static final String PEM_PATH = "pta_ptoa.pem";
     public static final String PEM_API2_PATH = "pta_api2.pem";
 
@@ -51,7 +55,25 @@ public class OkHttpUtils {
     private OkHttpClient mOkHttpClient = null;
     private OkHttpClient mOkHttpClient2 = null;
 
-    public static OkHttpClient initOkHttpClient(Context context) {
+    /**
+     * 返回是否是https
+     *
+     * @return
+     */
+    public static boolean initNet() {
+        JsonUtils jsonUtils = new JsonUtils();
+        String[] urls = jsonUtils.readNetWorkJson("net_config.json");
+        Constant.web_url_get_token = urls[0];
+        Constant.web_url_create_upload_image = urls[1];
+        Constant.web_url_create_download = urls[2];
+        Constant.pta_client_version_new = urls[3];
+        Constant.pta_client_version_art = urls[4];
+        Constant.web_url_check = urls[5];
+        Constant.netType = urls[6];
+        return Constant.web_url_get_token.startsWith("https");
+    }
+
+    public static OkHttpClient initOkHttpClient(Context context, boolean isHttps) {
         SSLSocketFactory sslSocketFactory = null;
         try {
 //            InputStream p12 = context.getAssets().open(P12_PATH);
@@ -79,7 +101,7 @@ public class OkHttpUtils {
                 .writeTimeout(60000L, TimeUnit.MILLISECONDS)
                 .readTimeout(60000L, TimeUnit.MILLISECONDS);
         OkHttpClient okHttpClient;
-        if (sslSocketFactory != null) {
+        if (sslSocketFactory != null && isHttps) {
             okHttpClient = builder.sslSocketFactory(sslSocketFactory).build();
         } else {
             okHttpClient = builder.build();
@@ -87,9 +109,14 @@ public class OkHttpUtils {
         return okHttpClient;
     }
 
-    public static OkHttpClient initOkHttpClient2(Context context) {
+    public static OkHttpClient initOkHttpClient2(Context context, boolean isHttps) {
         SSLSocketFactory sslSocketFactory = null;
         try {
+//            InputStream p12 = context.getAssets().open(P12_PATH);
+//            byte[] p12Bytes = new byte[p12.available()];
+//            p12.read(p12Bytes);
+//            p12.close();
+
 
             //p2a服务器需要的ca，手动传避免部分机型ca不全
             InputStream ca = context.getAssets().open(PEM_API2_PATH);
@@ -98,6 +125,8 @@ public class OkHttpUtils {
             ca.close();
 
             TrustManagerFactory tmf = OkHttpUtils.getTrustManagerFactory(caBytes);
+//            sslSocketFactory = new CustomSslSocketFactory(OkHttpUtils.getKeyManagerFactory(p12Bytes).getKeyManagers(),
+//                    tmf == null ? null : tmf.getTrustManagers());
             sslSocketFactory = new CustomSslSocketFactory(null,
                     tmf == null ? null : tmf.getTrustManagers());
         } catch (Exception e) {
@@ -108,7 +137,7 @@ public class OkHttpUtils {
                 .writeTimeout(60000L, TimeUnit.MILLISECONDS)
                 .readTimeout(60000L, TimeUnit.MILLISECONDS);
         OkHttpClient okHttpClient;
-        if (sslSocketFactory != null) {
+        if (sslSocketFactory != null && isHttps) {
             okHttpClient = builder.sslSocketFactory(sslSocketFactory).build();
         } else {
             okHttpClient = builder.build();
@@ -148,6 +177,7 @@ public class OkHttpUtils {
     public OkHttpClient getOkHttpClient2() {
         return mOkHttpClient2;
     }
+
 
     public static KeyManagerFactory getKeyManagerFactory(byte[] p12) {
         KeyManagerFactory kmf = null;
@@ -192,7 +222,7 @@ public class OkHttpUtils {
                 String.format("code=%s&device=%s", code, imei)
         );
         Log.e(TAG, "response " + String.format("code=%s&device=%s", code, imei));
-        getInstance().getOkHttpClient().newCall(new Request.Builder().url(Constant.web_url_check).post(requestBody).build()).enqueue(new Callback() {
+        getInstance().getmOkHttpClient3().newCall(new Request.Builder().url(Constant.web_url_check).post(requestBody).build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 callback.onFailure(call, e);
@@ -205,13 +235,23 @@ public class OkHttpUtils {
         });
     }
 
+    public OkHttpClient getmOkHttpClient3() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectTimeout(60000L, TimeUnit.MILLISECONDS)
+                .writeTimeout(60000L, TimeUnit.MILLISECONDS)
+                .readTimeout(60000L, TimeUnit.MILLISECONDS);
+        OkHttpClient okHttpClient;
+        okHttpClient = builder.build();
+        return okHttpClient;
+    }
+
     /**
      * 请求服务器，处理图片并获得处理后的数据
      *
      * @param callback
      */
     public static void getAvatarToken(final Callback callback) {
-        String url = Constant.web_url_get_token;
+        String url = Constant.web_url_get_token + "&type=" + Constant.netType;
         Log.i(TAG, "getAvatarToken url " + url);
         getInstance().getOkHttpClient2().newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
             @Override
@@ -315,6 +355,7 @@ public class OkHttpUtils {
         RequestBody requestBody = (new okhttp3.MultipartBody.Builder())
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("taskid", taskId)
+                .addFormDataPart("encoding", "url")
                 .build();
         getInstance().getOkHttpClient().newCall(new Request.Builder().url(url).post(requestBody).build()).enqueue(new Callback() {
             @Override
@@ -328,6 +369,114 @@ public class OkHttpUtils {
             }
         });
     }
+
+    /**
+     * 下载bundle文件
+     *
+     * @param url
+     * @param dir      文件存储的路径
+     * @param listener
+     */
+    public static void downServiceBundle(String url, String dir, final OnDownloadListener listener) {
+        if (listener != null) {
+            Log.i(TAG, "onDownloadStart:" + url);
+            listener.onDownloadStart();
+        }
+
+        Request request = new Request.Builder().url(url).build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .connectTimeout(60000L, TimeUnit.MILLISECONDS)
+                .writeTimeout(60000L, TimeUnit.MILLISECONDS)
+                .readTimeout(60000L, TimeUnit.MILLISECONDS);
+        OkHttpClient okHttpClient;
+        okHttpClient = builder.build();
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.e(TAG, "onFailure：" + call.toString() + " IOException：" + e.toString());
+                // 下载失败
+                if (listener != null)
+                    listener.onDownloadFailed();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                long currentLen = 0;
+                long allLen = response.body().contentLength();
+                if (listener != null) {
+                    listener.onDownProgress(currentLen, allLen);
+                }
+
+                // Okhttp/Retofit 下载监听
+                InputStream is = null;
+                byte[] buf = new byte[2048];
+                int len = 0;
+                FileOutputStream fos = null;
+                // 储存下载文件的目录
+                try {
+                    is = response.body().byteStream();
+                    final File file = new File(dir, "head.bundle");
+                    if (!file.exists()) file.createNewFile();
+                    fos = new FileOutputStream(file);
+                    while ((len = is.read(buf)) != -1) {
+                        fos.write(buf, 0, len);
+                        currentLen += len;
+                        if (listener != null) {
+                            listener.onDownProgress(currentLen, allLen);
+                        }
+                    }
+                    fos.flush();
+
+                    InputStream inputStream = new FileInputStream(file);
+                    byte[] head = new byte[inputStream.available()];
+                    inputStream.read(head);
+                    inputStream.close();
+                    // 下载完成
+                    if (listener != null)
+                        listener.onDownloadSuccess(head);
+                } catch (Exception e) {
+                    Log.e(TAG, "onFailure " + e.getMessage());
+                    if (listener != null)
+                        listener.onDownloadFailed();
+                } finally {
+                    try {
+                        if (is != null) is.close();
+                    } catch (IOException e) {
+                    }
+                    try {
+                        if (fos != null) fos.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        });
+    }
+
+    public interface OnDownloadListener {
+        /**
+         * 开始文件
+         */
+        void onDownloadStart();
+
+        /**
+         * 下载中
+         *
+         * @param currentLen 当前下载文件长度
+         * @param allLen     总文件长度
+         */
+        void onDownProgress(long currentLen, long allLen);
+
+        /**
+         * 下载成功
+         */
+        void onDownloadSuccess(byte[] bytes);
+
+        /**
+         * 下载失败
+         */
+        void onDownloadFailed();
+    }
+
 
     /**
      * 取消所有网络请求

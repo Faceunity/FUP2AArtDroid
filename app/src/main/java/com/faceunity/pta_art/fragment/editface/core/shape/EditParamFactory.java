@@ -60,6 +60,9 @@ public abstract class EditParamFactory {
             Iterator<String> it = object.keys();
             while (it.hasNext()) {
                 String k = it.next();
+                if (object.opt(k) instanceof String) {
+                    continue;
+                }
                 float value = (float) object.getDouble(k);
                 map.put(k, value);
             }
@@ -81,8 +84,12 @@ public abstract class EditParamFactory {
         return ret;
     }
 
-    private static int[] sParamFaceRes = {R.drawable.face_1, R.drawable.face_2, R.drawable.face_3, R.drawable.face_4};
-    private static int[] sParamEyeRes = {R.drawable.eye_1, R.drawable.eye_2, R.drawable.eye_3, R.drawable.eye_4};
-    private static int[] sParamMouthRes = {R.drawable.mouth_1, R.drawable.mouth_2, R.drawable.mouth_3, R.drawable.mouth_4};
-    private static int[] sParamNoseRes = {R.drawable.nose_1, R.drawable.nose_2, R.drawable.nose_3, R.drawable.nose_4};
+    private static int[] sParamFaceRes = {R.drawable.face_1, R.drawable.face_2, R.drawable.face_3, R.drawable.face_4,
+            R.drawable.face_5, R.drawable.face_6, R.drawable.face_7, R.drawable.face_8, R.drawable.face_9, R.drawable.face_10};
+    private static int[] sParamEyeRes = {R.drawable.eye_1, R.drawable.eye_2, R.drawable.eye_3, R.drawable.eye_4,
+            R.drawable.eye_5, R.drawable.eye_6, R.drawable.eye_7, R.drawable.eye_8, R.drawable.eye_9};
+    private static int[] sParamMouthRes = {R.drawable.mouth_1, R.drawable.mouth_2, R.drawable.mouth_3, R.drawable.mouth_4,
+            R.drawable.mouth_5, R.drawable.mouth_6, R.drawable.mouth_7, R.drawable.mouth_8, R.drawable.mouth_9, R.drawable.mouth_10};
+    private static int[] sParamNoseRes = {R.drawable.nose_1, R.drawable.nose_2, R.drawable.nose_3, R.drawable.nose_4,
+            R.drawable.nose_5, R.drawable.nose_6, R.drawable.nose_7, R.drawable.nose_8, R.drawable.nose_9, R.drawable.nose_10};
 }

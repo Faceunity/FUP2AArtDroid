@@ -66,9 +66,10 @@ public class AvatarEditor {
                     if (!TextUtils.isEmpty(hairRes.path)) {
                         String hair = avatarP2A.getBundleDir() + hairRes.name;
                         String hairNew = newAvatarP2A.getBundleDir() + hairRes.name;
-                        if (editFaceParameter.isHeadShapeChangeValues() && Constant.style == Constant.style_new) {
-                            PTAClientWrapper.deformHairByHead(head, mContext.getAssets().open(hairRes.path), hairNew);
-                        } else if (!isCreateAvatar) {
+//                        if (editFaceParameter.isHeadShapeChangeValues() && Constant.style == Constant.style_new) {
+//                            PTAClientWrapper.deformHairByHead(head, mContext.getAssets().open(hairRes.path), hairNew);
+//                        } else
+                        if (!isCreateAvatar) {
                             FileUtil.copyFileTo(mContext.getAssets().open(hair), new File(hairNew));
                         }
                     }
@@ -89,22 +90,6 @@ public class AvatarEditor {
                         }
                     }
                     listener.saveFailure();
-                }
-                try {
-                    for (int i = 0; i < hairBundles.size(); i++) {
-                        BundleRes hairRes = hairBundles.get(i);
-                        String hair = avatarP2A.getBundleDir() + hairRes.name;
-                        String hairNew = newAvatarP2A.getBundleDir() + hairRes.name;
-                        if (!TextUtils.isEmpty(hairRes.path)) {
-                            if (editFaceParameter.isHeadShapeChangeValues() && Constant.style == Constant.style_new) {
-                                PTAClientWrapper.deformHairByHead(head, mContext.getAssets().open(hairRes.path), hairNew);
-                            } else if (!isCreateAvatar) {
-                                FileUtil.copyFileTo(mContext.getAssets().open(hair), new File(hairNew));
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
         });

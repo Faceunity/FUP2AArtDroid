@@ -1,4 +1,43 @@
 <resources>
     <string name="app_name">DigiMeArt</string>
     <string name="rule_text">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`¬!"£$%^*()~=#{}[];':,./?/*-_+&#060;&#062;&#064;&#038;</string>
+
+    <array name="speakers">
+        <item>温柔女声01</item>
+        <item>标准男声02</item>
+        <item>严厉女声03</item>
+        <item>萝莉女声04</item>
+        <item>温柔女声05</item>
+        <item>标准女声06</item>
+        <item>标准男声07</item>
+        <item>标准男声08</item>
+        <item>严厉女声09</item>
+        <item>亲和女声10</item>
+        <item>甜美女声11</item>
+        <item>自然女声12</item>
+        <item>温柔女声13</item>
+        <item>严厉女声14</item>
+        <item>儿童音15</item>
+        <item>萝莉女声16</item>
+        <item>萝莉女声17</item>
+    </array>
+    <array name="speakers_id">
+        <item>Siqi</item>
+        <item>Sicheng</item>
+        <item>Sijing</item>
+        <item>Xiaobei</item>
+        <item>Aiqi</item>
+        <item>Aijia</item>
+        <item>Aicheng</item>
+        <item>Aida</item>
+        <item>Aiya</item>
+        <item>Aixia</item>
+        <item>Aimei</item>
+        <item>Aiyu</item>
+        <item>Aiyue</item>
+        <item>Aijing</item>
+        <item>Aitong</item>
+        <item>Aiwei</item>
+        <item>Aibao</item>
+    </array>
 </resources>

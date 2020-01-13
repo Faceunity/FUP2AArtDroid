@@ -1,0 +1,140 @@
+{
+  "singleScenes": [
+    {
+      "icon": "new_expression_single_5",
+      "camera": "new/expression/ani_pose_danren_01_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_pose_danren_01.bundle"
+        }
+      ]
+    }
+  ],
+  "multipleScenes": [
+    {
+      "icon": "new_expression_many_1",
+      "camera": "new/expression/ani_pose_shuangren_03_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_pose_shuangren_03_01_mid.bundle"
+        },
+        {
+          "gender": 1,
+          "path": "new/expression/ani_pose_shuangren_03_02_mid.bundle"
+        }
+      ]
+    }
+  ],
+  "animationScenes": [
+    {
+      "icon": "new_expression_single_1",
+      "camera": "new/expression/ani_dance_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_dance_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_2",
+      "camera": "new/expression/ani_LRPP_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_LRPP_mid.bundle",
+          "others": [
+            "new/expression/LRPP_shanzi.bundle",
+            "new/expression/ani_LRPP_shanzi.bundle"
+          ]
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_4",
+      "camera": "new/expression/ani_SJG_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_SJG_mid.bundle",
+          "others": [
+            "new/expression/SJG_shaungjiegun.bundle",
+            "new/expression/ani_SJG_shaungjiegun.bundle"
+          ]
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_3",
+      "camera": "new/expression/ani_SZW_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_SZW_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_danshoubixin",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_danshoubixin_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_guzhang",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_guzhang_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_shuangshoubixin",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_shuangshoubixin_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_hi",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_hi_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_ok",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_ok_mid.bundle"
+        }
+      ]
+    },
+    {
+      "icon": "new_expression_single_rock",
+      "camera": "new/expression/ani_cam.bundle",
+      "BundleRes": [
+        {
+          "gender": 1,
+          "path": "new/expression/ani_rock_mid.bundle"
+        }
+      ]
+    }
+  ]
+}

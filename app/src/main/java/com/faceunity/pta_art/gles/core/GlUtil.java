@@ -294,7 +294,10 @@ public abstract class GlUtil {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
-    public static void deleteFBO(int[] fboId) {
+    public static void deleteFBO(int[] fboTex, int[] fboId) {
+        if (fboTex != null && fboTex.length > 0) {
+            GLES20.glDeleteTextures(fboTex.length, fboTex, 0);
+        }
         if (fboId != null && fboId.length > 0) {
             GLES20.glDeleteFramebuffers(fboId.length, fboId, 0);
         }

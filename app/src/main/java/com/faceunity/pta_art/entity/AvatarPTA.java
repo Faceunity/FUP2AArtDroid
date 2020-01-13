@@ -35,11 +35,14 @@ public class AvatarPTA implements Serializable {
     private int hairIndex = 0;
     private int glassesIndex = 0;
     private int clothesIndex = 0;
+    private int clothesUpperIndex = 1;
+    private int clothesLowerIndex = 1;
     private int beardIndex = 0;
     private int eyelashIndex = 0;
     private int eyebrowIndex = 0;
     private int hatIndex = 0;
     private int shoeIndex = 1;
+    private int decorationsIndex = 0;
     private String expressionFile = "";
     private String[] otherFiles;
 
@@ -56,14 +59,19 @@ public class AvatarPTA implements Serializable {
         hairIndex = -1;
         glassesIndex = -1;
         clothesIndex = -1;
+        clothesLowerIndex = -1;
+        clothesUpperIndex = -1;
         beardIndex = -1;
         eyelashIndex = -1;
         eyebrowIndex = -1;
         hatIndex = -1;
         shoeIndex = -1;
+        decorationsIndex = -1;
     }
 
-    public AvatarPTA(String bundleDir, int originPhotoRes, int gender, String headFile, int hairIndex, int beardIndex, int clothesIndex, int shoeIndex) {
+    public AvatarPTA(String bundleDir, int originPhotoRes, int gender, String headFile, int hairIndex, int beardIndex,
+                     int clothesIndex, int clothesUpperIndex, int clothesLowerIndex,
+                     int shoeIndex, int decorationsIndex) {
         this.bundleDir = bundleDir;
         this.originPhotoRes = originPhotoRes;
         this.gender = gender;
@@ -72,7 +80,10 @@ public class AvatarPTA implements Serializable {
         this.hairIndex = hairIndex;
         this.beardIndex = beardIndex;
         this.clothesIndex = clothesIndex;
+        this.clothesUpperIndex = clothesUpperIndex;
+        this.clothesLowerIndex = clothesLowerIndex;
         this.shoeIndex = shoeIndex;
+        this.decorationsIndex = decorationsIndex;
 
         this.isCreateAvatar = false;
     }
@@ -134,6 +145,12 @@ public class AvatarPTA implements Serializable {
         return headFile;
     }
 
+    public void setMingXing(String headFile, String bodyFile, String expressionFile) {
+        this.headFile = headFile;
+        this.bodyFile = bodyFile;
+        this.expressionFile = expressionFile;
+    }
+
     public String getBodyFile() {
         return bodyFile;
     }
@@ -166,9 +183,26 @@ public class AvatarPTA implements Serializable {
         return clothesIndex;
     }
 
+    public int getClothesUpperIndex() {
+        return clothesUpperIndex;
+    }
+
+    public int getClothesLowerIndex() {
+        return clothesLowerIndex;
+    }
+
     public void setClothesIndex(int clothesIndex) {
         this.clothesIndex = clothesIndex;
     }
+
+    public void setClothesUpperIndex(int clothesUpperIndex) {
+        this.clothesUpperIndex = clothesUpperIndex;
+    }
+
+    public void setClothesLowerIndex(int clothesLowerIndex) {
+        this.clothesLowerIndex = clothesLowerIndex;
+    }
+
 
     public int getEyelashIndex() {
         return eyelashIndex;
@@ -210,6 +244,14 @@ public class AvatarPTA implements Serializable {
         this.shoeIndex = shoeIndex;
     }
 
+    public int getDecorationsIndex() {
+        return decorationsIndex;
+    }
+
+    public void setDecorationsIndex(int decorationsIndex) {
+        this.decorationsIndex = decorationsIndex;
+    }
+
     public String getExpressionFile() {
         return expressionFile;
     }
@@ -237,6 +279,14 @@ public class AvatarPTA implements Serializable {
         return getStringByIndex(FilePathFactory.clothesBundleRes(gender), clothesIndex);
     }
 
+    public String getClothesUpperFile() {
+        return getStringByIndex(FilePathFactory.clothUpperBundleRes(), clothesUpperIndex);
+    }
+
+    public String getClothesLowerFile() {
+        return getStringByIndex(FilePathFactory.clothLowerBundleRes(), clothesLowerIndex);
+    }
+
     public String getEyelashFile() {
         return getStringByIndex(FilePathFactory.eyelashBundleRes(gender), eyelashIndex);
     }
@@ -255,6 +305,10 @@ public class AvatarPTA implements Serializable {
 
     public String getShoeFile() {
         return getStringByIndex(FilePathFactory.shoeBundleRes(gender), shoeIndex);
+    }
+
+    public String getDecorationsFile() {
+        return getStringByIndex(FilePathFactory.decorationsBundleRes(), decorationsIndex);
     }
 
     private String getStringByIndex(List<BundleRes> lists, int index) {
@@ -363,12 +417,15 @@ public class AvatarPTA implements Serializable {
         avatarP2A.hairIndex = this.hairIndex;
         avatarP2A.glassesIndex = this.glassesIndex;
         avatarP2A.clothesIndex = this.clothesIndex;
+        avatarP2A.clothesUpperIndex = this.clothesUpperIndex;
+        avatarP2A.clothesLowerIndex = this.clothesLowerIndex;
         avatarP2A.expressionFile = this.expressionFile;
         avatarP2A.beardIndex = this.beardIndex;
         avatarP2A.eyelashIndex = this.eyelashIndex;
         avatarP2A.eyebrowIndex = this.eyebrowIndex;
         avatarP2A.hatIndex = this.hatIndex;
         avatarP2A.shoeIndex = this.shoeIndex;
+        avatarP2A.decorationsIndex = this.decorationsIndex;
 
         avatarP2A.skinColorValue = this.skinColorValue;
         avatarP2A.lipColorValue = this.lipColorValue;
@@ -385,11 +442,14 @@ public class AvatarPTA implements Serializable {
         return avatarP2A.hairIndex != this.hairIndex ||
                 avatarP2A.glassesIndex != this.glassesIndex ||
                 avatarP2A.clothesIndex != this.clothesIndex ||
+                avatarP2A.clothesUpperIndex != this.clothesUpperIndex ||
+                avatarP2A.clothesLowerIndex != this.clothesLowerIndex ||
                 avatarP2A.beardIndex != this.beardIndex ||
                 avatarP2A.eyelashIndex != this.eyelashIndex ||
                 avatarP2A.eyebrowIndex != this.eyebrowIndex ||
                 avatarP2A.hatIndex != this.hatIndex ||
                 avatarP2A.shoeIndex != this.shoeIndex ||
+                avatarP2A.decorationsIndex != this.decorationsIndex ||
                 avatarP2A.skinColorValue != this.skinColorValue ||
                 avatarP2A.lipColorValue != this.lipColorValue ||
                 avatarP2A.irisColorValue != this.irisColorValue ||

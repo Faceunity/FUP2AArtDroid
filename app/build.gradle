@@ -4,10 +4,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.faceunity.p2aart"
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 30
-        versionName "1.6.2"
+        versionName "1.7.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
@@ -21,7 +21,7 @@ android {
         release {
             minifyEnabled true
             zipAlignEnabled true
-            shrinkResources true
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -38,7 +38,21 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+        maven {
+            url "https://jitpack.io"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -51,6 +65,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.squareup.okio:okio:2.2.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    implementation files('libs/FUPTAClient.jar')
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation(name: 'FUTtsEngine', ext: 'aar')
+    implementation 'com.github.microshow:RxFFmpeg:2.1.0'
+    implementation files('libs/p2a_client.jar')
+    implementation files('libs/FUP2AHelper.jar')
+    implementation files('libs/nama.jar')
 }

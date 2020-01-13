@@ -1,0 +1,34 @@
+{
+  "shoesList": [
+    {
+      "gender": 2,
+      "path": "",
+      "icon": "edit_face_item_none"
+    },
+    {
+      "gender": 2,
+      "path": "new/shoes/xiezi_fanbu.bundle",
+      "icon": "xiezi_fanbu"
+    },
+    {
+      "gender": 2,
+      "path": "new/shoes/xiezi_danxie.bundle",
+      "icon": "xiezi_danxie"
+    },
+    {
+      "gender": 2,
+      "path": "new/shoes/xiezi_danxie_2.bundle",
+      "icon": "xiezi_danxie_2"
+    },
+    {
+      "gender": 2,
+      "path": "new/shoes/xiezi_fanbu_2.bundle",
+      "icon": "xiezi_fanbu_2"
+    },
+    {
+      "gender": 2,
+      "path": "new/shoes/xiezi_liangxie.bundle",
+      "icon": "xiezi_liangxie"
+    }
+  ]
+}

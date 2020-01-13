@@ -9,10 +9,17 @@
     <color name="translate">#00000000</color>
 
     <color name="color999999">#FF999999</color>
+    <color name="colorF8F8F8">#F8F8F8</color>
     <color name="color3E99F4">#FF3E99F4</color>
+    <color name="colorC6C6C6">#C6C6C6</color>
 
     <color name="color36B2FF">#36B2FF</color>
     <color name="color4C96FF">#4C96FF</color>
     <color name="color666666">#666666</color>
     <color name="colorF7F7F7">#F7F7F7</color>
+
+    <color name="cD3D8DC">#D3D8DC</color>
+    <color name="c333333">#333333</color>
+    <color name="cCCF66969">#CCF66969</color>
+    <color name="cE6F66969">#E6F66969</color>
 </resources>

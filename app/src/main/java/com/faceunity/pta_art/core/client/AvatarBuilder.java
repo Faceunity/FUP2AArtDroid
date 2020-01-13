@@ -2,15 +2,10 @@ package com.faceunity.pta_art.core.client;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.BundleRes;
-import com.faceunity.pta_art.utils.FileUtil;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -66,7 +61,8 @@ public class AvatarBuilder {
                         createComplete.run();
                 }
             });
-            PTAClientWrapper.createHead(objData, avatarP2A.getHeadFile());
+            //PTAClientWrapper.createHead(objData, avatarP2A.getHeadFile());
+            PTAClientWrapper.createNewHead(objData, avatarP2A.getHeadFile());
             synchronized (avatarP2A) {
                 if (--isCreateIndex == 0)
                     avatarP2A.notify();

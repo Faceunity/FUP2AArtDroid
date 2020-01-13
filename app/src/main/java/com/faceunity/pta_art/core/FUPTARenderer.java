@@ -10,6 +10,7 @@ import com.faceunity.pta_art.core.base.BaseCore;
 import com.faceunity.pta_art.core.base.FUItemHandler;
 import com.faceunity.wrapper.faceunity;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,17 +121,18 @@ public class FUPTARenderer {
      * @param h
      * @return
      */
-    public int onDrawFrame(byte[] img, int tex, int w, int h) {
-        if (tex <= 0 || w <= 0 || h <= 0) {
+    public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
+        if (w <= 0 || h <= 0) {
             Log.e(TAG, "onDrawFrame date error");
             return 0;
         }
         prepareDrawFrame();
         if (mNeedBenchmark) mFuCallStartTime = System.nanoTime();
-        int fuTex = mFUCore.onDrawFrame(img, tex, w, h);
+        int fuTex = mFUCore.onDrawFrame(img, tex, w, h, rotation);
         if (mNeedBenchmark) mOneHundredFrameFUTime += System.nanoTime() - mFuCallStartTime;
         return fuTex;
     }
+
 
     /**
      * 销毁faceunity相关的资源
@@ -199,7 +201,7 @@ public class FUPTARenderer {
         //queueEvent的Runnable在此处被调用
         while (mEventQueue != null && !mEventQueue.isEmpty()) {
             Runnable r = mEventQueue.remove(0);
-            if (r != null)  
+            if (r != null)
                 r.run();
         }
         mEventQueue.addAll(mNextEventQueue);

@@ -164,6 +164,7 @@ public class EditShapeFragment extends EditFaceBaseFragment {
         this.progress = progress;
         if (mColorSeekBar != null) {
             mColorSeekBar.setProgress((int) (this.progress * 100));
+            mColorSeekBar.setThumbColor(getSeekBarColorValue(progress));
         }
     }
 

@@ -25,7 +25,7 @@ public abstract class FaceCheckUtil {
 
     public static boolean checkExpression(float[] expressionData) {
         for (float e : expressionData) {
-            if (e > 0.5) {
+            if (e > 1.0) {
                 return true;
             }
         }

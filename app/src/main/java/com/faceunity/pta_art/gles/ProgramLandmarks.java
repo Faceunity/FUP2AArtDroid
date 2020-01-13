@@ -15,7 +15,6 @@
  */
 package com.faceunity.pta_art.gles;
 
-import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
@@ -122,20 +121,41 @@ public class ProgramLandmarks extends Program {
 
     public void refresh(float[] landmarksData, int width, int height, int orientation, int cameraType) {
         if (mWidth != width || mHeight != height || mOrientation != orientation || mCameraType != cameraType) {
+//            float[] orthoMtx = new float[16];
+//            float[] rotateMtx = new float[16];
+//            Matrix.orthoM(orthoMtx, 0, 0, width, 0, height, -1, 1);
+//            Matrix.setRotateM(rotateMtx, 0, 360 - orientation, 0.0f, 0.0f, 1.0f);
+//            if (cameraType == Camera.CameraInfo.CAMERA_FACING_BACK) {
+//                Matrix.rotateM(rotateMtx, 0, 180, 1.0f, 0.0f, 0.0f);
+//            }
+//            Matrix.multiplyMM(mvpMtx, 0, rotateMtx, 0, orthoMtx, 0);
+//
+//            mWidth = width;
+//            mHeight = height;
+//            mOrientation = orientation;
+//            mCameraType = cameraType;
+
             float[] orthoMtx = new float[16];
             float[] rotateMtx = new float[16];
+            float[] mirrorMtx = new float[16];
+            float[] result = new float[16];
+
             Matrix.orthoM(orthoMtx, 0, 0, width, 0, height, -1, 1);
-            Matrix.setRotateM(rotateMtx, 0, 360 - orientation, 0.0f, 0.0f, 1.0f);
-            if (cameraType == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                Matrix.rotateM(rotateMtx, 0, 180, 1.0f, 0.0f, 0.0f);
-            }
-            Matrix.multiplyMM(mvpMtx, 0, rotateMtx, 0, orthoMtx, 0);
+            Matrix.setRotateM(rotateMtx, 0, 180, 0.0f, 0.0f, 1.0f);
+            Matrix.setIdentityM(mirrorMtx, 0);
+            Matrix.scaleM(mirrorMtx, 0, -1, 1, 1);
+//            if (cameraType == Camera.CameraInfo.CAMERA_FACING_BACK) {
+//                Matrix.rotateM(rotateMtx, 0, 180, 1.0f, 0.0f, 0.0f);
+//            }
+            Matrix.multiplyMM(result, 0, rotateMtx, 0, orthoMtx, 0);
+            Matrix.multiplyMM(mvpMtx, 0, mirrorMtx, 0, result, 0);
 
             mWidth = width;
             mHeight = height;
             mOrientation = orientation;
             mCameraType = cameraType;
         }
+//        Matrix.setIdentityM(mvpMtx, 0);
 
         updateVertexArray(Arrays.copyOf(landmarksData, landmarksData.length));
     }

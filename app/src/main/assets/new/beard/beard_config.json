@@ -1,0 +1,54 @@
+{
+  "breadList": [
+    {
+      "gender": 2,
+      "path": "",
+      "icon": "new_beard_none",
+      "labels": [
+        -1, 0
+      ]
+    },{
+      "gender": 0,
+      "path": "new/beard/beard01.bundle",
+      "icon": "new_beard_1",
+      "labels": [
+        7, 8, 9, 10, 11, 12
+      ]
+    },{
+      "gender": 2,
+      "path": "new/beard/beard02.bundle",
+      "icon": "new_beard_2",
+      "labels": [
+        13, 14, 15, 16, 17, 18
+      ]
+    },{
+      "gender": 2,
+      "path": "new/beard/beard03.bundle",
+      "icon": "new_beard_3",
+      "labels": [
+        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
+      ]
+    },{
+      "gender": 2,
+      "path": "new/beard/beard04.bundle",
+      "icon": "new_beard_4",
+      "labels": [
+        1, 2
+      ]
+    },{
+      "gender": 2,
+      "path": "new/beard/beard05.bundle",
+      "icon": "new_beard_5",
+      "labels": [
+        3, 4
+      ]
+    },{
+      "gender": 2,
+      "path": "new/beard/beard06.bundle",
+      "icon": "new_beard_6",
+      "labels": [
+        5, 6
+      ]
+    }
+  ]
+}

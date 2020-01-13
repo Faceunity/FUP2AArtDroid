@@ -16,14 +16,15 @@ public class PTACore extends BaseCore {
 
     private AvatarHandle avatarHandle;
 
-    public static final int ITEM_ARRAYS_CONTROLLER = 0;
-    public static final int ITEM_ARRAYS_EFFECT = 1;
+    public static final int ITEM_ARRAYS_EFFECT = 0;
+    public static final int ITEM_ARRAYS_CONTROLLER = 1;
     public static final int ITEM_ARRAYS_FXAA = 2;
     public static final int ITEM_ARRAYS_COUNT = 3;
     private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
 
     public int fxaaItem, bgItem;
-
+    private int controller_config;
+    private int[] bgItems = new int[1];
     private boolean isNeedTrackFace = false;
 
     public PTACore(PTACore core) {
@@ -37,7 +38,9 @@ public class PTACore extends BaseCore {
     public PTACore(Context context, FUPTARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
 
-        mItemsArray[ITEM_ARRAYS_EFFECT] = bgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        bgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        bgItems[0] = bgItem;
+        controller_config = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_controller_config_new);
         mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
@@ -45,6 +48,11 @@ public class PTACore extends BaseCore {
         return avatarHandle = new AvatarHandle(this, mFUItemHandler, new Runnable() {
             @Override
             public void run() {
+                faceunity.fuBindItems(avatarHandle.controllerItem, new int[]{controller_config});
+                //背景道具逻辑修改
+                //现在需要把背景绑定到controller上
+                faceunity.fuBindItems(avatarHandle.controllerItem, bgItems);
+
                 faceunity.fuItemSetParam(avatarHandle.controllerItem, "arMode", (360 - mInputImageOrientation) / 90);
                 avatarHandle.resetAll();
             }
@@ -61,6 +69,7 @@ public class PTACore extends BaseCore {
 
     /**
      * fuAvatarToTexture 用于人脸驱动
+     *
      * @param img 图片buffer
      * @param tex 图片纹理
      * @param w   图片宽
@@ -68,7 +77,7 @@ public class PTACore extends BaseCore {
      * @return
      */
     @Override
-    public int onDrawFrame(byte[] img, int tex, int w, int h) {
+    public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
         int isTracking = 0;
         //是否开启人脸驱动
         if (isNeedTrackFace && img != null) {
@@ -76,45 +85,70 @@ public class PTACore extends BaseCore {
             isTracking = faceunity.fuIsTracking();
             if (isTracking > 0) {
                 /**
-                 *rotation 人脸三维旋转，返回值为旋转四元数，长度4
+                 * rotation 人脸三维旋转，返回值为旋转四元数，长度4
                  */
-                faceunity.fuGetFaceInfo(0, "rotation", rotationData);
+                faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
                 /**
-                 * expression  表情系数，长度56
+                 * expression  表情系数，长度57
                  */
-                faceunity.fuGetFaceInfo(0, "expression", expressionData);
+                faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
                 /**
                  * pupil pos 眼球方向，长度2
                  */
-                faceunity.fuGetFaceInfo(0, "pupil_pos", pupilPosData);
+                faceunity.fuGetFaceInfo(0, "pupil_pos", avatarInfo.mPupilPos);
                 /**
                  * rotation mode 人脸朝向，0-3分别对应手机四种朝向，长度1
                  */
-                faceunity.fuGetFaceInfo(0, "rotation_mode", rotationModeData);
+                faceunity.fuGetFaceInfo(0, "rotation_mode", avatarInfo.mRotationMode);
             }
         }
         if (isTracking <= 0) {
-            Arrays.fill(rotationData, 0.0f);
-            Arrays.fill(expressionData, 0.0f);
-            Arrays.fill(pupilPosData, 0.0f);
-            Arrays.fill(rotationModeData, 0.0f);
+            Arrays.fill(avatarInfo.mRotation, 0.0f);
+            Arrays.fill(avatarInfo.mExpression, 0.0f);
+            Arrays.fill(avatarInfo.mPupilPos, 0.0f);
+            Arrays.fill(avatarInfo.mRotationMode, 0.0f);
         }
-        rotationModeData[0] = (360 - mInputImageOrientation) / 90;
+        if (rotation < 0) {
+            avatarInfo.mRotationMode[0] = 0;
+        } else {
+            avatarInfo.mRotationMode[0] = 0;
+        }
+        avatarInfo.mIsValid = isTracking > 0 ? true : false;
 
-        return faceunity.fuAvatarToTexture(pupilPosData, expressionData, rotationData, rotationModeData,
-                0, w, h, mFrameId++, itemsArray(), isTracking);
+        int fuTex = faceunity.fuRenderBundles(avatarInfo,
+                0, w, h, mFrameId++, itemsArray());
+        return fuTex;
+    }
+
+    public void setCurrentInstancceId(int id) {
+        if (avatarHandle != null)
+            avatarHandle.setCurrentInstancceId(id);
     }
 
     @Override
     public void unBind() {
-        if (avatarHandle != null)
+        if (avatarHandle != null) {
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuUnBindItems(avatarHandle.controllerItem, bgItems);
+                }
+            });
             avatarHandle.unBindAll();
+        }
     }
 
     @Override
     public void bind() {
-        if (avatarHandle != null)
+        if (avatarHandle != null) {
+            queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuBindItems(avatarHandle.controllerItem, bgItems);
+                }
+            });
             avatarHandle.bindAll();
+        }
     }
 
     @Override

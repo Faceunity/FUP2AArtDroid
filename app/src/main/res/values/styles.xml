@@ -25,4 +25,13 @@
     <style name="GuideTheme" parent="FullScreenTheme">
         <item name="android:windowBackground">@drawable/guide_img</item>
     </style>
+
+    <!-- Frame叠加，isFloat是否浮动，isTranslucent是否半透明，Dim是背景是否变暗 -->
+    <style name="AudioDialogTheme" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>

@@ -5,7 +5,6 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.faceunity.pta_art.constant.Constant;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.base.BaseCore;
 import com.faceunity.pta_art.core.base.BasePTAHandle;
@@ -13,6 +12,9 @@ import com.faceunity.pta_art.core.base.FUItem;
 import com.faceunity.pta_art.core.base.FUItemHandler;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.wrapper.faceunity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -25,6 +27,7 @@ public class AvatarHandle extends BasePTAHandle {
 
     private boolean mIsNeedTrack;
     private boolean mIsNeedFacePUP;
+    private boolean isPose;//是否是静止动画
 
     public final FUItem headItem = new FUItem();
     public final FUItem hairItem = new FUItem();
@@ -35,7 +38,12 @@ public class AvatarHandle extends BasePTAHandle {
     public final FUItem hatItem = new FUItem();
     public final FUItem bodyItem = new FUItem();
     public final FUItem clothesItem = new FUItem();
+    //    public final FUItem clothesSuitUpperItem = new FUItem();
+//    public final FUItem clothesSuitLowerItem = new FUItem();
+    public final FUItem clothesUpperItem = new FUItem();
+    public final FUItem clothesLowerItem = new FUItem();
     public final FUItem shoeItem = new FUItem();
+    public final FUItem decorationsItem = new FUItem();
     public final FUItem expressionItem = new FUItem();
     public final FUItem otherItem[] = new FUItem[5];
 
@@ -47,7 +55,8 @@ public class AvatarHandle extends BasePTAHandle {
 
     public AvatarHandle(BaseCore baseCore, FUItemHandler FUItemHandler, final Runnable prepare) {
         super(baseCore, FUItemHandler);
-        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new FUItemHandler.LoadFUItemListener(FilePathFactory.bundleController()) {
+        isPose = false;
+        mFUItemHandler.loadFUItem(FUItemHandler_what_controller, new com.faceunity.pta_art.core.base.FUItemHandler.LoadFUItemListener(FilePathFactory.bundleController()) {
 
             @Override
             public void onLoadComplete(FUItem fuItem) {
@@ -56,6 +65,12 @@ public class AvatarHandle extends BasePTAHandle {
                     prepare.run();
             }
         });
+    }
+
+    public AvatarHandle(BaseCore baseCore, FUItemHandler FUItemHandler, int controller) {
+        super(baseCore, FUItemHandler);
+        isPose = false;
+        controllerItem = controller;
     }
 
     public void setAvatar(AvatarPTA avatar) {
@@ -78,12 +93,27 @@ public class AvatarHandle extends BasePTAHandle {
                 loadItem(eyebrowItem, avatar.getEyebrowFile());
                 loadItem(eyelashItem, avatar.getEyelashFile());
                 loadItem(hatItem, avatar.getHatFile());
-                loadItem(bodyItem, avatar.getBodyFile());
-                loadItem(clothesItem, avatar.getClothesFile());
+                loadItem(bodyItem, FilePathFactory.bodyBundle(avatar.getGender()));
+//                if (avatar.getClothesIndex() != 0) {
+                loadItem(hatItem, avatar.getClothesFile());
+//                }
+//                if (avatar.getClothesIndex() != 0) {
+//                    loadItem(clothesSuitUpperItem, avatar.getClothesFile()
+//                            .replace("_female", "").replace(".bundle", "_upper.bundle"));
+//                    loadItem(clothesSuitLowerItem, avatar.getClothesFile()
+//                            .replace("_female", "").replace(".bundle", "_lower.bundle"));
+//                } else {
+//                    loadItem(clothesSuitUpperItem, avatar.getClothesFile());
+//                    loadItem(clothesSuitLowerItem, avatar.getClothesFile());
+//                }
+                loadItem(clothesUpperItem, avatar.getClothesUpperFile());
+                loadItem(clothesLowerItem, avatar.getClothesLowerFile());
                 loadItem(shoeItem, avatar.getShoeFile());
+                loadItem(decorationsItem, avatar.getDecorationsFile());
                 loadItem(expressionItem,
                         TextUtils.isEmpty(avatar.getExpressionFile()) ?
-                                mIsNeedTrack || mIsNeedFacePUP ? FilePathFactory.bundlePose(avatar.getGender()) : FilePathFactory.bundleAnim(avatar.getGender())
+                                isPose ? FilePathFactory.bundlePose(avatar.getGender()) :
+                                        mIsNeedTrack || mIsNeedFacePUP ? FilePathFactory.bundleIdle(avatar.getGender()) : FilePathFactory.bundleAnim(avatar.getGender())
                                 : avatar.getExpressionFile());
                 String[] others = avatar.getOtherFile();
                 for (int i = 0; i < otherItem.length; i++) {
@@ -110,13 +140,34 @@ public class AvatarHandle extends BasePTAHandle {
         mFUItemHandler.sendMessage(msg);
     }
 
+    /**
+     * 设置当前controller控制的人物id（默认：0）
+     *
+     * @param id
+     */
+    public void setCurrentInstancceId(int id) {
+        if (controllerItem > 0) {
+            mBaseCore.queueEvent(new Runnable() {
+                @Override
+                public void run() {
+                    faceunity.fuItemSetParam(controllerItem,
+                            "current_instance_id", id);
+                }
+            });
+        }
+    }
+
     @Override
     protected void bindAll() {
         if (controllerItem > 0)
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, shoeItem.handle, expressionItem.handle, otherItem[0].handle, otherItem[1].handle, otherItem[2].handle, otherItem[3].handle, otherItem[4].handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
+                            clothesItem.handle,
+//                            clothesSuitUpperItem.handle, clothesSuitLowerItem.handle,
+                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsItem.handle,
+                            expressionItem.handle, otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " bindAll " + Arrays.toString(items));
                     faceunity.fuBindItems(controllerItem, items);
                     setAvatarColor();
@@ -130,7 +181,12 @@ public class AvatarHandle extends BasePTAHandle {
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle, shoeItem.handle, expressionItem.handle, otherItem[0].handle, otherItem[1].handle, otherItem[2].handle, otherItem[3].handle, otherItem[4].handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
+                            clothesItem.handle,
+//                            clothesSuitUpperItem.handle, clothesSuitLowerItem.handle,
+                            clothesUpperItem.handle, clothesLowerItem.handle,
+                            shoeItem.handle, decorationsItem.handle,
+                            expressionItem.handle, otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " unBindAll " + Arrays.toString(items));
                     faceunity.fuUnBindItems(controllerItem, items);
                 }
@@ -140,6 +196,18 @@ public class AvatarHandle extends BasePTAHandle {
     @Override
     public void release() {
         unBindAll();
+        releaseAll(true);
+    }
+
+    /*
+     * controllerItem不释放
+     */
+    public void releaseNoController() {
+        unBindAll();
+        releaseAll(false);
+    }
+
+    public void releaseAll(boolean isControllerRelease) {
         mBaseCore.queueEvent(mBaseCore.destroyItem(headItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(hairItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(glassItem.handle));
@@ -149,12 +217,19 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(hatItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(bodyItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesItem.handle));
+//        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitUpperItem.handle));
+//        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitLowerItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesLowerItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesUpperItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsItem.handle));
         for (FUItem item : otherItem) {
             mBaseCore.queueEvent(mBaseCore.destroyItem(item.handle));
         }
-        mBaseCore.queueEvent(mBaseCore.destroyItem(controllerItem));
+        if (isControllerRelease) {
+            mBaseCore.queueEvent(mBaseCore.destroyItem(controllerItem));
+        }
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
@@ -167,12 +242,19 @@ public class AvatarHandle extends BasePTAHandle {
                 hatItem.clear();
                 bodyItem.clear();
                 clothesItem.clear();
+//                clothesSuitUpperItem.clear();
+//                clothesSuitLowerItem.clear();
+                clothesUpperItem.clear();
+                clothesLowerItem.clear();
                 shoeItem.clear();
+                decorationsItem.clear();
                 expressionItem.clear();
                 for (FUItem item : otherItem) {
                     item.clear();
                 }
-                controllerItem = 0;
+                if (isControllerRelease) {
+                    controllerItem = 0;
+                }
             }
         });
     }
@@ -219,12 +301,80 @@ public class AvatarHandle extends BasePTAHandle {
         });
     }
 
+    /**
+     * avatar缩放比例
+     *
+     * @param scaleDelta avatar缩放比例增量
+     */
+    public void setScaleDelta(final float scaleDelta, double maxScale, double minScale) {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                double[] lastScale = getCurrent_position();
+                if ((lastScale[2] >= maxScale && scaleDelta > 0) || (lastScale[2] <= minScale && scaleDelta < 0)) {
+                    return;
+                }
+                if (scaleDelta > 0 && lastScale[2] + scaleDelta > maxScale) {
+                    faceunity.fuItemSetParam(controllerItem, "scale_delta", maxScale - lastScale[2]);
+                } else if (scaleDelta < 0 && lastScale[2] + scaleDelta < minScale) {
+                    faceunity.fuItemSetParam(controllerItem, "scale_delta", minScale - lastScale[2]);
+                } else {
+                    faceunity.fuItemSetParam(controllerItem, "scale_delta", scaleDelta);
+                }
+            }
+        });
+    }
+
+    /**
+     * 设置缩放
+     *
+     * @param xyz
+     */
+    public void setScale(double[] xyz) {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{xyz[0], xyz[1], xyz[2]});
+                faceunity.fuItemSetParam(controllerItem, "reset_all", 1);
+            }
+        });
+    }
+
+    /**
+     * 获取当前位置
+     *
+     * @return
+     */
+    public double[] getCurrent_position() {
+        if (controllerItem > 0) {
+            return faceunity.fuItemGetParamdv(controllerItem, "current_position");
+        } else {
+            return new double[]{0, 0, 0};
+        }
+    }
+
+    /**
+     * //NAMA中使用右手坐标系，X轴水平向右，Y轴竖直向上，Z轴垂直屏幕向外
+     * x范围[-100,100]
+     * y范围[-300,400]
+     * z范围[-1000,200]
+     */
+    public void resetAvatar() {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 11.76, -183.89});
+                faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
+                faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
+            }
+        });
+    }
+
     public void resetAll() {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? 30 : 80);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 15);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 11.76, -183.89});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -235,8 +385,7 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? -10 : 30);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", -2);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, -10.85, -11.12});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 3);
             }
@@ -247,9 +396,8 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", Constant.style == Constant.style_art ? -10 : 30);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", -2);
-                faceunity.fuItemSetParam(controllerItem, "target_angle", -1);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, -10.85, -11.12});
+                faceunity.fuItemSetParam(controllerItem, "target_angle", 0.125);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 3);
             }
         });
@@ -259,8 +407,7 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", 220);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 70);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 53.14, -476.6});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -271,8 +418,7 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", 350);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", Constant.style == Constant.style_art ? 120 : 110);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 93.01, -683.57});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -283,8 +429,7 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", 30);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 150);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 103.13, -1000});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 6);
             }
@@ -295,8 +440,7 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                faceunity.fuItemSetParam(controllerItem, "target_scale", 350);
-                faceunity.fuItemSetParam(controllerItem, "target_trans", 65);
+                faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0.0, 65, 350});
                 faceunity.fuItemSetParam(controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(controllerItem, "reset_all", 1);
             }
@@ -312,25 +456,78 @@ public class AvatarHandle extends BasePTAHandle {
             }
         });
     }
+
+    public void setPose(boolean isPose) {
+        this.isPose = isPose;
+    }
+
     //--------------------------------------动画----------------------------------------
 
-    public void seekToAnimFrameId(final int frameId) {
-        faceunity.fuItemSetParam(controllerItem, "animFrameId", frameId);
+    /**
+     * 相机动画控制
+     *
+     * @param state
+     */
+    public void setCameraAnim(int state) {
+        switch (state) {
+            case 1:
+                //启用/暂停当前动画
+                //1为开启，0为关闭
+                faceunity.fuItemSetParam(controllerItem, "enable_camera_animation", 1);
+                //循环动画
+                //1为循环，0为不循环
+                faceunity.fuItemSetParam(controllerItem, "camera_animation_loop", 1);
+                break;
+            case 2:
+                faceunity.fuItemSetParam(controllerItem, "enable_camera_animation", 0);
+                faceunity.fuItemSetParam(controllerItem, "camera_animation_loop", 0);
+                break;
+        }
+    }
+
+    //从头播放句柄为anim_id的动画（循环）
+    public void seekToAnimBegin(final int anim_id) {
+        faceunity.fuItemSetParam(controllerItem, "play_animation", anim_id);
     }
 
     /**
-     * @param state 1：播放 2：暂停 3：停止
+     * @param state   1：播放 2：暂停 3：停止
+     * @param role_id 角色id
      */
-    public void setAnimState(final int state) {
-        faceunity.fuItemSetParam(controllerItem, "animState", state);
+    public void setAnimState(final int state, int role_id) {
+        faceunity.fuItemSetParam(controllerItem,
+                "current_instance_id", role_id);
+        switch (state) {
+            case 1:
+                faceunity.fuItemSetParam(controllerItem, "start_animation", role_id);//当前帧开始播放
+                break;
+            case 2:
+                faceunity.fuItemSetParam(controllerItem, "pause_animation", role_id);
+                break;
+            case 3:
+                faceunity.fuItemSetParam(controllerItem, "stop_animation", role_id);//删除所有帧
+                break;
+        }
     }
 
-    public int getNowFrameId() {
-        return (int) faceunity.fuItemGetParam(controllerItem, "animFrameId");
-    }
-
-    public int getMaxFrameNum() {
-        return (int) faceunity.fuItemGetParam(controllerItem, "maxFrameNum");
+    /**
+     * 获取某个动画的播放进度
+     * 进度0-0.9999为第一次循环，1-1.9999为第二次循环，以此类推
+     * 即使play_animation_once,进度也会突破1.0，照常运行
+     *
+     * @param anim_id 当前动画的句柄
+     * @return
+     */
+    public float getAnimateProgress(final int anim_id) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", "get_animation_progress");
+            jsonObject.put("anim_id", anim_id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        float progress = (float) faceunity.fuItemGetParam(controllerItem, jsonObject.toString());
+        return progress;
     }
     //--------------------------------------捏脸----------------------------------------
 
@@ -357,8 +554,40 @@ public class AvatarHandle extends BasePTAHandle {
         });
     }
 
+    /**
+     * 隐藏脖子
+     */
+    public void hide_neck() {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuItemSetParam(controllerItem, "hide_neck", 1.0);
+            }
+        });
+    }
+
     public float fuItemGetParamShape(final String key) {
         return (float) faceunity.fuItemGetParam(controllerItem, "{\"name\":\"facepup\",\"param\":\"" + key + "\"}");
+    }
+
+    private volatile boolean executeCompleted = false;
+    private float[] expressions;
+
+    public float[] fuItemGetParamFaceShape() {
+        expressions = null;
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                expressions = faceunity.fuItemGetParamfv(controllerItem, "facepup_expression");
+                executeCompleted = true;
+            }
+        });
+
+        while (!executeCompleted) {
+        }
+        executeCompleted = false;
+
+        return expressions;
     }
 
     public Point getPointByIndex(int index) {

@@ -145,9 +145,51 @@
   public *;
 }
 
+#*****************RxFFmpeg*************#
+-dontwarn io.microshow.rxffmpeg.**
+-keep class io.microshow.rxffmpeg.**{*;}
+
+#gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
+
+-keep public class com.faceunity.pta_art.entity.StaBsBlendBean {public private protected *;}
+
 #
 # ----------------------------- faceunity库 -----------------------------
 #
 
 -keep class com.faceunity.p2a_client.** { *;}
 -keep class com.faceunity.pta_helper.** { *;}
+-keep class com.faceunity.wrapper.faceunity {*;}
+#内嵌类---避免initJniFiledIDs被混淆
+-keep class com.faceunity.wrapper.faceunity$* {
+    *;
+}
+
+#
+# ----------------------------- sta库 -----------------------------
+#
+-keep class com.faceunity.futtsexp.TtsCallback {*;}
+-keep class com.faceunity.data.TtsResponseBase64 {*;}
+-keep class com.faceunity.data.TtsResposeBuffer {*;}
+-keep class com.faceunity.FUTtsEngine{
+    public *;
+}
+-keep class com.faceunity.FUTtsEngine$Builder{
+    *;
+}
+-keep class com.faceunity.PrepareOptions {
+    public *;
+}
+-keep class com.faceunity.TtsOptions {
+    public *;
+}
+-keep class com.faceunity.FUTtsLanguage {
+    public *;
+}
+-keep class com.faceunity.util.LogUtils {
+    public *;
+}

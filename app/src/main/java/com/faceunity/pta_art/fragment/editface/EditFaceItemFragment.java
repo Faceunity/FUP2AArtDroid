@@ -13,8 +13,12 @@ import com.faceunity.pta_art.fragment.editface.core.EditFaceBaseFragment;
 import com.faceunity.pta_art.fragment.editface.core.ItemChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.item.ItemAdapter;
 import com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView;
+import com.faceunity.pta_art.utils.ToastUtil;
 
 import java.util.List;
+
+import static com.faceunity.pta_art.fragment.EditFaceFragment.TITLE_CLOTHES_LOWER_INDEX;
+import static com.faceunity.pta_art.fragment.EditFaceFragment.TITLE_CLOTHES_UPPER_INDEX;
 
 /**
  * Created by tujh on 2018/8/22.
@@ -39,6 +43,15 @@ public class EditFaceItemFragment extends EditFaceBaseFragment {
         mItemRecycler.setItemControllerListener(new ItemAdapter.ItemSelectListener() {
             @Override
             public boolean itemSelectListener(int lastPos, int position) {
+                if (mEditFaceBaseFragmentId == TITLE_CLOTHES_UPPER_INDEX
+                        || mEditFaceBaseFragmentId == TITLE_CLOTHES_LOWER_INDEX) {
+                    //衣服必须选择一件
+                    if (mAvatarP2A.getClothesIndex() == 0 && position == 0) {
+                        ToastUtil.showCenterToast(mActivity,
+                                "必须有一套衣服");
+                        return false;
+                    }
+                }
                 mItemChangeListener.itemChangeListener(mEditFaceBaseFragmentId, position);
                 return true;
             }

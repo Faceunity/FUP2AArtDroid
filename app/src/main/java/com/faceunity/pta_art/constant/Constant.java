@@ -13,24 +13,23 @@ import java.util.regex.Pattern;
  */
 
 public abstract class Constant {
-    public static final int NANO_IN_ONE_MILLI_SECOND = 1000000;
 
     public static final String APP_NAME = "FUP2AArtDemo";
     public static final boolean is_debug;
     public static final int is_q = 1;
 
-    public static final int style_basic = 0;
     public static final int style_art = 1;
     public static final int style_new = 2;
     public static int style = style_new;
 
-    public static final String web_url_get_token = "https://api2.faceunity.com:7070/token?company=faceunity";
-    public static final String web_url_create_upload_image = "https://api-ptoa.faceunity.com/api/p2a/upload";
-    public static final String web_url_create_download = "https://api-ptoa.faceunity.com/api/p2a/download";
-    public static final String pta_client_version_new = "1.0.4";
-    public static final String pta_client_version_art = "1.0.2";
+    public static String web_url_get_token = "";
+    public static String web_url_create_upload_image = "";
+    public static String web_url_create_download = "";
+    public static String pta_client_version_new = "";
+    public static String pta_client_version_art = "";
 
-    public static final String web_url_check = "";
+    public static String web_url_check = "";
+    public static String netType = "";//请求的风格类型
 
     public static final String filePath = Environment.getExternalStoragePublicDirectory("")
             + File.separator + "FaceUnity" + File.separator + APP_NAME + File.separator;

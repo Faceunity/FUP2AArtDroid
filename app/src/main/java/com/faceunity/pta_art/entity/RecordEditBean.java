@@ -1,5 +1,8 @@
 package com.faceunity.pta_art.entity;
 
+/**
+ * 撤销模型
+ */
 public class RecordEditBean {
     private int type;
     private String bundleName;

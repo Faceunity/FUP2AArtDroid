@@ -95,7 +95,7 @@ public class EditPointLayout extends RelativeLayout {
                 EditFacePoint point = (EditFacePoint) mMovingView.getTag();
                 isOperate = true;
                 if (mOnScrollListener != null) {
-                    mOnScrollListener.onScrollListener(point, distanceX / length, distanceY / length);
+                    mOnScrollListener.onScrollListener(point, -distanceX / length, distanceY / length);
                 }
                 return true;
             }

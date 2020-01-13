@@ -22,9 +22,11 @@ public class NamaCore extends BaseCore {
     }
 
     @Override
-    public int onDrawFrame(byte[] img, int tex, int w, int h) {
+    public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
         if (img == null) return 0;
-        return faceunity.fuDualInputToTexture(img, tex, faceunity.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE, w, h, mFrameId++, itemsArray());
+        int fuTex = faceunity.fuRenderBundlesWithCamera(img, tex, faceunity.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE, w, h, mFrameId++, itemsArray());
+        faceunity.fuTrackFace(img, 0, w, h);
+        return fuTex;
     }
 
     @Override

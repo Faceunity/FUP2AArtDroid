@@ -1,11 +1,13 @@
 package com.faceunity.pta_art;
 
 import android.app.Application;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.faceunity.pta_art.core.FUPTARenderer;
-import com.faceunity.pta_art.core.client.PTAClientWrapper;
 import com.faceunity.pta_art.core.authpack;
+import com.faceunity.pta_art.core.client.PTAClientWrapper;
+import com.faceunity.pta_art.utils.sta.TtsEngineUtils;
 import com.faceunity.pta_art.web.OkHttpUtils;
 import com.faceunity.pta_helper.FUAuthCheck;
 
@@ -19,16 +21,20 @@ import java.lang.reflect.Method;
  */
 public class FUApplication extends Application {
     private static final String TAG = FUApplication.class.getSimpleName();
+    private static FUApplication fuApplication;
+    private int height;
 
     @Override
     public void onCreate() {
         super.onCreate();
         closeAndroidPDialog();
-        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this),
-                OkHttpUtils.initOkHttpClient2(this));
+        fuApplication = this;
+
+        boolean isHttps = OkHttpUtils.initNet();
+        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this, isHttps),
+                OkHttpUtils.initOkHttpClient2(this, isHttps));
 
         //TODO 初始化部分
-
         long startTime = System.currentTimeMillis();
         //初始化nama
         FUPTARenderer.initFURenderer(this);
@@ -46,6 +52,26 @@ public class FUApplication extends Application {
                 + "\nInitNamaTime: " + (endInitNamaTime - startTime)
                 + "\nInitP2ATime: " + (endInitP2ATime - endInitNamaTime)
                 + "\nInitCoreDataTime: " + (endInitCoreDataTime - endInitP2ATime));
+
+        TtsEngineUtils.getInstance().init(this);
+        initResolution();
+    }
+
+    //
+    public static FUApplication getInstance() {
+        return fuApplication;
+    }
+
+    private void initResolution() {
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        height = dm.heightPixels;
+//        Log.d("onCreate", "width=" + dm.widthPixels + "--height=" + dm.heightPixels
+//                + "--md=" + dm.density);
+    }
+
+    //
+    public int getHeight() {
+        return height;
     }
 
     /**

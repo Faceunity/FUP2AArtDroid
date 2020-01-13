@@ -27,16 +27,18 @@ public abstract class BaseCore {
     protected int mCurrentCameraType = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
     protected float[] landmarksData = new float[150];
-    protected float[] expressionData = new float[56];
-    protected float[] rotationData = new float[4];
-    protected float[] pupilPosData = new float[2];
+    protected faceunity.AvatarInfo avatarInfo = new faceunity.AvatarInfo();
     protected float[] faceRectData = new float[4];
-    protected float[] rotationModeData = new float[1];
 
     public BaseCore(Context context, FUPTARenderer fuP2ARenderer) {
         this.mContext = context.getApplicationContext();
         this.mFUP2ARenderer = fuP2ARenderer;
         this.mFUItemHandler = fuP2ARenderer.getFUItemHandler();
+
+        avatarInfo.mExpression = new float[57];
+        avatarInfo.mRotation = new float[4];
+        avatarInfo.mPupilPos = new float[2];
+        avatarInfo.mRotationMode = new float[1];
     }
 
     /**
@@ -55,7 +57,7 @@ public abstract class BaseCore {
      * @param h   图片高
      * @return
      */
-    public abstract int onDrawFrame(byte[] img, int tex, int w, int h);
+    public abstract int onDrawFrame(byte[] img, int tex, int w, int h, int rotarion);
 
     /**
      * 切换相机
@@ -116,12 +118,12 @@ public abstract class BaseCore {
     }
 
     /**
-     *rotation 人脸三维旋转，返回值为旋转四元数，长度4
+     * rotation 人脸三维旋转，返回值为旋转四元数，长度4
      */
     public float[] getRotationData() {
-        Arrays.fill(rotationData, 0.0f);
-        faceunity.fuGetFaceInfo(0, "rotation", rotationData);
-        return rotationData;
+        Arrays.fill(avatarInfo.mRotation, 0.0f);
+        faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
+        return avatarInfo.mRotation;
     }
 
     public float[] getFaceRectData() {
@@ -134,9 +136,9 @@ public abstract class BaseCore {
      * expression  表情系数，长度46
      */
     public float[] getExpressionData() {
-        Arrays.fill(expressionData, 0.0f);
-        faceunity.fuGetFaceInfo(0, "expression", expressionData);
-        return expressionData;
+        Arrays.fill(avatarInfo.mExpression, 0.0f);
+        faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
+        return avatarInfo.mExpression;
     }
 
     /**
@@ -172,6 +174,18 @@ public abstract class BaseCore {
                 if (oldItem > 0) {
                     faceunity.fuDestroyItem(oldItem);
                     Log.i(TAG, "bundle destroyItem oldItem " + oldItem);
+                }
+            }
+        };
+    }
+
+    public Runnable fu3DBodyTrackerDestroy(final long oldItem) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (oldItem > 0) {
+                    faceunity.fu3DBodyTrackerDestroy(oldItem);
+                    Log.i(TAG, "bundle fu3DBodyTrackerDestroy oldItem " + oldItem);
                 }
             }
         };

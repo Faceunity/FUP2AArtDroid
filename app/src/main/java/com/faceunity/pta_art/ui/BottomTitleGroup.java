@@ -144,8 +144,15 @@ public class BottomTitleGroup extends HorizontalScrollView {
 
     public void setResStrings(String[] resStrings, int[] ids, int checkedIndex) {
         this.resStrings = resStrings;
-        resIds = new ArrayList<>();
-        resRadioButtons = new ArrayList<>();
+        if (resIds == null)
+            resIds = new ArrayList<>();
+        else
+            resIds.clear();
+        if (resRadioButtons == null)
+            resRadioButtons = new ArrayList<>();
+        else
+            resRadioButtons.clear();
+        mRadioGroup.removeAllViews();
 
         for (int i = 0; i < resStrings.length; i++) {
             String res = resStrings[i];
@@ -182,5 +189,48 @@ public class BottomTitleGroup extends HorizontalScrollView {
 
     public void clearCheck() {
         mRadioGroup.clearCheck();
+    }
+
+    public void setDefaultCheck() {
+        CustomerRadioButton button = resRadioButtons.get(0);
+        final int left = button.getLeft() + length + mRadioGroup.getLeft();
+        final int width = getWidth(button) - 2 * length;
+        if (mView.getVisibility() == GONE) {
+            mView.setVisibility(VISIBLE);
+            setViewLayoutParams(left, width);
+        } else {
+            if (mValueAnimator != null) {
+                mValueAnimator.cancel();
+                mValueAnimator = null;
+            }
+            final int viewLeft = mView.getLeft();
+            final int viewWidth = mView.getWidth();
+            mValueAnimator = ValueAnimator.ofFloat(0, 1f).setDuration(300);
+            mValueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float v = (float) animation.getAnimatedValue();
+                    setViewLayoutParams((int) (viewLeft + (left - viewLeft) * v), (int) (viewWidth + (width - viewWidth) * v));
+                }
+            });
+            mValueAnimator.start();
+        }
+
+        smoothScrollTo(left + width / 2 - screenWidthHalf, 0);
+        if (mOnCheckedChangeListener != null) {
+            mOnCheckedChangeListener.onCheckedChanged(mRadioGroup, 0);
+        }
+    }
+
+    public int getWidth(View view) {
+        //制定测量规则 参数表示size + mode
+        int width = MeasureSpec.makeMeasureSpec(0,
+                MeasureSpec.UNSPECIFIED);
+        int height = MeasureSpec.makeMeasureSpec(0,
+                MeasureSpec.UNSPECIFIED);
+//调用measure方法之后就可以获取宽高
+        view.measure(width, height);
+        return view.getMeasuredWidth(); // 获取宽度
+//        view.getMeasuredHeight(); // 获取高度
     }
 }

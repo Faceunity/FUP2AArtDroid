@@ -5,12 +5,13 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.faceunity.p2a_client.fuPTAClient;
 import com.faceunity.pta_art.constant.Constant;
+import com.faceunity.pta_art.constant.FUPTAClient;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.authpack;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.utils.FileUtil;
-import com.faceunity.p2a_client.FUP2AClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,9 +32,9 @@ public abstract class PTAClientWrapper {
             clientCore.read(clientCoreData);
             clientCore.close();
             // 数据初始化
-            boolean retData = FUP2AClient.setupData(clientCoreData);
+            boolean retData = FUPTAClient.setupData(clientCoreData);
             //鉴权
-            boolean retAuth = FUP2AClient.setupAuth(authpack.A());
+            boolean retAuth = FUPTAClient.setupAuth(authpack.A());
             Log.e(TAG, "setupData " + retData + " setupAuth " + retAuth);
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,7 +51,7 @@ public abstract class PTAClientWrapper {
             clientBin.read(clientBinData);
             clientBin.close();
             // 数据初始化
-            boolean ret = FUP2AClient.setupStyleData(clientBinData);
+            boolean ret = FUPTAClient.setupStyleData(clientBinData);
             Log.e(TAG, "setupStyleData " + ret);
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,27 +65,29 @@ public abstract class PTAClientWrapper {
     }
 
     public static void initializeAvatarP2AData(@NonNull byte[] objData, @NonNull AvatarPTA avatarP2A) {
-        int hairLabel = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAIR);
-//        avatarP2A.setHairIndex(FilePathFactory.getDefaultIndex(FilePathFactory.hairBundleRes(avatarP2A.getGender()), hairLabel));
+        int[] labels = FUPTAClient.getInfoWithServerData(objData, new String[]{
+                FUPTAClient.FACE_INFO_KEY_HAIR, FUPTAClient.FACE_INFO_KEY_BEARD,
+                FUPTAClient.FACE_INFO_KEY_HAS_GLASSES, FUPTAClient.FACE_INFO_KEY_SHAPE_GLASSES,
+                FUPTAClient.FACE_INFO_KEY_RIM_GLASSES
+        });
+        int hairLabel = labels[0];
         avatarP2A.setHairIndex(FilePathFactory.getDefaultHairIndex(FilePathFactory.hairBundleRes(avatarP2A.getGender()), hairLabel));
-
-        int beardLabel = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_BEARD);
+        int beardLabel = labels[1];
         avatarP2A.setBeardIndex(FilePathFactory.getDefaultIndex(FilePathFactory.beardBundleRes(avatarP2A.getGender()), beardLabel));
-
-        int hasGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_HAS_GLASSES);
-        int shapeGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_SHAPE_GLASSES);
-        int rimGrasses = FUP2AClient.getInfoWithServerData(objData, FUP2AClient.FACE_INFO_KEY_RIM_GLASSES);
+        int hasGrasses = labels[2];
+        int shapeGrasses = labels[3];
+        int rimGrasses = labels[4];
         avatarP2A.setGlassesIndex(hasGrasses > 0 ? FilePathFactory.glassesIndex(avatarP2A.getGender(), shapeGrasses, rimGrasses) : 0);
-
         Log.i(TAG, "initializeAvatarP2AData hairLabel " + hairLabel + " beardLabel " + beardLabel
                 + " hasGrasses " + hasGrasses + " shapeGrasses " + shapeGrasses + " rimGrasses " + rimGrasses);
-
-//        double[] lipColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_LIP_COLOR));
-//        double[] skinColor = changeFloat2Double(FUP2AClient.getInfoWithServerDataFloats(objData, FUP2AClient.FACE_INFO_SKIN_COLOR));
-//        Log.i(TAG, "initializeAvatarP2AData LipColorServerValues " + Arrays.toString(lipColor) + " SkinColorServerValues " + Arrays.toString(skinColor));
-
-        avatarP2A.setClothesIndex(Constant.style == Constant.style_art ? 1 : FilePathFactory.indexOfGender(FilePathFactory.clothesBundleRes(avatarP2A.getGender()), avatarP2A.getGender()));
         avatarP2A.setShoeIndex(Constant.style == Constant.style_art ? 0 : FilePathFactory.indexOfGender(FilePathFactory.shoeBundleRes(avatarP2A.getGender()), avatarP2A.getGender()));
+        if (avatarP2A.getGender() == AvatarPTA.gender_boy) {
+            avatarP2A.setClothesUpperIndex(1);
+        } else {
+            avatarP2A.setClothesUpperIndex(5);
+        }
+        avatarP2A.setClothesLowerIndex(1);
+        avatarP2A.setShoeIndex(1);
     }
 
     public static double[] changeFloat2Double(float[] color) {
@@ -97,7 +100,13 @@ public abstract class PTAClientWrapper {
 
     public static void createHead(byte[] server, @NonNull String dst) throws IOException {
         if (TextUtils.isEmpty(dst)) return;
-        final byte[] head = FUP2AClient.createAvatarHeadWithData(server);
+        fuPTAClient.HeadData headData = new fuPTAClient.HeadData();
+        FUPTAClient.createAvatarHeadWithData(headData, server);
+        FileUtil.saveDataToFile(dst, headData.bundle);
+    }
+
+    public static void createNewHead(byte[] head, @NonNull String dst) throws IOException {
+        if (TextUtils.isEmpty(dst)) return;
         FileUtil.saveDataToFile(dst, head);
     }
 
@@ -107,7 +116,7 @@ public abstract class PTAClientWrapper {
         byte[] hairData = new byte[hairIS.available()];
         hairIS.read(hairData);
         hairIS.close();
-        byte[] hair = FUP2AClient.createAvatarHairWithServerData(server, hairData);
+        byte[] hair = FUPTAClient.createAvatarHairWithServerData(server, hairData);
         FileUtil.saveDataToFile(dst, hair);
     }
 
@@ -117,7 +126,7 @@ public abstract class PTAClientWrapper {
         byte[] hairData = new byte[hairIS.available()];
         hairIS.read(hairData);
         hairIS.close();
-        byte[] hair = FUP2AClient.createAvatarHairWithHeadData(head, hairData);
+        byte[] hair = FUPTAClient.createAvatarHairWithHeadData(head, hairData);
         FileUtil.saveDataToFile(dst, hair);
     }
 
@@ -128,11 +137,12 @@ public abstract class PTAClientWrapper {
                 values[i] = 0;
             }
         }
-        byte[] headData = new byte[headIS.available()];
-        headIS.read(headData);
+        byte[] headBundle = new byte[headIS.available()];
+        headIS.read(headBundle);
         headIS.close();
-        byte[] head = FUP2AClient.deformAvatarHeadWithHeadData(headData, values);
-        FileUtil.saveDataToFile(dst, head);
-        return head;
+        fuPTAClient.HeadData headData = new fuPTAClient.HeadData();
+        FUPTAClient.deformAvatarHeadWithHeadData(headData, headBundle, values);
+        FileUtil.saveDataToFile(dst, headData.bundle);
+        return headData.bundle;
     }
 }

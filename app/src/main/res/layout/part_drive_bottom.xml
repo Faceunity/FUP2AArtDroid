@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <View
+        android:id="@+id/v_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x322"
+        android:background="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_text_drive"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x60"
+        android:layout_marginLeft="@dimen/x16"
+        android:layout_marginBottom="@dimen/x26"
+        android:background="@drawable/bg_body_drivve"
+        android:gravity="center"
+        android:text="文字驱动"
+        android:textColor="@color/tv_body_drive_bottom"
+        android:textSize="@dimen/x24"
+        app:layout_constraintRight_toLeftOf="@+id/tv_ar_drive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_ar_drive"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x60"
+        android:layout_marginRight="@dimen/x16"
+        android:layout_marginBottom="@dimen/x26"
+        android:background="@drawable/bg_body_drivve"
+        android:gravity="center"
+        android:text="AR驱动"
+        android:textColor="@color/tv_body_drive_bottom"
+        android:textSize="@dimen/x24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/tv_text_drive" />
+
+    <View
+        android:id="@+id/v_interval"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x26"
+        app:layout_constraintBottom_toTopOf="@id/tv_text_drive" />
+
+</merge>

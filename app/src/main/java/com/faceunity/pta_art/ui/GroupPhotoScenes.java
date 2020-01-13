@@ -26,6 +26,7 @@ public class GroupPhotoScenes extends RelativeLayout {
     private RecyclerView mSingleRecycler;
     private RecyclerView mMultipleRecycler;
     private RecyclerView mAnimationRecycler;
+    private View backBtn;
 
     public GroupPhotoScenes(@NonNull Context context) {
         this(context, null);
@@ -39,7 +40,8 @@ public class GroupPhotoScenes extends RelativeLayout {
         super(context, attrs, defStyleAttr);
         View view = LayoutInflater.from(context).inflate(R.layout.layout_group_photo_scenes, this, true);
 
-        view.findViewById(R.id.group_photo_scenes_back).setOnClickListener(new OnClickListener() {
+        backBtn = view.findViewById(R.id.group_photo_scenes_back);
+        backBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mBackRunnable != null) {
@@ -96,7 +98,7 @@ public class GroupPhotoScenes extends RelativeLayout {
                 @Override
                 public void onClick(View v) {
                     if (mScenesSelectListener != null) {
-                        mScenesSelectListener.onScenesSelectListener(scenes == FilePathFactory.animationScenes(), scenes[position]);
+                        mScenesSelectListener.onScenesSelectListener(scenes[0].isAnimte, scenes[position]);
                     }
                 }
             });
@@ -135,5 +137,14 @@ public class GroupPhotoScenes extends RelativeLayout {
 
     public interface ScenesSelectListener {
         void onScenesSelectListener(boolean isAnim, Scenes scenes);
+    }
+
+    /**
+     * 设置返回按钮是否可用
+     *
+     * @param enable
+     */
+    public void setBackBtnEnable(boolean enable) {
+        backBtn.setEnabled(enable);
     }
 }
