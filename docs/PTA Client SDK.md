@@ -8,9 +8,9 @@
 
 下载工程后需要先获取一个证书：
 
-- authpack.h：Nama SDK鉴权证书，用于在客户端，使用Nama SDK 绘制的鉴权。
+- authpack.java：Nama SDK鉴权证书，用于在客户端，使用Nama SDK 绘制的鉴权。
 
-将authpack.h拷贝到[core](app/src/main/java/com/faceunity/pta_art/core/)文件夹下，然后直接运行工程即可。
+将authpack.java拷贝到[core](../app/src/main/java/com/faceunity/pta_art/core/)文件夹下，然后直接运行工程即可。
 
 ## 资源说明
 
