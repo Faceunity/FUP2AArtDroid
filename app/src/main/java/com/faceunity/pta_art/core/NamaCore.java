@@ -24,8 +24,9 @@ public class NamaCore extends BaseCore {
     @Override
     public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
         if (img == null) return 0;
+        //如果道具为空，则不进行图片等识别操作
         int fuTex = faceunity.fuRenderBundlesWithCamera(img, tex, faceunity.FU_ADM_FLAG_EXTERNAL_OES_TEXTURE, w, h, mFrameId++, itemsArray());
-        faceunity.fuTrackFace(img, 0, w, h);
+        faceunity.fuFaceCaptureProcessFrame(face_capture, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, 0);
         return fuTex;
     }
 

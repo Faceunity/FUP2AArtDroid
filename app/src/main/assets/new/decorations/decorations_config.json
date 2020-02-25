@@ -2,23 +2,188 @@
   "decorationsList": [
     {
       "gender": 2,
-      "path": "",
+      "bundle": "",
       "icon": "edit_face_item_none"
     },
     {
       "gender": 2,
-      "path": "new/decorations/peishi_jiao_1.bundle",
+      "bundle": "new/decorations/peishi_shou_1.bundle",
+      "icon": "peishi_shou_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_shou_2.bundle",
+      "icon": "peishi_shou_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_shou_3.bundle",
+      "icon": "peishi_shou_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_shou_6.bundle",
+      "icon": "peishi_shou_6"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_jiao_1.bundle",
       "icon": "peishi_jiao_1"
     },
     {
       "gender": 2,
-      "path": "new/decorations/peishi_xianglian_3.bundle",
+      "bundle": "new/decorations/peishi_jiao_2.bundle",
+      "icon": "peishi_jiao_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_jiao_3.bundle",
+      "icon": "peishi_jiao_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_jiao_4.bundle",
+      "icon": "peishi_jiao_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erji.bundle",
+      "icon": "peishi_erji"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_xianglian_1.bundle",
+      "icon": "peishi_xianglian_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_xianglian_2.bundle",
+      "icon": "peishi_xianglian_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_xianglian_3.bundle",
       "icon": "peishi_xianglian_3"
     },
     {
       "gender": 2,
-      "path": "new/decorations/peishi_erding_2.bundle",
+      "bundle": "new/decorations/peishi_xianglian_4.bundle",
+      "icon": "peishi_xianglian_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_14.bundle",
+      "icon": "toushi_14"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erding_1.bundle",
+      "icon": "peishi_erding_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erding_2.bundle",
       "icon": "peishi_erding_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erding_3.bundle",
+      "icon": "peishi_erding_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erding_4.bundle",
+      "icon": "peishi_erding_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/peishi_erding_5.bundle",
+      "icon": "peishi_erding_5"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_1.bundle",
+      "icon": "toushi_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_2.bundle",
+      "icon": "toushi_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_3.bundle",
+      "icon": "toushi_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_4.bundle",
+      "icon": "toushi_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_5.bundle",
+      "icon": "toushi_5"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_6.bundle",
+      "icon": "toushi_6"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_7.bundle",
+      "icon": "toushi_7"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_8.bundle",
+      "icon": "toushi_8"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_9.bundle",
+      "icon": "toushi_9"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_10.bundle",
+      "icon": "toushi_10"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_11.bundle",
+      "icon": "toushi_11"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_13.bundle",
+      "icon": "toushi_13"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_15.bundle",
+      "icon": "toushi_15"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_16.bundle",
+      "icon": "toushi_16"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_17.bundle",
+      "icon": "toushi_17"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_maozi_1.bundle",
+      "icon": "toushi_maozi_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/toushi_maozi_2.bundle",
+      "icon": "toushi_maozi_2"
     }
   ]
 }

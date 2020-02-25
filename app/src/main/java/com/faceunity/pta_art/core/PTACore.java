@@ -22,6 +22,7 @@ public class PTACore extends BaseCore {
     public static final int ITEM_ARRAYS_COUNT = 3;
     private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
 
+
     public int fxaaItem, bgItem;
     private int controller_config;
     private int[] bgItems = new int[1];
@@ -33,6 +34,7 @@ public class PTACore extends BaseCore {
         System.arraycopy(core.mItemsArray, 0, mItemsArray, 0, ITEM_ARRAYS_COUNT);
         fxaaItem = core.fxaaItem;
         bgItem = core.bgItem;
+        face_capture = mFUP2ARenderer.createFaceCapture();
     }
 
     public PTACore(Context context, FUPTARenderer fuP2ARenderer) {
@@ -42,6 +44,7 @@ public class PTACore extends BaseCore {
         bgItems[0] = bgItem;
         controller_config = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_controller_config_new);
         mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
+        face_capture = mFUP2ARenderer.createFaceCapture();
     }
 
     public AvatarHandle createAvatarHandle() {
@@ -53,8 +56,15 @@ public class PTACore extends BaseCore {
                 //现在需要把背景绑定到controller上
                 faceunity.fuBindItems(avatarHandle.controllerItem, bgItems);
 
+                closeDDE();
+
                 faceunity.fuItemSetParam(avatarHandle.controllerItem, "arMode", (360 - mInputImageOrientation) / 90);
+                //将这个模型注册到controller的当前角色上，并分配人脸索引，索引从0开始
+                faceunity.fuItemSetParamu64(avatarHandle.controllerItem, "register_face_capture_manager", face_capture);
+                faceunity.fuItemSetParam(avatarHandle.controllerItem, "register_face_capture_face_id", 0.0);
+
                 avatarHandle.resetAll();
+
             }
         });
     }
@@ -81,25 +91,29 @@ public class PTACore extends BaseCore {
         int isTracking = 0;
         //是否开启人脸驱动
         if (isNeedTrackFace && img != null) {
-            faceunity.fuTrackFaceWithTongue(img, 0, w, h);
-            isTracking = faceunity.fuIsTracking();
-            if (isTracking > 0) {
+            //如果开启CNN 面部追踪，每帧都需要调用fuFaceCaptureProcessFrame处理输入图像
+            faceunity.fuFaceCaptureProcessFrame(face_capture, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, 0);
+            //获取识别人脸数
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                isTracking = faceunity.fuFaceCaptureGetResultIsFace(face_capture, 0);
                 /**
                  * rotation 人脸三维旋转，返回值为旋转四元数，长度4
                  */
-                faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
+                faceunity.fuFaceCaptureGetResultRotation(face_capture, 0, avatarInfo.mRotation);
                 /**
                  * expression  表情系数，长度57
                  */
-                faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
+                faceunity.fuFaceCaptureGetResultExpression(face_capture, 0, avatarInfo.mExpression);
                 /**
-                 * pupil pos 眼球方向，长度2
+                 * pupil pos 眼球方向，长度4 xyzw
                  */
-                faceunity.fuGetFaceInfo(0, "pupil_pos", avatarInfo.mPupilPos);
+                faceunity.fuFaceCaptureGetResultEyesRotation(face_capture, 0, avatarInfo.mPupilPos);
                 /**
                  * rotation mode 人脸朝向，0-3分别对应手机四种朝向，长度1
+                 * 新接口已去除
                  */
-                faceunity.fuGetFaceInfo(0, "rotation_mode", avatarInfo.mRotationMode);
+//                faceunity.fuFaceCaptureGetResult(face_capture, 0, avatarInfo.mRotationMode);
             }
         }
         if (isTracking <= 0) {
@@ -107,22 +121,27 @@ public class PTACore extends BaseCore {
             Arrays.fill(avatarInfo.mExpression, 0.0f);
             Arrays.fill(avatarInfo.mPupilPos, 0.0f);
             Arrays.fill(avatarInfo.mRotationMode, 0.0f);
+            faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_CONTROLLER], "face_detector_status", 0);
         }
-        if (rotation < 0) {
-            avatarInfo.mRotationMode[0] = 0;
-        } else {
-            avatarInfo.mRotationMode[0] = 0;
-        }
-        avatarInfo.mIsValid = isTracking > 0 ? true : false;
 
-        int fuTex = faceunity.fuRenderBundles(avatarInfo,
+        avatarInfo.mRotationMode[0] = 0;
+        avatarInfo.mIsValid = isTracking > 0;
+
+        return faceunity.fuRenderBundles(avatarInfo,
                 0, w, h, mFrameId++, itemsArray());
-        return fuTex;
     }
 
     public void setCurrentInstancceId(int id) {
         if (avatarHandle != null)
             avatarHandle.setCurrentInstancceId(id);
+    }
+
+    /**
+     * 关闭dde
+     */
+    public void closeDDE() {
+        faceunity.fuItemSetParam(avatarHandle.controllerItem, "is_close_dde", 1.0);
+        avatarHandle.setFaceCapture(false);
     }
 
     @Override
@@ -156,18 +175,11 @@ public class PTACore extends BaseCore {
         avatarHandle.release();
         queueEvent(destroyItem(fxaaItem));
         queueEvent(destroyItem(bgItem));
+        queueEvent(destroyFaceCaptureItem(face_capture));
     }
 
     public void setNeedTrackFace(boolean needTrackFace) {
         isNeedTrackFace = needTrackFace;
-        avatarHandle.setNeedTrackFace(isNeedTrackFace);
-    }
-
-    @Override
-    public float[] getLandmarksData() {
-        Arrays.fill(landmarksData, 0.0f);
-        if (isNeedTrackFace && isTracking() > 0)
-            faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
-        return landmarksData;
+        avatarHandle.setCNNTrackFace(isNeedTrackFace);
     }
 }

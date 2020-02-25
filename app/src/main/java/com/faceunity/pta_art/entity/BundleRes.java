@@ -2,6 +2,8 @@ package com.faceunity.pta_art.entity;
 
 import android.text.TextUtils;
 
+import java.util.Arrays;
+
 /**
  * Created by tujh on 2018/12/17.
  */
@@ -13,6 +15,7 @@ public class BundleRes extends FURes {
 
     public Integer[] labels;
     public boolean isSupport;
+    public int bodyLevel;
 
     public String[] others;
 
@@ -63,13 +66,35 @@ public class BundleRes extends FURes {
         this(gender, path, resId, labels, isSupport, null);
     }
 
+
     public BundleRes(int gender, String path, int resId, Integer[] labels, boolean isSupport, String[] others) {
+        this(gender, path, resId, labels, isSupport, 0, others);
+    }
+
+    public BundleRes(int gender, String path, int resId, Integer[] labels, boolean isSupport, int bodyLevel) {
+        this(gender, path, resId, labels, isSupport, bodyLevel, null);
+    }
+
+    public BundleRes(int gender, String path, int resId, Integer[] labels, boolean isSupport, int bodyLevel, String[] others) {
         this.gender = gender;
         this.resId = resId;
         this.path = path;
         this.name = getNameByPath(path);
         this.labels = labels;
         this.isSupport = isSupport;
+        this.bodyLevel = bodyLevel;
         this.others = others;
+    }
+
+    @Override
+    public String toString() {
+        return "BundleRes{" +
+                "path='" + path + '\'' +
+                ", gender=" + gender +
+                ", name='" + name + '\'' +
+                ", labels=" + Arrays.toString(labels) +
+                ", isSupport=" + isSupport +
+                ", others=" + Arrays.toString(others) +
+                '}';
     }
 }

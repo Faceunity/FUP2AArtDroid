@@ -18,7 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JsonUtils {
-    private List<BundleRes> hairlist;
+
+
+    private List<BundleRes> jsonList;
     private List<Scenes> scenesList;
     private Context context;
 
@@ -26,11 +28,10 @@ public class JsonUtils {
         this.context = FUApplication.getInstance();
     }
 
-    //读取头发数据
-    public void readHairJson(String path) {
-        if (hairlist == null)
-            hairlist = new ArrayList<>();
-        hairlist.clear();
+    public void readJson(String path) {
+        if (jsonList == null)
+            jsonList = new ArrayList<>();
+        jsonList.clear();
         try {
             InputStream inputStream = context.getAssets().open(path);
             byte[] data = new byte[inputStream.available()];
@@ -41,7 +42,7 @@ public class JsonUtils {
             JSONArray jsonArray = (JSONArray) (jsonObject.opt(jsonObject.keys().next()));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                resolveHairJson(jsonObject1);
+                resolveConfigJson(jsonObject1);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,52 +53,51 @@ public class JsonUtils {
         }
     }
 
-    private void resolveHairJson(JSONObject jsonObject) {
-        Iterator iterator = jsonObject.keys();
+    private void resolveConfigJson(JSONObject jsonObject) {
         int gender = 0;
-        String path = "";
+        String bundle = "";
         int resId = 0;
         Integer[] label = new Integer[]{};
         boolean isSupport = true;
-        int i = 0;
-        while (iterator.hasNext()) {
-            String key = iterator.next().toString();
-            Object value = jsonObject.opt(key);
-            switch (i) {
-                case 0:
-                    gender = ((int) value);
-                    break;
-                case 1:
-                    path = ((String) value);
-                    break;
-                case 2:
-                    resId = context.getResources().getIdentifier((String) value, "drawable", context.getPackageName());
-                    break;
-                case 3:
-                    JSONArray jsonArray = (JSONArray) (value);
-                    if (jsonArray.length() > 0) {
-                        label = new Integer[jsonArray.length()];
-                        for (int j = 0; j < jsonArray.length(); j++) {
-                            label[j] = jsonArray.optInt(j);
-                        }
-                    } else {
-                        label = new Integer[]{};
-                    }
-                    break;
-                case 4:
-                    isSupport = ((boolean) value);
-                    break;
-                default:
-                    break;
+        int bodyLevel = 0;
+        try {
+            if (jsonObject.has("bundle")) {
+                bundle = jsonObject.getString("bundle");
             }
-            i++;
 
+            if (jsonObject.has("icon")) {
+                resId = context.getResources().getIdentifier(jsonObject.getString("icon"), "drawable", context.getPackageName());
+            }
+
+            if (jsonObject.has("gender")) {
+                gender = jsonObject.getInt("gender");
+            }
+
+            if (jsonObject.has("label")) {
+                JSONArray labelJA = jsonObject.getJSONArray("label");
+                if (labelJA != null && labelJA.length() > 0) {
+                    label = new Integer[labelJA.length()];
+                }
+                for (int i = 0; i < labelJA.length(); i++) {
+                    label[i] = labelJA.getInt(i);
+                }
+            }
+
+            if (jsonObject.has("body_match_level")) {
+                bodyLevel = jsonObject.getInt("body_match_level");
+            }
+            if (jsonObject.has("body_level")) {
+                bodyLevel = jsonObject.getInt("body_level");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        hairlist.add(new BundleRes(gender, path, resId, label, isSupport));
+        jsonList.add(new BundleRes(gender, bundle, resId, label, isSupport, bodyLevel));
     }
 
-    public List<BundleRes> getHairList() {
-        return hairlist;
+    public List<BundleRes> getBundleResList() {
+        return jsonList;
     }
 
     //读取动画数据

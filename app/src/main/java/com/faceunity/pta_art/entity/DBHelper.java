@@ -20,7 +20,7 @@ import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 28;
+    public static final int DATABASE_VERSION = 30;
 
     static final String DATABASE_NAME = Constant.APP_NAME + "_avatar.db";
     static final String HISTORY_TABLE_NAME = "avatar_history";
@@ -43,6 +43,13 @@ public class DBHelper extends SQLiteOpenHelper {
     static final String HISTORY_HAT_INDEX = "hat_index";
     static final String HISTORY_SHOES_INDEX = "shoes_index";
     static final String HISTORY_DECORATIONS_INDEX = "decorations_index";
+    static final String HISTORY_BODY_LEVEL = "body_level";
+    static final String HISTORY_EYELINER_INDEX = "eyeliner_index";
+    static final String HISTORY_EYESHADOW_INDEX = "eyeshadow_index";
+    static final String HISTORY_FACEMAKEUP_INDEX = "facemakeup_index";
+    static final String HISTORY_LIPGLOSS_INDEX = "lipgloss_index";
+    static final String HISTORY_PUPIL_INDEX = "pupil_index";
+
 
     static final String HISTORY_SKIN_COLOR = "skin_color_values";
     static final String HISTORY_LIP_COLOR = "lip_color_values";
@@ -86,7 +93,13 @@ public class DBHelper extends SQLiteOpenHelper {
                         " glasses_frame_color_values double," +
                         " beard_color_values double," +
                         " hat_color_values double," +
-                        " decorations_index integer" +
+                        " decorations_index integer," +
+                        " body_level double," +
+                        " eyeliner_index integer," +
+                        " eyeshadow_index integer," +
+                        " facemakeup_index integer," +
+                        " lipgloss_index integer," +
+                        " pupil_index integer" +
                         ")"
         );
     }
@@ -117,6 +130,13 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_HAT_INDEX, avatarP2A.getHatIndex());
         contentValues.put(HISTORY_SHOES_INDEX, avatarP2A.getShoeIndex());
         contentValues.put(HISTORY_DECORATIONS_INDEX, avatarP2A.getDecorationsIndex());
+
+        contentValues.put(HISTORY_EYELINER_INDEX, avatarP2A.getEyelinerIndex());
+        contentValues.put(HISTORY_EYESHADOW_INDEX, avatarP2A.getEyeshadowIndex());
+        contentValues.put(HISTORY_FACEMAKEUP_INDEX, avatarP2A.getFaceMakeupIndex());
+        contentValues.put(HISTORY_LIPGLOSS_INDEX, avatarP2A.getLipglossIndex());
+        contentValues.put(HISTORY_PUPIL_INDEX, avatarP2A.getPupilIndex());
+
         contentValues.put(HISTORY_SKIN_COLOR, avatarP2A.getSkinColorValue());
         contentValues.put(HISTORY_LIP_COLOR, avatarP2A.getLipColorValue());
         contentValues.put(HISTORY_IRIS_COLOR, avatarP2A.getIrisColorValue());
@@ -126,6 +146,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_BEARD_COLOR, avatarP2A.getBeardColorValue());
         contentValues.put(HISTORY_HAT_COLOR, avatarP2A.getHatColorValue());
         contentValues.put(HISTORY_GENDER, avatarP2A.getGender());
+        contentValues.put(HISTORY_BODY_LEVEL, avatarP2A.getBodyLevel());
         db.insert(HISTORY_TABLE_NAME, null, contentValues);
         db.close();
         return true;
@@ -150,6 +171,13 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_HAT_INDEX, avatarP2A.getHatIndex());
         contentValues.put(HISTORY_SHOES_INDEX, avatarP2A.getShoeIndex());
         contentValues.put(HISTORY_DECORATIONS_INDEX, avatarP2A.getDecorationsIndex());
+
+        contentValues.put(HISTORY_EYELINER_INDEX, avatarP2A.getEyelinerIndex());
+        contentValues.put(HISTORY_EYESHADOW_INDEX, avatarP2A.getEyeshadowIndex());
+        contentValues.put(HISTORY_FACEMAKEUP_INDEX, avatarP2A.getFaceMakeupIndex());
+        contentValues.put(HISTORY_LIPGLOSS_INDEX, avatarP2A.getLipglossIndex());
+        contentValues.put(HISTORY_PUPIL_INDEX, avatarP2A.getPupilIndex());
+
         contentValues.put(HISTORY_SKIN_COLOR, avatarP2A.getSkinColorValue());
         contentValues.put(HISTORY_LIP_COLOR, avatarP2A.getLipColorValue());
         contentValues.put(HISTORY_IRIS_COLOR, avatarP2A.getIrisColorValue());
@@ -159,6 +187,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_BEARD_COLOR, avatarP2A.getBeardColorValue());
         contentValues.put(HISTORY_HAT_COLOR, avatarP2A.getHatColorValue());
         contentValues.put(HISTORY_GENDER, avatarP2A.getGender());
+        contentValues.put(HISTORY_BODY_LEVEL, avatarP2A.getBodyLevel());
         db.update(HISTORY_TABLE_NAME, contentValues, HISTORY_DIR + "=?", new String[]{avatarP2A.getBundleDir()});
         db.close();
         return true;
@@ -200,6 +229,13 @@ public class DBHelper extends SQLiteOpenHelper {
         int hatIndex = res.getColumnIndex(HISTORY_HAT_INDEX);
         int shoeIndex = res.getColumnIndex(HISTORY_SHOES_INDEX);
         int decorationsIndex = res.getColumnIndex(HISTORY_DECORATIONS_INDEX);
+
+        int eyelinerIndex = res.getColumnIndex(HISTORY_EYELINER_INDEX);
+        int eyeshadowIndex = res.getColumnIndex(HISTORY_EYESHADOW_INDEX);
+        int facemakeupIndex = res.getColumnIndex(HISTORY_FACEMAKEUP_INDEX);
+        int lipglossIndex = res.getColumnIndex(HISTORY_LIPGLOSS_INDEX);
+        int pupilIndex = res.getColumnIndex(HISTORY_PUPIL_INDEX);
+
         int skinColorIndex = res.getColumnIndex(HISTORY_SKIN_COLOR);
         int lipColorIndex = res.getColumnIndex(HISTORY_LIP_COLOR);
         int irisColorIndex = res.getColumnIndex(HISTORY_IRIS_COLOR);
@@ -208,6 +244,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int glassesFrameColorIndex = res.getColumnIndex(HISTORY_GLASSES_FRAME_COLOR);
         int beardColorIndex = res.getColumnIndex(HISTORY_BEARD_COLOR);
         int hatColorIndex = res.getColumnIndex(HISTORY_HAT_COLOR);
+        int bodyLevel = res.getColumnIndex(HISTORY_BODY_LEVEL);
         while (!res.isAfterLast()) {
             AvatarPTA historyItem = new AvatarPTA(res.getString(bundleDirIndex), res.getInt(genderIndex), res.getString(qBundleIndex));
             historyItem.setOriginPhotoThumbNail(res.getString(imageThumbNailIndex));
@@ -223,6 +260,13 @@ public class DBHelper extends SQLiteOpenHelper {
             historyItem.setHatIndex(res.getInt(hatIndex));
             historyItem.setShoeIndex(res.getInt(shoeIndex));
             historyItem.setDecorationsIndex(res.getInt(decorationsIndex));
+
+            historyItem.setEyelinerIndex(res.getInt(eyelinerIndex));
+            historyItem.setEyeshadowIndex(res.getInt(eyeshadowIndex));
+            historyItem.setFaceMakeupIndex(res.getInt(facemakeupIndex));
+            historyItem.setLipglossIndex(res.getInt(lipglossIndex));
+            historyItem.setPupilIndex(res.getInt(pupilIndex));
+
             historyItem.setSkinColorValue(res.getDouble(skinColorIndex));
             historyItem.setLipColorValue(res.getDouble(lipColorIndex));
             historyItem.setIrisColorValue(res.getDouble(irisColorIndex));
@@ -231,6 +275,7 @@ public class DBHelper extends SQLiteOpenHelper {
             historyItem.setGlassesFrameColorValue(res.getDouble(glassesFrameColorIndex));
             historyItem.setBeardColorValue(res.getDouble(beardColorIndex));
             historyItem.setHatColorValue(res.getDouble(hatColorIndex));
+            historyItem.setBodyLevel(res.getInt(bodyLevel));
             allHistoryItemList.add(historyItem);
             res.moveToNext();
         }

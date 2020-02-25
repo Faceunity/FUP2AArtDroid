@@ -2,75 +2,75 @@
   "hatList": [
     {
       "gender": 2,
-      "path": "",
+      "bundle": "",
       "icon": "edit_face_item_none"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat01.bundle",
+      "bundle": "new/hat/mid_hat01.bundle",
       "icon": "hat_1"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat02.bundle",
+      "bundle": "new/hat/mid_hat02.bundle",
       "icon": "hat_2"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat03.bundle",
+      "bundle": "new/hat/mid_hat03.bundle",
       "icon": "hat_3"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat04.bundle",
+      "bundle": "new/hat/mid_hat04.bundle",
       "icon": "hat_4"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat05.bundle",
+      "bundle": "new/hat/mid_hat05.bundle",
       "icon": "hat_5"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat06.bundle",
+      "bundle": "new/hat/mid_hat06.bundle",
       "icon": "hat_6"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat07.bundle",
+      "bundle": "new/hat/mid_hat07.bundle",
       "icon": "hat_7"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat08.bundle",
+      "bundle": "new/hat/mid_hat08.bundle",
       "icon": "hat_8"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat09.bundle",
+      "bundle": "new/hat/mid_hat09.bundle",
       "icon": "hat_9"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat10.bundle",
+      "bundle": "new/hat/mid_hat10.bundle",
       "icon": "hat_10"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat11.bundle",
+      "bundle": "new/hat/mid_hat11.bundle",
       "icon": "hat_11"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat12.bundle",
+      "bundle": "new/hat/mid_hat12.bundle",
       "icon": "hat_12"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat13.bundle",
+      "bundle": "new/hat/mid_hat13.bundle",
       "icon": "hat_13"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat16.bundle",
+      "bundle": "new/hat/mid_hat16.bundle",
       "icon": "hat_16"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat17.bundle",
+      "bundle": "new/hat/mid_hat17.bundle",
       "icon": "hat_17"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat18.bundle",
+      "bundle": "new/hat/mid_hat18.bundle",
       "icon": "hat_18"
     }, {
       "gender": 2,
-      "path": "new/hat/mid_hat21.bundle",
+      "bundle": "new/hat/mid_hat21.bundle",
       "icon": "hat_21"
     }
   ]

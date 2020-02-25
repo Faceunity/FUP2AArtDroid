@@ -33,12 +33,17 @@ public class AvatarARHandle extends BasePTAHandle {
     public final FUItem hatItem = new FUItem();
     public final FUItem bodyItem = new FUItem();
     public final FUItem clothesItem = new FUItem();
-    //    public final FUItem clothesSuitUpperItem = new FUItem();
-//    public final FUItem clothesSuitLowerItem = new FUItem();
     public final FUItem clothesUpperItem = new FUItem();
     public final FUItem clothesLowerItem = new FUItem();
     public final FUItem shoeItem = new FUItem();
     public final FUItem decorationsItem = new FUItem();
+
+    public final FUItem eyelinerItem = new FUItem();
+    public final FUItem eyeshadowItem = new FUItem();
+    public final FUItem facemakeupItem = new FUItem();
+    public final FUItem lipglossItem = new FUItem();
+    public final FUItem pupilItem = new FUItem();
+
     public final FUItem expressionItem = new FUItem();
     public final FUItem otherItem[] = new FUItem[5];
     public int hairMask;
@@ -64,6 +69,13 @@ public class AvatarARHandle extends BasePTAHandle {
                 loadItemNew(eyebrowItem, avatar.getEyebrowFile(), needDestory);
                 loadItemNew(eyelashItem, avatar.getEyelashFile(), needDestory);
                 loadItemNew(hatItem, avatar.getHatFile(), needDestory);
+
+                loadItem(eyelinerItem, avatar.getEyelinerFile());
+                loadItem(eyeshadowItem, avatar.getEyeshadowFile());
+                loadItem(facemakeupItem, avatar.getFacemakeupFile());
+                loadItem(lipglossItem, avatar.getLipglossFile());
+                loadItem(pupilItem, avatar.getPupilFile());
+
                 commitItem(avatar);
                 if (runnable != null) {
                     runnable.run();
@@ -89,24 +101,19 @@ public class AvatarARHandle extends BasePTAHandle {
                 loadItemNew(eyebrowItem, avatar.getEyebrowFile(), needDestory);
                 loadItemNew(eyelashItem, avatar.getEyelashFile(), needDestory);
                 loadItemNew(hatItem, avatar.getHatFile(), needDestory);
-                loadItemNew(bodyItem, FilePathFactory.bodyBundle(avatar.getGender()), needDestory);
-                //if (avatar.getClothesIndex() != 0) {
+                loadItemNew(bodyItem, FilePathFactory.bodyBundle(avatar.getGender(), avatar.getBodyLevel()), needDestory);
                 loadItemNew(clothesItem, avatar.getClothesFile(), needDestory);
-                //}
-//                if (avatar.getClothesIndex() != 0) {
-//                    loadItemNew(clothesSuitUpperItem, avatar.getClothesFile().replace("_female", "").replace(".bundle", "_upper.bundle"),
-//                            needDestory);
-//                    loadItemNew(clothesSuitLowerItem, avatar.getClothesFile().replace("_female", "").replace(".bundle", "_lower.bundle"),
-//                            needDestory);
-//                } else {
-//                    loadItemNew(clothesSuitUpperItem, avatar.getClothesFile(), needDestory);
-//                    loadItemNew(clothesSuitLowerItem, avatar.getClothesFile(), needDestory);
-//                }
                 loadItemNew(clothesUpperItem, avatar.getClothesUpperFile(), needDestory);
                 loadItemNew(clothesLowerItem, avatar.getClothesLowerFile(), needDestory);
                 loadItemNew(shoeItem, avatar.getShoeFile(), needDestory);
                 loadItemNew(decorationsItem, avatar.getDecorationsFile(), needDestory);
                 loadItemNew(expressionItem, FilePathFactory.bundleAnim(avatar.getGender()), needDestory);
+
+                loadItem(eyelinerItem, avatar.getEyelinerFile());
+                loadItem(eyeshadowItem, avatar.getEyeshadowFile());
+                loadItem(facemakeupItem, avatar.getFacemakeupFile());
+                loadItem(lipglossItem, avatar.getLipglossFile());
+                loadItem(pupilItem, avatar.getPupilFile());
 
                 String[] others = avatar.getOtherFile();
                 for (int i = 0; i < otherItem.length; i++) {
@@ -151,20 +158,20 @@ public class AvatarARHandle extends BasePTAHandle {
                 loadItemNew(eyebrowItem, avatar.getEyebrowFile(), needDestory);
                 loadItemNew(eyelashItem, avatar.getEyelashFile(), needDestory);
                 loadItemNew(hatItem, avatar.getHatFile(), needDestory);
-                loadItemNew(bodyItem, FilePathFactory.bodyBundle(avatar.getGender()), needDestory);
+                loadItemNew(bodyItem, FilePathFactory.bodyBundle(avatar.getGender(), avatar.getBodyLevel()), needDestory);
                 loadItemNew(clothesItem, avatar.getClothesFile(), needDestory);
-//                if (avatar.getClothesIndex() != 0) {
-//                    loadItemNew(clothesSuitUpperItem, avatar.getClothesFile().replace("_female", "").replace(".bundle", "_upper.bundle"), needDestory);
-//                    loadItemNew(clothesSuitLowerItem, avatar.getClothesFile().replace("_female", "").replace(".bundle", "_lower.bundle"), needDestory);
-//                } else {
-//                    loadItemNew(clothesSuitUpperItem, avatar.getClothesFile(), needDestory);
-//                    loadItemNew(clothesSuitLowerItem, avatar.getClothesFile(), needDestory);
-//                }
                 loadItemNew(clothesUpperItem, avatar.getClothesUpperFile(), needDestory);
                 loadItemNew(clothesLowerItem, avatar.getClothesLowerFile(), needDestory);
                 loadItemNew(shoeItem, avatar.getShoeFile(), needDestory);
                 loadItemNew(decorationsItem, avatar.getDecorationsFile(), needDestory);
                 loadItemNew(expressionItem, FilePathFactory.bundleIdle(avatar.getGender()), needDestory);
+
+                loadItem(eyelinerItem, avatar.getEyelinerFile());
+                loadItem(eyeshadowItem, avatar.getEyeshadowFile());
+                loadItem(facemakeupItem, avatar.getFacemakeupFile());
+                loadItem(lipglossItem, avatar.getLipglossFile());
+                loadItem(pupilItem, avatar.getPupilFile());
+
                 String[] others = avatar.getOtherFile();
                 for (int i = 0; i < otherItem.length; i++) {
                     if (others != null && i < others.length) {
@@ -250,12 +257,8 @@ public class AvatarARHandle extends BasePTAHandle {
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{bodyItem.handle,
-                            clothesItem.handle,
-//                            clothesSuitUpperItem.handle, clothesSuitLowerItem.handle,
-                            clothesUpperItem.handle, clothesLowerItem.handle,
-                            shoeItem.handle, decorationsItem.handle,
-                            expressionItem.handle,
+                    int[] items = new int[]{bodyItem.handle, clothesItem.handle, clothesUpperItem.handle,
+                            clothesLowerItem.handle, shoeItem.handle, decorationsItem.handle, expressionItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle unBindAndDestory controlItem " + controllerItem + " unBindAll " + Arrays.toString(items));
                     faceunity.fuUnBindItems(controllerItem, items);
@@ -263,8 +266,6 @@ public class AvatarARHandle extends BasePTAHandle {
             });
             mBaseCore.queueEvent(mBaseCore.destroyItem(bodyItem.handle));
             mBaseCore.queueEvent(mBaseCore.destroyItem(clothesItem.handle));
-//            mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitUpperItem.handle));
-//            mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitLowerItem.handle));
             mBaseCore.queueEvent(mBaseCore.destroyItem(clothesUpperItem.handle));
             mBaseCore.queueEvent(mBaseCore.destroyItem(clothesLowerItem.handle));
             mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
@@ -280,8 +281,6 @@ public class AvatarARHandle extends BasePTAHandle {
                 public void run() {
                     bodyItem.clear();
                     clothesItem.clear();
-//                    clothesSuitUpperItem.clear();
-//                    clothesSuitLowerItem.clear();
                     clothesUpperItem.clear();
                     clothesLowerItem.clear();
                     shoeItem.clear();
@@ -313,12 +312,15 @@ public class AvatarARHandle extends BasePTAHandle {
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
-                            clothesItem.handle,
-//                            clothesSuitUpperItem.handle, clothesSuitLowerItem.handle,
-                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsItem.handle,
-                            expressionItem.handle,
-                            otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle,
+                            beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle,
+                            bodyItem.handle, clothesItem.handle, clothesUpperItem.handle, clothesLowerItem.handle,
+                            shoeItem.handle, decorationsItem.handle, expressionItem.handle,
+                            eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
+                            lipglossItem.handle, pupilItem.handle,
+                            otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
+                            otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle,
+                            otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " bindAll " + Arrays.toString(items));
                     faceunity.fuBindItems(controllerItem, items);
                     setAvatarColor();
@@ -332,14 +334,15 @@ public class AvatarARHandle extends BasePTAHandle {
             mBaseCore.queueEvent(new Runnable() {
                 @Override
                 public void run() {
-                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
-                            clothesItem.handle,
-//                            clothesSuitUpperItem.handle, clothesSuitLowerItem.handle,
-                            clothesUpperItem.handle, clothesLowerItem.handle,
-                            shoeItem.handle, decorationsItem.handle,
-                            expressionItem.handle,
-                            hairMask,
-                            otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
+                    int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle,
+                            eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
+                            clothesItem.handle, clothesUpperItem.handle, clothesLowerItem.handle,
+                            shoeItem.handle, decorationsItem.handle, expressionItem.handle, hairMask,
+                            eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
+                            lipglossItem.handle, pupilItem.handle,
+                            otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
+                            otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle,
+                            otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " unBindAll " + Arrays.toString(items));
                     faceunity.fuUnBindItems(controllerItem, items);
                 }
@@ -357,6 +360,7 @@ public class AvatarARHandle extends BasePTAHandle {
                 public void run() {
                     faceunity.fuUnBindItems(controllerItem, new int[]{hairMask});
                     faceunity.fuItemSetParam(controllerItem, "quit_ar_mode", 1);
+                    faceunity.fuItemSetParam(controllerItem, "modelmat_to_bone", 1.0);
                 }
             });
     }
@@ -371,8 +375,10 @@ public class AvatarARHandle extends BasePTAHandle {
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem, "enter_ar_mode", 1);
                     faceunity.fuBindItems(controllerItem, new int[]{hairMask});
+                    faceunity.fuItemSetParam(controllerItem, "modelmat_to_bone", 0.0);
                 }
             });
+
     }
 
     /**
@@ -421,13 +427,18 @@ public class AvatarARHandle extends BasePTAHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(hatItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(bodyItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesItem.handle));
-//        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitLowerItem.handle));
-//        mBaseCore.queueEvent(mBaseCore.destroyItem(clothesSuitUpperItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesUpperItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesLowerItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
+
+        mBaseCore.queueEvent(mBaseCore.destroyItem(eyelinerItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(eyeshadowItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(facemakeupItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(lipglossItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(pupilItem.handle));
+
         mBaseCore.queueEvent(mBaseCore.destroyItem(hairMask));
         for (FUItem item : otherItem) {
             if (item != null) {
@@ -446,13 +457,18 @@ public class AvatarARHandle extends BasePTAHandle {
                 hatItem.clear();
                 bodyItem.clear();
                 clothesItem.clear();
-//                clothesSuitUpperItem.clear();
-//                clothesSuitLowerItem.clear();
                 clothesUpperItem.clear();
                 clothesLowerItem.clear();
                 shoeItem.clear();
                 decorationsItem.clear();
                 expressionItem.clear();
+
+                eyelinerItem.clear();
+                eyeshadowItem.clear();
+                facemakeupItem.clear();
+                lipglossItem.clear();
+                pupilItem.clear();
+
                 for (FUItem item : otherItem) {
                     if (item != null) {
                         item.clear();
@@ -477,6 +493,21 @@ public class AvatarARHandle extends BasePTAHandle {
             @Override
             public void run() {
                 faceunity.fuItemSetParam(controllerItem, needTrackFace ? "enter_track_rotation_mode" : "quit_track_rotation_mode", 1);
+            }
+        });
+    }
+
+    /**
+     * CNN 面部追踪
+     *
+     * @param isOpen
+     */
+    public void setCNNTrackFace(boolean isOpen) {
+        mBaseCore.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                //3.设置close_face_capture，说明启用或者关闭CNN面部追踪，value = 0.0表示开启，value = 1.0表示关闭
+                faceunity.fuItemSetParam(controllerItem, "close_face_capture", isOpen ? 0.0 : 1.0);
             }
         });
     }
