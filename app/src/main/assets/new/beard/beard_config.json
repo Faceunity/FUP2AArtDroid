@@ -2,53 +2,75 @@
   "breadList": [
     {
       "gender": 2,
-      "path": "",
+      "bundle": "",
       "icon": "new_beard_none",
       "labels": [
-        -1, 0
+        -1,
+        0
       ]
-    },{
-      "gender": 0,
-      "path": "new/beard/beard01.bundle",
-      "icon": "new_beard_1",
-      "labels": [
-        7, 8, 9, 10, 11, 12
-      ]
-    },{
+    },
+    {
+      "bundle": "new/beard/beard_1.bundle",
+      "icon": "beard_1",
+      "label": [],
       "gender": 2,
-      "path": "new/beard/beard02.bundle",
-      "icon": "new_beard_2",
-      "labels": [
-        13, 14, 15, 16, 17, 18
-      ]
-    },{
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_2.bundle",
+      "icon": "beard_2",
+      "label": [],
       "gender": 2,
-      "path": "new/beard/beard03.bundle",
-      "icon": "new_beard_3",
-      "labels": [
-        19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
-      ]
-    },{
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_3.bundle",
+      "icon": "beard_3",
+      "label": [],
       "gender": 2,
-      "path": "new/beard/beard04.bundle",
-      "icon": "new_beard_4",
-      "labels": [
-        1, 2
-      ]
-    },{
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_4.bundle",
+      "icon": "beard_4",
+      "label": [],
       "gender": 2,
-      "path": "new/beard/beard05.bundle",
-      "icon": "new_beard_5",
-      "labels": [
-        3, 4
-      ]
-    },{
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_5.bundle",
+      "icon": "beard_5",
+      "label": [],
       "gender": 2,
-      "path": "new/beard/beard06.bundle",
-      "icon": "new_beard_6",
-      "labels": [
-        5, 6
-      ]
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_6.bundle",
+      "icon": "beard_6",
+      "label": [],
+      "gender": 2,
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_7.bundle",
+      "icon": "beard_7",
+      "label": [],
+      "gender": 2,
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_8.bundle",
+      "icon": "beard_8",
+      "label": [],
+      "gender": 2,
+      "gender_match": 0
+    },
+    {
+      "bundle": "new/beard/beard_9.bundle",
+      "icon": "beard_9",
+      "label": [],
+      "gender": 2,
+      "gender_match": 0
     }
   ]
 }

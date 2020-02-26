@@ -2,12 +2,12 @@
   "glassesList": [
     {
       "gender": 2,
-      "path": "",
+      "bundle": "",
       "icon": "edit_face_item_none"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_1.bundle",
+      "bundle": "new/glasses/glass_1.bundle",
       "icon": "glass_1",
       "label": [
         1,
@@ -16,7 +16,7 @@
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_2.bundle",
+      "bundle": "new/glasses/glass_2.bundle",
       "icon": "glass_2",
       "label": [
         0,
@@ -25,32 +25,32 @@
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_3.bundle",
+      "bundle": "new/glasses/glass_3.bundle",
       "icon": "glass_3"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_4.bundle",
+      "bundle": "new/glasses/glass_4.bundle",
       "icon": "glass_4"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_5.bundle",
+      "bundle": "new/glasses/glass_5.bundle",
       "icon": "glass_5"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_6.bundle",
+      "bundle": "new/glasses/glass_6.bundle",
       "icon": "glass_6"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_7.bundle",
+      "bundle": "new/glasses/glass_7.bundle",
       "icon": "glass_7"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_8.bundle",
+      "bundle": "new/glasses/glass_8.bundle",
       "icon": "glass_8",
       "label": [
         1,
@@ -59,32 +59,32 @@
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_9.bundle",
+      "bundle": "new/glasses/glass_9.bundle",
       "icon": "glass_9"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_10.bundle",
+      "bundle": "new/glasses/glass_10.bundle",
       "icon": "glass_10"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_11.bundle",
+      "bundle": "new/glasses/glass_11.bundle",
       "icon": "glass_11"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_12.bundle",
+      "bundle": "new/glasses/glass_12.bundle",
       "icon": "glass_12"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_13.bundle",
+      "bundle": "new/glasses/glass_13.bundle",
       "icon": "glass_13"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_14.bundle",
+      "bundle": "new/glasses/glass_14.bundle",
       "icon": "glass_14",
       "label": [
         1,
@@ -93,7 +93,7 @@
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_15.bundle",
+      "bundle": "new/glasses/glass_15.bundle",
       "icon": "glass_15",
       "label": [
         1,
@@ -102,32 +102,32 @@
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_16.bundle",
+      "bundle": "new/glasses/glass_16.bundle",
       "icon": "glass_16"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_17.bundle",
+      "bundle": "new/glasses/glass_17.bundle",
       "icon": "glass_17"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_18.bundle",
+      "bundle": "new/glasses/glass_18.bundle",
       "icon": "glass_18"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_19.bundle",
+      "bundle": "new/glasses/glass_19.bundle",
       "icon": "glass_19"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_20.bundle",
+      "bundle": "new/glasses/glass_20.bundle",
       "icon": "glass_20"
     },
     {
       "gender": 2,
-      "path": "new/glasses/glass_21.bundle",
+      "bundle": "new/glasses/glass_21.bundle",
       "icon": "glass_21"
     }
   ]

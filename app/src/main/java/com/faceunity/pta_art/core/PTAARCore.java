@@ -128,26 +128,29 @@ public class PTAARCore extends BaseCore {
         int isTracking = 0;
         //是否开启面部追踪
         if (isNeedTrackFace && img != null) {
-            //trackface
-            faceunity.fuTrackFaceWithTongue(img, 0, w, h);
-            isTracking = faceunity.fuIsTracking();
-            if (isTracking > 0) {
+            //如果开启CNN 面部追踪，每帧都需要调用fuFaceCaptureProcessFrame处理输入图像
+            faceunity.fuFaceCaptureProcessFrame(face_capture, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, 0);
+            //获取识别人脸数
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                isTracking = faceunity.fuFaceCaptureGetResultIsFace(face_capture, 0);
                 /**
                  * rotation 人脸三维旋转，返回值为旋转四元数，长度4
                  */
-                faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
+                faceunity.fuFaceCaptureGetResultRotation(face_capture, 0, avatarInfo.mRotation);
                 /**
                  * expression  表情系数，长度57
                  */
-                faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
+                faceunity.fuFaceCaptureGetResultExpression(face_capture, 0, avatarInfo.mExpression);
                 /**
-                 * pupil pos 眼球方向，长度2
+                 * pupil pos 眼球方向，长度4 xyzw
                  */
-                faceunity.fuGetFaceInfo(0, "pupil_pos", avatarInfo.mPupilPos);
+                faceunity.fuFaceCaptureGetResultEyesRotation(face_capture, 0, avatarInfo.mPupilPos);
                 /**
                  * rotation mode 人脸朝向，0-3分别对应手机四种朝向，长度1
+                 * 新接口已去除
                  */
-                faceunity.fuGetFaceInfo(0, "rotation_mode", avatarInfo.mRotationMode);
+//                faceunity.fuFaceCaptureGetResult(face_capture, 0, avatarInfo.mRotationMode);
             }
         }
         if (isTracking <= 0) {
@@ -155,13 +158,10 @@ public class PTAARCore extends BaseCore {
             Arrays.fill(avatarInfo.mExpression, 0.0f);
             Arrays.fill(avatarInfo.mPupilPos, 0.0f);
             Arrays.fill(avatarInfo.mRotationMode, 0.0f);
+            faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_CONTROLLER], "face_detector_status", 0);
         }
-        if (rotation < 0) {
-            avatarInfo.mRotationMode[0] = 0;
-        } else {
-            avatarInfo.mRotationMode[0] = 0;
-        }
-        avatarInfo.mIsValid = isTracking > 0 ? true : false;
+        avatarInfo.mRotationMode[0] = 0;
+        avatarInfo.mIsValid = isTracking > 0;
 
         if (mode == BodyDriveFragment.TYPE_TEXT_DRIVE) {
             //文字驱动模式
@@ -213,7 +213,7 @@ public class PTAARCore extends BaseCore {
     }
 
     public void enterFaceDrive(boolean needTrackFace) {
-        avatarARHandle.setNeedTrackFace(needTrackFace);
+        avatarARHandle.setCNNTrackFace(needTrackFace);
     }
 
     @Override
@@ -260,13 +260,5 @@ public class PTAARCore extends BaseCore {
                 }
             }
         });
-    }
-
-    @Override
-    public float[] getLandmarksData() {
-        Arrays.fill(landmarksData, 0.0f);
-        if (isNeedTrackFace && isTracking() > 0)
-            faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
-        return landmarksData;
     }
 }

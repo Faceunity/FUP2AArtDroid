@@ -1,44 +1,162 @@
 {
   "clothUpperList": [
     {
+      "bundle": "",
+      "icon": "edit_face_item_none",
       "gender": 2,
-      "path": "",
-      "icon": "edit_face_item_none"
+      "body_match_level": 4
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/shangyi_chushi.bundle",
-      "icon": "shangyi_chushi"
+      "bundle":"new/clothes/upper/shangyi_chushi.bundle",
+      "icon":"shangyi_chushi",
+      "gender": 0,
+      "body_match_level": 4
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/shangyi_chenshan_6_female.bundle",
-      "icon": "shangyi_chenshan_6"
+      "bundle":"new/clothes/upper/shangyi_chenshan_1.bundle",
+      "icon":"shangyi_chenshan_1",
+      "gender": 0,
+      "body_match_level": 4
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/shangyi_maoyi_2.bundle",
-      "icon": "shangyi_maoyi_2"
+      "bundle":"new/clothes/upper/shangyi_chenshan_2.bundle",
+      "icon":"shangyi_chenshan_2",
+      "gender": 0,
+      "body_match_level": 1
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/shangyi_maoyi_3_female.bundle",
-      "icon": "shangyi_maoyi_3"
+      "bundle":"new/clothes/upper/shangyi_chenshan_3.bundle",
+      "icon":"shangyi_chenshan_3",
+      "gender": 0,
+      "body_match_level": 4
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/waitao_2_female.bundle",
-      "icon": "waitao_2"
+      "bundle":"new/clothes/upper/shangyi_chenshan_4.bundle",
+      "icon":"shangyi_chenshan_4",
+      "gender": 1,
+      "body_match_level": 3
     },
     {
-      "gender": 2,
-      "path": "new/clothes/upper/waitao_3.bundle",
-      "icon": "waitao_3"
+      "bundle":"new/clothes/upper/shangyi_chenshan_6.bundle",
+      "icon":"shangyi_chenshan_6",
+      "gender": 1,
+      "body_match_level": 3
     },
     {
+      "bundle":"new/clothes/upper/shangyi_maoyi_1.bundle",
+      "icon":"shangyi_maoyi_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_maoyi_2.bundle",
+      "icon":"shangyi_maoyi_2",
+      "gender": 0,
+      "body_match_level": 4
+
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_maoyi_3.bundle",
+      "icon":"shangyi_maoyi_3",
+      "gender": 1,
+      "body_match_level": 3
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_POLO_1.bundle",
+      "icon":"shangyi_polo_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_Txu_1.bundle",
+      "icon":"shangyi_txu_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_weiyi_1.bundle",
+      "icon":"shangyi_weiyi_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_weiyi_2.bundle",
+      "icon":"shangyi_weiyi_2",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/shangyi_weiyi_3.bundle",
+      "icon":"shangyi_weiyi_3",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_1.bundle",
+      "icon":"waitao_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_3.bundle",
+      "icon":"waitao_3",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_5.bundle",
+      "icon":"waitao_5",
+      "gender": 1,
+      "body_match_level": 3
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_6.bundle",
+      "icon":"waitao_6",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_7.bundle",
+      "icon":"waitao_7",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_10.bundle",
+      "icon":"waitao_10",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_dayi_1.bundle",
+      "icon":"waitao_dayi_1",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_dayi_2.bundle",
+      "icon":"waitao_dayi_2",
+      "gender": 1,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_dayi_3.bundle",
+      "icon":"waitao_dayi_3",
+      "gender": 0,
+      "body_match_level": 4
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_yurong_1.bundle",
+      "icon":"waitao_yurong_1",
       "gender": 2,
-      "path": "new/clothes/upper/waitao_4.bundle",
-      "icon": "waitao_4"
+      "body_match_level": 4
+
+    },
+    {
+      "bundle":"new/clothes/upper/waitao_yurong_2.bundle",
+      "icon":"waitao_yurong_2",
+      "gender": 2,
+      "body_match_level": 4
     }
   ]
 }

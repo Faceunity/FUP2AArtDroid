@@ -1,34 +1,69 @@
 {
   "shoesList": [
     {
-      "gender": 2,
-      "path": "",
-      "icon": "edit_face_item_none"
+      "bundle": "",
+      "icon": "edit_face_item_none",
+      "gender": 2
     },
     {
+      "bundle": "new/shoes/xiezi_tuoxie_3.bundle",
+      "icon": "xiezi_tuoxie_3",
       "gender": 2,
-      "path": "new/shoes/xiezi_fanbu.bundle",
-      "icon": "xiezi_fanbu"
+      "body_match_level": 4
     },
     {
+      "bundle": "new/shoes/xiezi_danxie.bundle",
+      "icon": "xiezi_danxie",
       "gender": 2,
-      "path": "new/shoes/xiezi_danxie.bundle",
-      "icon": "xiezi_danxie"
+      "body_match_level": 4
     },
     {
+      "bundle": "new/shoes/cloth_22_shoes.bundle",
+      "icon": "cloth_22_shoes",
       "gender": 2,
-      "path": "new/shoes/xiezi_danxie_2.bundle",
-      "icon": "xiezi_danxie_2"
+      "body_match_level": 4
     },
     {
+      "bundle": "new/shoes/female_cloth03_shoes.bundle",
+      "icon": "female_cloth03_shoes",
       "gender": 2,
-      "path": "new/shoes/xiezi_fanbu_2.bundle",
-      "icon": "xiezi_fanbu_2"
+      "body_match_level": 4
     },
     {
+      "bundle": "new/shoes/xiezi_pixie_1.bundle",
+      "icon": "xiezi_pixie_1",
       "gender": 2,
-      "path": "new/shoes/xiezi_liangxie.bundle",
-      "icon": "xiezi_liangxie"
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/xiezi_tuoxie_1.bundle",
+      "icon": "xiezi_tuoxie_1",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/xiezi_tuoxie_2.bundle",
+      "icon": "xiezi_tuoxie_2",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/xiezi_tuoxie_4.bundle",
+      "icon": "xiezi_tuoxie_4",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/xiezi_xuezi_1.bundle",
+      "icon": "xiezi_xuezi_1",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/taozhuang_2_shoes.bundle",
+      "icon": "taozhuang_2_shoes",
+      "gender": 2,
+      "body_match_level": 4
     }
   ]
 }

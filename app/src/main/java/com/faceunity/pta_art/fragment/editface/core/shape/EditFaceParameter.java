@@ -357,6 +357,7 @@ public class EditFaceParameter {
         if (tempMap == null) {
             tempMap = new LinkedHashMap<>();
         }
+
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
             entry.setValue(getValue(mMap.get(entry.getKey())));
@@ -370,9 +371,16 @@ public class EditFaceParameter {
     public void resetToTemp() {
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
-            float v = getValue(tempMap.get(entry.getKey()));
+            String key = entry.getKey();
+            float v = getValue(tempMap.get(key));
             entry.setValue(v);
-            mAvatarHandle.fuItemSetParamFaceShape(entry.getKey(), v);
+            if (key.contains("_L")) {
+                String rightKey = key.replace("_L", "_R");
+                if (mMap.containsKey(rightKey) && getValue(mMap.get(rightKey)) == 0.0f) {
+                    tempMap.put(rightKey, v);
+                }
+            }
+            mAvatarHandle.fuItemSetParamFaceShape(key, v);
         }
     }
 

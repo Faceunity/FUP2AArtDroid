@@ -104,6 +104,26 @@ public class FUPTARenderer {
     }
 
     /**
+     * 创建面部追踪模型
+     *
+     * @return
+     */
+    public long createFaceCapture() {
+        InputStream face_capture = null;
+        try {
+            face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_capture);
+            byte[] face_capture_Date = new byte[face_capture.available()];
+            face_capture.read(face_capture_Date);
+            face_capture.close();
+            return faceunity.fuFaceCaptureCreate(face_capture_Date);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    /**
      * 创建及初始化faceunity相应的资源
      */
     public void onSurfaceCreated() {
@@ -178,7 +198,7 @@ public class FUPTARenderer {
         benchmarkFPS();
 
         //获取人脸是否识别，并调用回调接口
-        int isTracking = faceunity.fuIsTracking();
+        int isTracking = mFUCore.isTracking();
         if (mOnTrackingStatusChangedListener != null && mTrackingStatus != isTracking) {
             mOnTrackingStatusChangedListener.onTrackingStatusChanged(mTrackingStatus = isTracking);
         }

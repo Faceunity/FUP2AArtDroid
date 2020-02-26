@@ -1,9 +1,6 @@
 package com.faceunity.pta_art.fragment;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,25 +15,19 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.faceunity.pta_art.FUApplication;
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.AvatarARHandle;
 import com.faceunity.pta_art.core.PTAARCore;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.ui.BottomTitleGroup;
-import com.faceunity.pta_art.ui.audio.AudioRecordButton;
-import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.utils.KeyboardUtil;
 import com.faceunity.pta_art.utils.ToastUtil;
 import com.faceunity.pta_art.utils.keyboard.KeyboardHeightObserver;
@@ -44,7 +35,6 @@ import com.faceunity.pta_art.utils.keyboard.KeyboardHeightProvider;
 import com.faceunity.pta_art.utils.sta.AliTtsHandler;
 import com.faceunity.pta_art.utils.sta.MediaPlayerHandler;
 import com.faceunity.pta_art.utils.sta.player.BaseMediaPlayer;
-import com.faceunity.pta_helper.video.MediaEncoder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,7 +60,7 @@ public class BodyDriveFragment extends BaseFragment
     private BodyDriveAdapter mBodyDriveAdapter;
     //
     private TextView tv_text_drive,
-             tv_ar_drive;
+            tv_ar_drive;
 
     //驱动模式
     public final static int TYPE_TEXT_DRIVE = 1;//文字驱动
@@ -163,12 +153,13 @@ public class BodyDriveFragment extends BaseFragment
             }
         });
         mP2AARCore = new PTAARCore(mActivity, mFUP2ARenderer);
+        mP2AARCore.setFace_capture(mP2ACore.face_capture);
         mP2ACore.unBind();
         mFUP2ARenderer.setFUCore(mP2AARCore);
         mAvatarARHandle = mP2AARCore.createAvatarARHandle(mAvatarHandle.controllerItem);
         selectMode(TYPE_AR_DRIVE);
         setSoftKeyBoardListener();
-       return view;
+        return view;
     }
 
     @Override
@@ -221,8 +212,14 @@ public class BodyDriveFragment extends BaseFragment
 
 
     private void backToHome() {
+        if (mCameraRenderer != null && mCameraRenderer.isChangeCamera()) {
+            return;
+        }
         KeyboardUtil.hideKeyboard(mActivity, et_input_text);
         mAvatarARHandle.quitArMode();
+        mP2AARCore.setNeedTrackFace(false);
+        mP2AARCore.enterFaceDrive(false);
+
         mAvatarARHandle.quitVoiceMode();
 
         mMediaPlayerHandler.stopMediaPlayer();
@@ -285,6 +282,8 @@ public class BodyDriveFragment extends BaseFragment
 
         switch (mode) {
             case TYPE_TEXT_DRIVE:
+                mP2AARCore.setNeedTrackFace(false);
+                mP2AARCore.enterFaceDrive(false);
                 iv_change_camera.setVisibility(View.GONE);
                 mAvatarARHandle.enterVoiceMode();
 
@@ -320,6 +319,8 @@ public class BodyDriveFragment extends BaseFragment
                         mActivity.setCanClick(true, false);
                     }
                 });
+                mP2AARCore.setNeedTrackFace(true);
+                mP2AARCore.enterFaceDrive(true);
                 break;
         }
     }
@@ -346,6 +347,7 @@ public class BodyDriveFragment extends BaseFragment
     }
 
     private KeyboardHeightProvider mKeyboardHeightProvider;
+
     /**
      * 添加软键盘监听
      */

@@ -2,21 +2,13 @@
   "hairList": [
     {
       "gender": 2,
-      "path": "",
+      "bundle": "",
       "icon": "new_hair_none",
       "label": []
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_0.bundle",
-      "icon": "new_male_hair_0",
-      "label": [
-        0
-      ]
-    },
-    {
-      "gender": 0,
-      "path": "new/hair/male_hair_1.bundle",
+      "bundle": "new/hair/male_hair_1.bundle",
       "icon": "new_male_hair_1",
       "label": [
         1,
@@ -25,7 +17,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_1_t1.bundle",
+      "bundle": "new/hair/male_hair_1_t1.bundle",
       "icon": "new_male_hair_1_t1",
       "label": [
         1,
@@ -34,7 +26,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_1_t2.bundle",
+      "bundle": "new/hair/male_hair_1_t2.bundle",
       "icon": "new_male_hair_1_t2",
       "label": [
         1,
@@ -43,7 +35,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_1_t3.bundle",
+      "bundle": "new/hair/male_hair_1_t3.bundle",
       "icon": "new_male_hair_1_t3",
       "label": [
         1,
@@ -52,7 +44,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_1_t4.bundle",
+      "bundle": "new/hair/male_hair_1_t4.bundle",
       "icon": "new_male_hair_1_t4",
       "label": [
         1,
@@ -61,7 +53,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_2.bundle",
+      "bundle": "new/hair/male_hair_2.bundle",
       "icon": "new_male_hair_2",
       "label": [
         2
@@ -69,7 +61,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_3.bundle",
+      "bundle": "new/hair/male_hair_3.bundle",
       "icon": "new_male_hair_3",
       "label": [
         3
@@ -77,7 +69,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_4.bundle",
+      "bundle": "new/hair/male_hair_4.bundle",
       "icon": "new_male_hair_4",
       "label": [
         4
@@ -85,7 +77,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_4_t1.bundle",
+      "bundle": "new/hair/male_hair_4_t1.bundle",
       "icon": "new_male_hair_4_t1",
       "label": [
         4
@@ -93,7 +85,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_4_t2.bundle",
+      "bundle": "new/hair/male_hair_4_t2.bundle",
       "icon": "new_male_hair_4_t2",
       "label": [
         4
@@ -101,7 +93,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_5.bundle",
+      "bundle": "new/hair/male_hair_5.bundle",
       "icon": "new_male_hair_5",
       "label": [
         5
@@ -109,7 +101,7 @@
     },
     {
       "gender": 0,
-      "path": "new/hair/male_hair_6.bundle",
+      "bundle": "new/hair/male_hair_6.bundle",
       "icon": "new_male_hair_6",
       "label": [
         6
@@ -117,7 +109,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_7.bundle",
+      "bundle": "new/hair/female_hair_7.bundle",
       "icon": "new_female_hair_7",
       "label": [
         7
@@ -125,7 +117,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_8.bundle",
+      "bundle": "new/hair/female_hair_8.bundle",
       "icon": "new_female_hair_8",
       "label": [
         8
@@ -133,7 +125,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_9.bundle",
+      "bundle": "new/hair/female_hair_9.bundle",
       "icon": "new_female_hair_9",
       "label": [
         9
@@ -141,7 +133,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_10.bundle",
+      "bundle": "new/hair/female_hair_10.bundle",
       "icon": "new_female_hair_10",
       "label": [
         10
@@ -149,7 +141,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_11.bundle",
+      "bundle": "new/hair/female_hair_11.bundle",
       "icon": "new_female_hair_11",
       "label": [
         11,
@@ -158,7 +150,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_12.bundle",
+      "bundle": "new/hair/female_hair_12.bundle",
       "icon": "new_female_hair_12",
       "label": [
         12
@@ -167,7 +159,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_13.bundle",
+      "bundle": "new/hair/female_hair_13.bundle",
       "icon": "new_female_hair_13",
       "label": [
         13,
@@ -176,7 +168,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_15.bundle",
+      "bundle": "new/hair/female_hair_15.bundle",
       "icon": "new_female_hair_15",
       "label": [
         15
@@ -184,7 +176,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_16.bundle",
+      "bundle": "new/hair/female_hair_16.bundle",
       "icon": "new_female_hair_16",
       "label": [
         16
@@ -192,7 +184,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_17.bundle",
+      "bundle": "new/hair/female_hair_17.bundle",
       "icon": "new_female_hair_17",
       "label": [
         17,
@@ -201,7 +193,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_19.bundle",
+      "bundle": "new/hair/female_hair_19.bundle",
       "icon": "new_female_hair_19",
       "label": [
         19
@@ -209,7 +201,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_20.bundle",
+      "bundle": "new/hair/female_hair_20.bundle",
       "icon": "new_female_hair_20",
       "label": [
         20
@@ -217,7 +209,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_21.bundle",
+      "bundle": "new/hair/female_hair_21.bundle",
       "icon": "new_female_hair_21",
       "label": [
         21
@@ -225,7 +217,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_21_t1.bundle",
+      "bundle": "new/hair/female_hair_21_t1.bundle",
       "icon": "new_female_hair_21_t1",
       "label": [
         21
@@ -233,7 +225,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_21_t2.bundle",
+      "bundle": "new/hair/female_hair_21_t2.bundle",
       "icon": "new_female_hair_21_t2",
       "label": [
         21
@@ -241,7 +233,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_21_t3.bundle",
+      "bundle": "new/hair/female_hair_21_t3.bundle",
       "icon": "new_female_hair_21_t3",
       "label": [
         21
@@ -249,7 +241,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_21_t4.bundle",
+      "bundle": "new/hair/female_hair_21_t4.bundle",
       "icon": "new_female_hair_21_t4",
       "label": [
         21
@@ -257,7 +249,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_22.bundle",
+      "bundle": "new/hair/female_hair_22.bundle",
       "icon": "new_female_hair_22",
       "label": [
         22
@@ -265,7 +257,7 @@
     },
     {
       "gender": 1,
-      "path": "new/hair/female_hair_23.bundle",
+      "bundle": "new/hair/female_hair_23.bundle",
       "icon": "new_female_hair_23",
       "label": [
         23,

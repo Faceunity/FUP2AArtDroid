@@ -29,6 +29,7 @@ public abstract class BaseCore {
     protected float[] landmarksData = new float[150];
     protected faceunity.AvatarInfo avatarInfo = new faceunity.AvatarInfo();
     protected float[] faceRectData = new float[4];
+    public long face_capture;//创建面部追踪模型
 
     public BaseCore(Context context, FUPTARenderer fuP2ARenderer) {
         this.mContext = context.getApplicationContext();
@@ -37,9 +38,14 @@ public abstract class BaseCore {
 
         avatarInfo.mExpression = new float[57];
         avatarInfo.mRotation = new float[4];
-        avatarInfo.mPupilPos = new float[2];
+        avatarInfo.mPupilPos = new float[4];
         avatarInfo.mRotationMode = new float[1];
     }
+
+    public void setFace_capture(long face_capture) {
+        this.face_capture = face_capture;
+    }
+
 
     /**
      * 获取所有道具句柄
@@ -71,7 +77,9 @@ public abstract class BaseCore {
             public void run() {
                 mCurrentCameraType = currentCameraType;
                 mInputImageOrientation = inputImageOrientation;
-                faceunity.fuOnCameraChange();
+                if (face_capture != 0) {
+                    faceunity.fuFaceCaptureReset(face_capture);
+                }
             }
         });
     }
@@ -105,7 +113,15 @@ public abstract class BaseCore {
 
     //******************nama SDK中的人脸信息相关参数*****************************//
     public int isTracking() {
-        return faceunity.fuIsTracking();
+        int isTracking = 0;
+        if (face_capture > 0) {
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                isTracking = faceunity.fuFaceCaptureGetResultIsFace(face_capture, 0);
+            }
+        }
+        return isTracking;
+
     }
 
     /**
@@ -113,7 +129,12 @@ public abstract class BaseCore {
      */
     public float[] getLandmarksData() {
         Arrays.fill(landmarksData, 0.0f);
-        faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
+        if (face_capture > 0) {
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                faceunity.fuFaceCaptureGetResultLandmarks(face_capture, 0, landmarksData);
+            }
+        }
         return landmarksData;
     }
 
@@ -122,22 +143,37 @@ public abstract class BaseCore {
      */
     public float[] getRotationData() {
         Arrays.fill(avatarInfo.mRotation, 0.0f);
-        faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
+        if (face_capture > 0) {
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                faceunity.fuFaceCaptureGetResultRotation(face_capture, 0, avatarInfo.mRotation);
+            }
+        }
         return avatarInfo.mRotation;
     }
 
     public float[] getFaceRectData() {
         Arrays.fill(faceRectData, 0.0f);
-        faceunity.fuGetFaceInfo(0, "face_rect", faceRectData);
+        if (face_capture > 0) {
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                faceunity.fuFaceCaptureGetResultFaceBbox(face_capture, 0, faceRectData);
+            }
+        }
         return faceRectData;
     }
 
     /**
-     * expression  表情系数，长度46
+     * expression  表情系数，长度57
      */
     public float[] getExpressionData() {
         Arrays.fill(avatarInfo.mExpression, 0.0f);
-        faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
+        if (face_capture > 0) {
+            int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+            if (face_num > 0) {
+                faceunity.fuFaceCaptureGetResultExpression(face_capture, 0, avatarInfo.mExpression);
+            }
+        }
         return avatarInfo.mExpression;
     }
 
@@ -178,6 +214,25 @@ public abstract class BaseCore {
             }
         };
     }
+
+    /**
+     * 销毁面部追踪模型
+     *
+     * @param oldItem
+     * @return
+     */
+    public Runnable destroyFaceCaptureItem(final long oldItem) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                if (oldItem > 0) {
+                    faceunity.fuFaceCaptureDestory(oldItem);
+                    Log.i(TAG, "bundle destroyItem oldItem " + oldItem);
+                }
+            }
+        };
+    }
+
 
     public Runnable fu3DBodyTrackerDestroy(final long oldItem) {
         return new Runnable() {

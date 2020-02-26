@@ -128,7 +128,10 @@ public class PTAMultipleCore extends BaseCore {
         queueEvent(new Runnable() {
             @Override
             public void run() {
-                mBackgroundUtil.release();
+                if (mBackgroundUtil != null) {
+                    mBackgroundUtil.release();
+                    mBackgroundUtil = null;
+                }
                 faceunity.fuUnBindItems(controllerItem, bgItems);
                 unBindCamera();
             }

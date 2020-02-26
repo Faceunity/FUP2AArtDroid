@@ -209,7 +209,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         if (mCameraNV21Image != null)
             checkPic(mFuTextureId, GlUtil.IDENTITY_MATRIX, mCameraNV21Image.mWidth, mCameraNV21Image.mHeight);
         else {
-            checkPic(mFuTextureId, mtx, mCameraHeight, mCameraWidth);
+            checkPic(mFuTextureId, GlUtil.IDENTITY_MATRIX, mCameraHeight, mCameraWidth);
         }
 
         if (!isNeedStopDrawFrame) {
@@ -374,6 +374,10 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         releaseCamera();
         openCamera(mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT);
         isChangeCamera = false;
+    }
+
+    public boolean isChangeCamera() {
+        return isChangeCamera;
     }
 
     public int getCameraOrientation() {

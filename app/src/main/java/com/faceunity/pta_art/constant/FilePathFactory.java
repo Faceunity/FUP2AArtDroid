@@ -1,5 +1,7 @@
 package com.faceunity.pta_art.constant;
 
+import android.support.v4.util.ArrayMap;
+
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.BundleRes;
@@ -15,6 +17,8 @@ import java.util.Random;
  */
 public abstract class FilePathFactory {
 
+    private static ArrayMap<String, List<BundleRes>> cacheMap = new ArrayMap<>();
+
     /**
      * 目录assets下的 *.bundle为程序的数据文件。
      * 其中 v3.bundle：人脸识别数据文件，缺少该文件会导致系统初始化失败；
@@ -28,66 +32,57 @@ public abstract class FilePathFactory {
     public static final String BUNDLE_tongue = "tongue.bundle";
     public static final String BUNDLE_hair_mask = "hair_mask.bundle";
     public static final String BUNDLE_client_core = "pta_client_core.bin";
+    public static final String BUNDLE_face_capture = "face_capture.bundle";
 
     /**
      * client_bin：client 风格数据包
      */
-    public static final String BUNDLE_client_bin_art = "art/pta_client_q.bin";
     public static final String BUNDLE_client_bin_new = "new/pta_client_q1.bin";
 
     public static String bundleClientBin() {
-        return Constant.style == Constant.style_art ? BUNDLE_client_bin_art : BUNDLE_client_bin_new;
+        return BUNDLE_client_bin_new;
     }
 
     /**
      * controller.bundle：controller数据文件，用于控制和显示avatar。
      */
-    public static final String BUNDLE_controller_art = "art/controller.bundle";
     public static final String BUNDLE_controller_new = "new/controller.bundle";
     public static final String BUNDLE_controller_config_new = "new/controller_config.bundle";
 
     public static String bundleController() {
-        return Constant.style == Constant.style_art ? BUNDLE_controller_art : BUNDLE_controller_new;
+        return BUNDLE_controller_new;
     }
 
     /**
      * color.json：各类颜色列表
      */
-    public static final String COLOR_PATH_art = "art/color.json";
     public static final String COLOR_PATH_new = "new/color.json";
 
     public static String jsonColor() {
-        return Constant.style == Constant.style_art ? COLOR_PATH_art : COLOR_PATH_new;
+        return COLOR_PATH_new;
     }
 
-    private static final String MESHPOINTS_PATH_art = "art/MeshPoints.json";
     private static final String MESHPOINTS_PATH_new = "new/MeshPoints.json";
 
     public static String jsonMeshPoint() {
-        return Constant.style == Constant.style_art ? MESHPOINTS_PATH_art : MESHPOINTS_PATH_new;
+        return MESHPOINTS_PATH_new;
     }
 
-    private static final String shape_param_PATH_art = "art/shape_list.json";
     private static final String shape_param_PATH_new = "new/shape_list.json";
 
     public static String jsonShapeParam() {
-        return Constant.style == Constant.style_art ? shape_param_PATH_art : shape_param_PATH_new;
+        return shape_param_PATH_new;
     }
 
     /**
      * EXPRESSION：呼吸动画
      */
-    private static final String EXPRESSION_ART_BOY = "art/expression/male_animation.bundle";
-    private static final String EXPRESSION_ART_GIRL = "art/expression/female_animation.bundle";
-
     private static final String EXPRESSION_NEW_BOY = "new/expression/ani_huxi_hi.bundle";
     private static final String EXPRESSION_NEW_GRIL = "new/expression/ani_huxi_hi.bundle";
 
 
     public static String bundleAnim(int gender) {
-        return Constant.style == Constant.style_art ?
-                (gender == AvatarPTA.gender_boy ? EXPRESSION_ART_BOY : EXPRESSION_ART_GIRL)
-                : (gender == AvatarPTA.gender_boy ? EXPRESSION_NEW_BOY : EXPRESSION_NEW_GRIL);
+        return gender == AvatarPTA.gender_boy ? EXPRESSION_NEW_BOY : EXPRESSION_NEW_GRIL;
     }
 
     //进入形象编辑页加载的动画
@@ -102,16 +97,12 @@ public abstract class FilePathFactory {
     /**
      * EXPRESSION：静止动画
      */
-    private static final String POSE_ART_BOY = "art/expression/male_pose_v2.bundle";
-    private static final String POSE_ART_GIRL = "art/expression/female_pose.bundle";
 
     private static final String POSE_NEW_BOY = "new/expression/ani_pose.bundle";
     private static final String POSE_NEW_GIRL = "new/expression/ani_pose.bundle";
 
     public static String bundlePose(int gender) {
-        return Constant.style == Constant.style_art ?
-                (gender == AvatarPTA.gender_boy ? POSE_ART_BOY : POSE_ART_GIRL)
-                : (gender == AvatarPTA.gender_boy ? POSE_NEW_BOY : POSE_NEW_GIRL);
+        return gender == AvatarPTA.gender_boy ? POSE_NEW_BOY : POSE_NEW_GIRL;
     }
 
     /**
@@ -142,14 +133,8 @@ public abstract class FilePathFactory {
      */
     public static List<AvatarPTA> getDefaultAvatarP2As() {
         List<AvatarPTA> p2AS = new ArrayList<>();
-        if (Constant.style == Constant.style_art) {
-            p2AS.add(0, new AvatarPTA("art/head/head_1/", R.drawable.head_1_art_male, AvatarPTA.gender_boy,
-                    "art/head/head_1/head.bundle", 2, 0, 0, 1, 1, 0, 0));
-            p2AS.add(1, new AvatarPTA("art/head/head_2/", R.drawable.head_2_art_female, AvatarPTA.gender_girl, "art/head/head_2/head.bundle", 8, 0, 0, 1, 1, 0, 0));
-        } else {
-            p2AS.add(0, new AvatarPTA("new/head/head_1/", R.drawable.head_1_male, AvatarPTA.gender_boy, "new/head/head_1/head.bundle", 8, 0, 0, 1, 1, 1, 0));
-            p2AS.add(1, new AvatarPTA("new/head/head_2/", R.drawable.head_2_female, AvatarPTA.gender_girl, "new/head/head_2/head.bundle", 26, 0, 0, 5, 1, 1, 0));
-        }
+        p2AS.add(0, new AvatarPTA("new/head/head_1/", R.drawable.head_1_male, AvatarPTA.gender_boy, "new/head/head_1/head.bundle", 7, 0, 0, 1, 1, 1, 0));
+        p2AS.add(1, new AvatarPTA("new/head/head_2/", R.drawable.head_2_female, AvatarPTA.gender_girl, "new/head/head_2/head.bundle", 26, 0, 0, 5, 1, 1, 0));
         return p2AS;
     }
 
@@ -157,40 +142,16 @@ public abstract class FilePathFactory {
      * 头发 （-1默认头发，男女各一个）--z 风格--q版   L风格--写实--老版
      */
     public static List<BundleRes> hairBundleRes(int gender) {
-        JsonUtils jsonUtils = new JsonUtils();
-        List<BundleRes> tempList;
-        if (Constant.style == Constant.style_new) {
-            jsonUtils.readHairJson("new/hair/hair_config.json");
-            tempList = jsonUtils.getHairList();
-        } else {
-            jsonUtils.readHairJson("art/hair/hair_config.json");
-            tempList = jsonUtils.getHairList();
-            BundleRes[] res = new BundleRes[tempList.size()];
-            tempList.toArray(res);
-            tempList.clear();
-            tempList.addAll(filterBundleRes(res, gender));
-        }
-        return tempList;
+        String configPath = "new/hair/hair_config.json";
+        return getBundleResForPath(configPath);
     }
 
     /**
      * 眼镜
      */
     public static List<BundleRes> glassesBundleRes(int gender) {
-        JsonUtils jsonUtils = new JsonUtils();
-        List<BundleRes> tempList;
-        if (Constant.style == Constant.style_new) {
-            jsonUtils.readHairJson("new/glasses/glasses_config.json");
-            tempList = jsonUtils.getHairList();
-        } else {
-            jsonUtils.readHairJson("art/glasses/glasses_config.json");
-            tempList = jsonUtils.getHairList();
-            BundleRes[] res = new BundleRes[tempList.size()];
-            tempList.toArray(res);
-            tempList.clear();
-            tempList.addAll(filterBundleRes(res, gender));
-        }
-        return tempList;
+        String configPath = "new/glasses/glasses_config.json";
+        return getBundleResForPath(configPath);
     }
 
     public static int glassesIndex(int gender, int shape, int rim) {
@@ -209,58 +170,80 @@ public abstract class FilePathFactory {
      * 衣服
      */
     public static List<BundleRes> clothesBundleRes(int gender) {
-        JsonUtils jsonUtils = new JsonUtils();
-        jsonUtils.readHairJson("new/clothes/suit/suit_config.json");
-        return jsonUtils.getHairList();
+        String configPath = "new/clothes/suit/suit_config.json";
+        return getBundleResForPath(configPath);
     }
 
     /**
      * 上衣
      */
     public static List<BundleRes> clothUpperBundleRes() {
-        JsonUtils jsonUtils = new JsonUtils();
-        jsonUtils.readHairJson("new/clothes/upper/upper_config.json");
-        return jsonUtils.getHairList();
+        String configPath = "new/clothes/upper/upper_config.json";
+        return getBundleResForPath(configPath);
     }
 
     /**
      * 下衣
      */
     public static List<BundleRes> clothLowerBundleRes() {
+        String configPath = "new/clothes/lower/lower_config.json";
+        return getBundleResForPath(configPath);
+    }
+
+    private static List<BundleRes> getBundleResForPath(String configPath) {
+        if (cacheMap.containsKey(configPath)) {
+            List<BundleRes> bundleRes = cacheMap.get(configPath);
+            if (bundleRes != null) {
+                return bundleRes;
+            }
+        }
         JsonUtils jsonUtils = new JsonUtils();
-        jsonUtils.readHairJson("new/clothes/lower/lower_config.json");
-        return jsonUtils.getHairList();
+        jsonUtils.readJson(configPath);
+        cacheMap.put(configPath, jsonUtils.getBundleResList());
+        return jsonUtils.getBundleResList();
     }
 
     /**
      * 鞋子
      */
     public static List<BundleRes> shoeBundleRes(int gender) {
-        JsonUtils jsonUtils = new JsonUtils();
-        jsonUtils.readHairJson("new/shoes/shoes_config.json");
-        return jsonUtils.getHairList();
+        String configPath = "new/shoes/shoes_config.json";
+        return getBundleResForPath(configPath);
     }
 
     /**
      * 配饰
      */
     public static List<BundleRes> decorationsBundleRes() {
-        JsonUtils jsonUtils = new JsonUtils();
-        jsonUtils.readHairJson("new/decorations/decorations_config.json");
-        return jsonUtils.getHairList();
+        String configPath = "new/decorations/decorations_config.json";
+        return getBundleResForPath(configPath);
     }
 
     /**
      * 身体
      */
-    private static final String BODY_BUNDLE_BOY = "art/body/male_body.bundle";
-    private static final String BODY_BUNDLE_GIRL = "art/body/female_body.bundle";
-    private static final String BODY_BUNDLE_NEW_BOY = "new/body/midBody_male.bundle";
-    private static final String BODY_BUNDLE_NEW_GIRL = "new/body/midBody_female.bundle";
-
     public static String bodyBundle(int gender) {
-        return Constant.style == Constant.style_art ? (AvatarPTA.gender_boy == gender ? BODY_BUNDLE_BOY : BODY_BUNDLE_GIRL)
-                : (AvatarPTA.gender_boy == gender ? BODY_BUNDLE_NEW_BOY : BODY_BUNDLE_NEW_GIRL);
+        return bodyBundle(gender, 0);
+    }
+
+    public static String bodyBundle(int gender, int bodyLevel) {
+        return getBodyBundle(gender, bodyLevel);
+    }
+
+    private static String getBodyBundle(int gender, int bodyLevel) {
+        JsonUtils jsonUtils = new JsonUtils();
+        jsonUtils.readJson("new/body/body_config.json");
+        List<BundleRes> hairList = jsonUtils.getBundleResList();
+        for (BundleRes bundleRes : hairList) {
+
+            if (bundleRes.gender == gender || gender == AvatarPTA.gender_mid) {
+                if (bundleRes.bodyLevel == bodyLevel) {
+                    return "new/body/" + bundleRes.path;
+                }
+            }
+        }
+
+        return "";
     }
 
     /**
@@ -270,11 +253,11 @@ public abstract class FilePathFactory {
 //        JsonUtils jsonUtils = new JsonUtils();
         List<BundleRes> tempList = new ArrayList<>();
 //        if (Constant.style == Constant.style_new) {
-//            jsonUtils.readHairJson("new/hat/hat_config.json");
-//            tempList = jsonUtils.getHairList();
+//            jsonUtils.readJson("new/hat/hat_config.json");
+//            tempList = jsonUtils.getBundleResList();
 //        } else {
-//            jsonUtils.readHairJson("art/hat/hat_config.json");
-//            tempList = jsonUtils.getHairList();
+//            jsonUtils.readJson("art/hat/hat_config.json");
+//            tempList = jsonUtils.getBundleResList();
 //            BundleRes[] res = new BundleRes[tempList.size()];
 //            tempList.toArray(res);
 //            tempList.clear();
@@ -287,24 +270,13 @@ public abstract class FilePathFactory {
      * 胡子
      */
     public static List<BundleRes> beardBundleRes(int gender) {
-        JsonUtils jsonUtils = new JsonUtils();
-        List<BundleRes> tempList;
-        if (Constant.style == Constant.style_new) {
-            jsonUtils.readHairJson("new/beard/beard_config.json");
-            tempList = jsonUtils.getHairList();
-        } else {
-            jsonUtils.readHairJson("art/beard/beard_config.json");
-            tempList = jsonUtils.getHairList();
-            BundleRes[] res = new BundleRes[tempList.size()];
-            tempList.toArray(res);
-            tempList.clear();
-            tempList.addAll(filterBundleRes(res, gender));
-        }
-        return tempList;
+        String configPath = "new/beard/beard_config.json";
+        return getBundleResForPath(configPath);
     }
 
     private static final BundleRes[] EYEBROW_NEW = {
             new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/eyebrow/Eyebrow_1.bundle", R.drawable.eyebrow_1)
     };
 
     public static List<BundleRes> eyebrowBundleRes(int gender) {
@@ -312,10 +284,81 @@ public abstract class FilePathFactory {
     }
 
     private static final BundleRes[] EYELASH_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/eyelash/Eyelash_1.bundle", R.drawable.eyelash_1),
     };
 
     public static List<BundleRes> eyelashBundleRes(int gender) {
         return Arrays.asList(EYELASH_NEW);
+    }
+
+    /**
+     * 眼线
+     */
+    private static final BundleRes[] EYELINER_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/eyeliner/Eyeliner_1.bundle", R.drawable.eyeliner_1),
+    };
+
+    public static List<BundleRes> eyelinerBundleRes(int gender) {
+        return Arrays.asList(EYELINER_NEW);
+    }
+
+    /**
+     * 眼影
+     */
+    private static final BundleRes[] EYESHADOW_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/eyeshadow/Eyeshadow_1.bundle", R.drawable.eyeshadow_1),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/eyeshadow/Eyeshadow_2.bundle", R.drawable.eyeshadow_2),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/eyeshadow/Eyeshadow_3.bundle", R.drawable.eyeshadow_3),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/eyeshadow/Eyeshadow_4.bundle", R.drawable.eyeshadow_4),
+    };
+
+    public static List<BundleRes> eyeshadowBundleRes(int gender) {
+        return Arrays.asList(EYESHADOW_NEW);
+    }
+
+    /**
+     * 脸装
+     */
+    private static final BundleRes[] FACEMAKEUP_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_1.bundle", R.drawable.facemakeup_1),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_2.bundle", R.drawable.facemakeup_2),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_3.bundle", R.drawable.facemakeup_3),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_4.bundle", R.drawable.facemakeup_4),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_5.bundle", R.drawable.facemakeup_5),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/facemakeup/facemakeup_6.bundle", R.drawable.facemakeup_6),
+    };
+
+    public static List<BundleRes> facemakeupBundleRes(int gender) {
+        return Arrays.asList(FACEMAKEUP_NEW);
+    }
+
+    /**
+     * 唇妆
+     */
+    private static final BundleRes[] LIPGLOSS_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/lipgloss/lipgloss_1.bundle", R.drawable.lipgloss_1),
+    };
+
+    public static List<BundleRes> lipglossBundleRes(int gender) {
+        return Arrays.asList(LIPGLOSS_NEW);
+    }
+
+    /**
+     * 美瞳
+     */
+    private static final BundleRes[] PUPIL_NEW = {
+            new BundleRes(AvatarPTA.gender_mid, "", R.drawable.edit_face_reset),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/pupil/pupil_1.bundle", R.drawable.pupil_1),
+            new BundleRes(AvatarPTA.gender_mid, "new/makeup/pupil/pupil_2.bundle", R.drawable.pupil_2),
+    };
+
+    public static List<BundleRes> pupilBundleRes(int gender) {
+        return Arrays.asList(PUPIL_NEW);
     }
 
     /**

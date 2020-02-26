@@ -2,15 +2,15 @@
 
 本文主要介绍了如何快速跑通我们的FUPTA工程 、如何创建和编辑风格化形象、如何绘制风格化形象、SDK的分类及相关资源说明等。工程中会使用到三个库文件:p2a\_client SDK、Nama SDK、FUTtsEngine SDK，其中p2a\_client SDK 用来做风格化形象的生成，Nama SDK 用来做风格化形象的绘制，FUTtsEngine SDK用来做语音驱动。
 
-如果您之前已经接入过我们的V1.6.0版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.7.0更新说明文档.md)。
+如果您之前已经接入过我们的V1.7.0版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.7.1更新说明文档.md)。
 
 ## 快速开始
 
 下载工程后需要先获取一个证书：
 
-- authpack.h：Nama SDK鉴权证书，用于在客户端，使用Nama SDK 绘制的鉴权。
+- authpack.java：Nama SDK鉴权证书，用于在客户端，使用Nama SDK 绘制的鉴权。
 
-将authpack.h拷贝到[core](app/src/main/java/com/faceunity/pta_art/core/)文件夹下，然后直接运行工程即可。
+将authpack.java拷贝到[core](../app/src/main/java/com/faceunity/pta_art/core/)文件夹下，然后直接运行工程即可。
 
 ## 资源说明
 
