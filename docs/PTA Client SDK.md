@@ -24,6 +24,9 @@
 
 - controller.bundle：风格化形象的控制中心，负责绑定头、身体、衣服、胡子、头发、AR滤镜、眼镜、帽子等配饰。并负责捏脸、发色修改、胡子颜色修改、肤色修改、唇色修改、配饰颜色修改、缩放、旋转、身体动画、AR模式、人脸跟踪、表情裁剪等诸多功能的控制。实际绘制时只需要将controller道具的句柄传入Nama的render接口进行绘制即可，关于controller参数使用方法，请查看[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
 - controller\_config.bundle：controller配置文件，每创建一个controller必须绑定controller\_config。
+- face_capture.bundle：算法深度模型，用于配置相关数据。
+- hair_mask.bundle：头发遮罩，应用于ar模式。
+- plane_mg.bundle：平地阴影道具，应用于不跟随模式的身体驱动；
 - head.bundle：头道具，不同的人生成的头不一样，需要绑定到controller道具上才能使用。
 - body.bundle：身体道具，男女各一个身体，需要绑定到controller道具上才能使用。
 - hair.bundle：头发道具，有多种款式，可以修改发色，需要绑定到controller道具上才能使用。
@@ -71,14 +74,14 @@
 初始化接口说明如下：
 
 ```java
-        /**
-         * 初始化 FUPTAClient data
-         * - 需要先初始化 data 才能使用其他接口，全局只需要初始化 ptaClientBin 一次
-         *
-         * @param ptaClientBin 初始化数据包
-         * @return 是否初始化成功
-         */
-        public static boolean setupData(byte[] ptaClientBin);
+/**
+ * 初始化 FUPTAClient data
+ * - 需要先初始化 data 才能使用其他接口，全局只需要初始化 ptaClientBin 一次
+ *
+ * @param ptaClientBin 初始化数据包
+ * @return 是否初始化成功
+ */
+public static boolean setupData(byte[] ptaClientBin);
 ```
 
 ### 保存头道具
@@ -86,17 +89,17 @@
 server.bundle 便是生成头道具，所有保存该数据即可，相关API接口说明如下：
 
 ```java
-        /**
-         * 服务端返回的 server.bundle即head.bundle
-         * - 根据服务端传回的数据流生成 风格化形象 的头部模型
-         *
-         * @param dst 本地存储的路径
-         * @return 
-         */
-        public static void createNewHead(byte[] head, @NonNull String dst) throws IOException {
-            if (TextUtils.isEmpty(dst)) return;
-            FileUtil.saveDataToFile(dst, head);
-        }
+/**
+ * 服务端返回的 server.bundle即head.bundle
+ * - 根据服务端传回的数据流生成 风格化形象 的头部模型
+ *
+ * @param dst 本地存储的路径
+ * @return 
+ */
+public static void createNewHead(byte[] head, @NonNull String dst) throws IOException {
+    if (TextUtils.isEmpty(dst)) return;
+    FileUtil.saveDataToFile(dst, head);
+}
 ```
 
 ### 生成头发道具
@@ -104,15 +107,15 @@ server.bundle 便是生成头道具，所有保存该数据即可，相关API接
 使用 server.bundle 与预置的 hair.bundle，调用 p2a\_client SDK 相关接口，生成与头道具大小相匹配的头发道具，相关API接口说明如下：
 
 ```java
-        /**
-         * 生成 hair.Bundle
-         * - 根据服务端传回的数据流和预置的头发模型 生成和此头部模型匹配的头发模型
-         *
-         * @param serverData 服务端传回的数据流
-         * @param hairData   预置头发模型数据
-         * @return 生成的头发模型数据
-         */
-        public static byte[] createAvatarHairWithServerData(byte[] serverData, byte[] hairData);
+/**
+ * 生成 hair.Bundle
+ * - 根据服务端传回的数据流和预置的头发模型 生成和此头部模型匹配的头发模型
+ *
+ * @param serverData 服务端传回的数据流
+ * @param hairData   预置头发模型数据
+ * @return 生成的头发模型数据
+ */
+public static byte[] createAvatarHairWithServerData(byte[] serverData, byte[] hairData);
 ```
 
 注：该接口支持异步并行调用。
@@ -124,16 +127,16 @@ server.bundle 便是生成头道具，所有保存该数据即可，相关API接
 API接口说明如下：
 
 ```java
-        /**
-         * 对已存在的头部模型进行编辑
-         * - 对现有的头部模型进行形变处理，生成一个新的头部模型
-         *
-         * @param headData       生成新的头的结构体
-         * @param head_bundle    现有的头部模型数据
-         * @param deformParam    形变参数
-         * @return 
-         */
-        public static void deformAvatarHeadWithHeadData(final fuPTAClient.HeadData headData, byte[] head_bundle, final float[] deformParam);
+/**
+ * 对已存在的头部模型进行编辑
+ * - 对现有的头部模型进行形变处理，生成一个新的头部模型
+ *
+ * @param headData       生成新的头的结构体
+ * @param head_bundle    现有的头部模型数据
+ * @param deformParam    形变参数
+ * @return 
+ */
+public static void deformAvatarHeadWithHeadData(final fuPTAClient.HeadData headData, byte[] head_bundle, final float[] deformParam);
 ```
 
 注：该接口支持异步并行调用。
@@ -481,72 +484,59 @@ avatarPTA.getClothesLowerFile().equals(clothesLowerFile) ? oldClothesLowerItem :
 首先将 controller 道具及背景道具句柄存储到的一个 int 数组中，然后把该 int 数组作为参数传入 fuRenderBundles 进行绘制即可。示例如下：
 
 ```java
-    /**
-     * 检测人脸接口
-     *
-     * @param img NV21数据
-     * @param w
-     * @param h
-     */
-    public void trackFace(byte[] img, int w, int h) {
-        if (img == null || w <= 0 || h <= 0) {
-            Log.e(TAG, "trackFace img " + img + " w " + w + " h " + h);
-            return;
+/**
+ * fuAvatarToTexture 用于人脸驱动
+ *
+ * @param img 图片buffer
+ * @param tex 图片纹理
+ * @param w   图片宽
+ * @param h   图片高
+ * @return
+ */
+@Override
+public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
+    int isTracking = 0;
+    //是否开启人脸驱动
+    if (isNeedTrackFace && img != null) {
+        //如果开启CNN 面部追踪，每帧都需要调用fuFaceCaptureProcessFrame处理输入图像
+        faceunity.fuFaceCaptureProcessFrame(face_capture, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, 0);
+        //获取识别人脸数
+        int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+        if (face_num > 0) {
+            isTracking = faceunity.fuFaceCaptureGetResultIsFace(face_capture, 0);
+            /**
+             * rotation 人脸三维旋转，返回值为旋转四元数，长度4
+             */
+            faceunity.fuFaceCaptureGetResultRotation(face_capture, 0, avatarInfo.mRotation);
+            /**
+             * expression  表情系数，长度57
+             */
+            faceunity.fuFaceCaptureGetResultExpression(face_capture, 0, avatarInfo.mExpression);
+            /**
+             * pupil pos 眼球方向，长度4 xyzw
+             */
+            faceunity.fuFaceCaptureGetResultEyesRotation(face_capture, 0, avatarInfo.mPupilPos);
+            /**
+             * rotation mode 人脸朝向，0-3分别对应手机四种朝向，长度1
+             * 新接口已去除
+             */
+//                faceunity.fuFaceCaptureGetResult(face_capture, 0, avatarInfo.mRotationMode);
         }
-        if (mNeedBenchmark) mFuCallStartTime = System.nanoTime();
-        faceunity.fuTrackFace(img, 0, w, h);
     }
-
-    /**
-     * 使用 fuTrackFace + fuRenderBundles 的方法组合绘制画面，该组合没有camera画面绘制，适用于animoji等相关道具的绘制。
-     * fuTrackFace 获取识别到的人脸信息
-     * fuRenderBundles 依据人脸信息绘制道具
-     *
-     * @param w
-     * @param h
-     * @return
-     */
-    public int onDrawFrameAvatar(int w, int h) {
-        Arrays.fill(landmarksData, 0.0f);
+    if (isTracking <= 0) {
         Arrays.fill(avatarInfo.mRotation, 0.0f);
         Arrays.fill(avatarInfo.mExpression, 0.0f);
         Arrays.fill(avatarInfo.mPupilPos, 0.0f);
         Arrays.fill(avatarInfo.mRotationMode, 0.0f);
-
-        mIsTracking = faceunity.fuIsTracking();
-
-        if (mIsTracking > 0 && isNeedTrackFace) {
-            /**
-             * landmarks 2D人脸特征点，返回值为75个二维坐标，长度75*2
-             */
-            faceunity.fuGetFaceInfo(0, "landmarks", landmarksData);
-            /**
-             *rotation 人脸三维旋转，返回值为旋转四元数，长度4
-             */
-            faceunity.fuGetFaceInfo(0, "rotation_aligned", avatarInfo.mRotation);
-            /**
-             * expression  表情系数，长度57
-             */
-            faceunity.fuGetFaceInfo(0, "expression_aligned", avatarInfo.mExpression);
-            /**
-             * pupil pos 人脸朝向，0-3分别对应手机四种朝向，长度1
-             */
-            faceunity.fuGetFaceInfo(0, "pupil_pos", avatarInfo.mPupilPos);
-            /**
-             * rotation mode
-             */
-            faceunity.fuGetFaceInfo(0, "rotation_mode", avatarInfo.mRotationMode);
-        }
-        avatarInfo.mRotationMode[0] = 0;
-        avatarInfo.mIsValid = isTracking > 0 ? true : false;
-
-        prepareDrawFrame();
-        if (mNeedBenchmark) mFuCallStartTime = System.nanoTime();
-        int tex = faceunity.fuRenderBundles(avatarInfo,
-                0, w, h, mFrameId++, mItemsArray);
-        if (mNeedBenchmark) mOneHundredFrameFUTime += System.nanoTime() - mFuCallStartTime;
-        return tex;
+        faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_CONTROLLER], "face_detector_status", 0);
     }
+
+    avatarInfo.mRotationMode[0] = 0;
+    avatarInfo.mIsValid = isTracking > 0;
+
+    return faceunity.fuRenderBundles(avatarInfo,
+            0, w, h, mFrameId++, itemsArray());
+}
 ```
 ## 文字驱动
 文字驱动是指，用文字驱动形象，将输入文字的文字通过云端转换为表情系数来驱动形象。示例如下：
@@ -644,7 +634,96 @@ public static native int fuRenderBundlesWithCamera(byte[] img, int tex_in, int f
                     }
                 };
 ```
+## CNN面部追踪
+
+通过加载face_capture.bundle（算法深度模型）能够更利于我们捕捉到图像中的人脸，我们还可以通过face_capture.bundle获取到对应的数据。
+
+### 创建面部追踪模型
+
+```java
+/**
+ * 创建面部追踪模型
+ *
+ * @return
+ */
+public long createFaceCapture() {
+    InputStream face_capture = null;
+    try {
+        face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_capture);
+        byte[] face_capture_Date = new byte[face_capture.available()];
+        face_capture.read(face_capture_Date);
+        face_capture.close();
+        return faceunity.fuFaceCaptureCreate(face_capture_Date);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+```
+
+### 启用面部追踪
+
+```java
+//将这个模型注册到controller的当前角色上，并分配人脸索引，索引从0开始
+faceunity.fuItemSetParamu64(avatarHandle.controllerItem, "register_face_capture_manager", face_capture);
+faceunity.fuItemSetParam(avatarHandle.controllerItem, "register_face_capture_face_id", 0.0);
+```
+
+### 使用面部追踪模型
+
+```java
+/**
+ * @param img 图片buffer
+ * @param tex 图片纹理
+ * @param w   图片宽
+ * @param h   图片高
+ * @return
+ */
+@Override
+public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
+    int isTracking = 0;
+    //是否开启人脸驱动
+    if (isNeedTrackFace && img != null) {
+        //如果开启CNN 面部追踪，每帧都需要调用fuFaceCaptureProcessFrame处理输入图像
+        faceunity.fuFaceCaptureProcessFrame(face_capture, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, 0);
+        //获取识别人脸数
+        int face_num = faceunity.fuFaceCaptureGetResultFaceNum(face_capture);
+        if (face_num > 0) {
+            isTracking = faceunity.fuFaceCaptureGetResultIsFace(face_capture, 0);
+            /**
+             * rotation 人脸三维旋转，返回值为旋转四元数，长度4
+             */
+            faceunity.fuFaceCaptureGetResultRotation(face_capture, 0, avatarInfo.mRotation);
+            /**
+             * expression  表情系数，长度57
+             */
+            faceunity.fuFaceCaptureGetResultExpression(face_capture, 0, avatarInfo.mExpression);
+            /**
+             * pupil pos 眼球方向，长度4 xyzw
+             */
+            faceunity.fuFaceCaptureGetResultEyesRotation(face_capture, 0, avatarInfo.mPupilPos);
+        }
+    }
+    if (isTracking <= 0) {
+        Arrays.fill(avatarInfo.mRotation, 0.0f);
+        Arrays.fill(avatarInfo.mExpression, 0.0f);
+        Arrays.fill(avatarInfo.mPupilPos, 0.0f);
+        Arrays.fill(avatarInfo.mRotationMode, 0.0f);
+        faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_CONTROLLER], "face_detector_status", 0);
+    }
+
+    avatarInfo.mRotationMode[0] = 0;
+    avatarInfo.mIsValid = isTracking > 0;
+
+    return faceunity.fuRenderBundles(avatarInfo,
+            0, w, h, mFrameId++, itemsArray());
+}
+```
+
+关于更多CNN面部追踪的使用方法，请查看[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
+
 ## 注意
+
 demo预先对纹理和buffer进行转正处理（即：把两者处理成竖直方向），
 具体逻辑参考CameraRender：
 
