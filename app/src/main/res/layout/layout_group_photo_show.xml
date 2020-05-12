@@ -1,78 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorWhite">
+    android:layout_height="match_parent">
 
     <ImageButton
         android:id="@+id/group_photo_show_back"
         android:layout_width="@dimen/x108"
         android:layout_height="@dimen/x108"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_back" />
+        android:src="@drawable/group_photo_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/group_photo_show_home"
         android:layout_width="@dimen/x108"
         android:layout_height="@dimen/x108"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_home" />
+        android:src="@drawable/group_photo_home"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/group_photo_show_img"
         android:layout_width="@dimen/x616"
         android:layout_height="@dimen/x716"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/x238"
         android:scaleType="centerCrop"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/v_group_photo_show_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/group_photo_show_img"
-        android:layout_alignTop="@+id/group_photo_show_img"
-        android:layout_alignRight="@+id/group_photo_show_img"
-        android:layout_alignBottom="@+id/group_photo_show_img"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/group_photo_round"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/group_photo_show_img"
+        app:layout_constraintLeft_toLeftOf="@id/group_photo_show_img"
+        app:layout_constraintRight_toRightOf="@id/group_photo_show_img"
+        app:layout_constraintTop_toTopOf="@id/group_photo_show_img" />
+
+    <!--    <SurfaceView-->
+    <!--        android:id="@+id/surfaceview"-->
+    <!--        android:layout_width="@dimen/x403"-->
+    <!--        android:layout_height="@dimen/x716"-->
+    <!--        android:layout_centerHorizontal="true"-->
+    <!--        android:layout_marginTop="@dimen/x238" />-->
 
     <SurfaceView
         android:id="@+id/surfaceview"
-        android:layout_width="@dimen/x403"
-        android:layout_height="@dimen/x716"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/x238" />
+        android:layout_width="@dimen/x480"
+        android:layout_height="@dimen/x592"
+        android:layout_marginTop="@dimen/x238"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!--<View-->
-        <!--android:id="@+id/v_surfaceview"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignLeft="@+id/surfaceview"-->
-        <!--android:layout_alignTop="@+id/surfaceview"-->
-        <!--android:layout_alignRight="@+id/surfaceview"-->
-        <!--android:layout_alignBottom="@+id/surfaceview"-->
-        <!--android:background="@drawable/group_photo_round" />-->
+<!--    <View-->
+<!--        android:id="@+id/v_surfaceview"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:background="@drawable/group_photo_round"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/surfaceview"-->
+<!--        app:layout_constraintLeft_toLeftOf="@id/surfaceview"-->
+<!--        app:layout_constraintRight_toRightOf="@id/surfaceview"-->
+<!--        app:layout_constraintTop_toTopOf="@id/surfaceview" />-->
 
 
     <Button
         android:id="@+id/group_photo_show_save"
         android:layout_width="@dimen/x400"
         android:layout_height="@dimen/x88"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/x140"
         android:background="@drawable/group_photo_save_background"
         android:text="保存"
         android:textColor="@color/colorWhite"
-        android:textSize="@dimen/text_size_34" />
-</RelativeLayout>
+        android:textSize="@dimen/text_size_34"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+</android.support.constraint.ConstraintLayout>

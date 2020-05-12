@@ -6,13 +6,14 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.entity.BundleRes;
-import com.faceunity.pta_art.fragment.EditFaceFragment;
 import com.faceunity.pta_art.fragment.editface.core.ColorValuesChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.EditFaceBaseFragment;
+import com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager;
 import com.faceunity.pta_art.fragment.editface.core.ItemChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.color.ColorAdapter;
 import com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView;
@@ -51,24 +52,25 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
         mItemRecycler.setItemControllerListener(new ItemAdapter.ItemSelectListener() {
             @Override
             public boolean itemSelectListener(int lastPos, int position) {
-                if ((mEditFaceBaseFragmentId == EditFaceFragment.TITLE_HAIR_INDEX
+                if ((mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_HAIR_INDEX
                         && mAvatarP2A.getHatIndex() > 0
                         && (!FilePathFactory.hairBundleRes(mAvatarP2A.getGender()).get(position).isSupport)
-                ) || (mEditFaceBaseFragmentId == EditFaceFragment.TITLE_HAT_INDEX
+                ) || (mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_HAT_INDEX
                         && position > 0
                         && (!FilePathFactory.hairBundleRes(mAvatarP2A.getGender()).get(mAvatarP2A.getHairIndex()).isSupport)
                 )) {
                     ToastUtil.showCenterToast(mActivity, "此发型暂不支持帽子哦");
                     return false;
                 }
-                mColorRecycler.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
+                setRVHeight(position);
                 mItemSelectListener.itemChangeListener(mEditFaceBaseFragmentId, position);
                 return true;
             }
         });
 
         mColorRecycler.init(colorList, mDefaultSelectColor);
-        mColorRecycler.setVisibility(mDefaultSelectItem > 0 ? View.VISIBLE : View.GONE);
+        setRVHeight(mDefaultSelectItem);
+
         mColorRecycler.setColorSelectListener(new ColorAdapter.ColorSelectListener() {
             @Override
             public void colorSelectListener(int position) {
@@ -76,6 +78,15 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
             }
         });
         return view;
+    }
+
+    private void setRVHeight(int position) {
+        mColorRecycler.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mItemRecycler.getLayoutParams();
+        layoutParams.height = mColorRecycler.getVisibility() == View.GONE ?
+                getResources().getDimensionPixelOffset(R.dimen.x450) :
+                getResources().getDimensionPixelOffset(R.dimen.x350);
+        mItemRecycler.setLayoutParams(layoutParams);
     }
 
     public void initData(double[][] colorList, int defaultSelectColor, ColorValuesChangeListener colorSelectListener,
@@ -95,6 +106,6 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
 
     public void setItem(int position) {
         mItemRecycler.setItem(position);
-        mColorRecycler.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
+        setRVHeight(position);
     }
 }

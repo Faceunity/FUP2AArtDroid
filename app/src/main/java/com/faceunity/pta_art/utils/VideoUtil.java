@@ -52,6 +52,9 @@ public class VideoUtil {
                         MediaVideoEncoder videoEncoder = (MediaVideoEncoder) encoder;
                         videoEncoder.setEglContext(EGL14.eglGetCurrentContext());
                         mVideoEncoder = videoEncoder;
+                        if (endListener != null) {
+                            endListener.start();
+                        }
                     }
                 });
             }
@@ -136,28 +139,33 @@ public class VideoUtil {
             // for video capturing
             MediaEncoder mediaVideoEncoder;
             mediaVideoEncoder = new MediaVideoEncoder(mMuxer, mMediaEncoderListener, width, height, cropX, cropY,
-                    textureWidth, textureHeight);
+                                                      textureWidth, textureHeight);
             mediaVideoEncoder.setInterval(interval);
 
             MediaEncoder mediaEncoder = null;
-            if (TextUtils.isEmpty(input)) {
+            if (!TextUtils.isEmpty(input)) {
                 mediaEncoder = new MediaAudioEncoder(mMuxer, mMediaEncoderListener);
                 mediaEncoder.setInterval(interval);
                 //1 * 1000 * 1000 / 25
                 maxNum = 2;
             } else {
                 maxNum = 1;
-//                mediaEncoder = new MediaAudioFileEncoder(mMuxer, mMediaEncoderListener, input);
-//                mediaEncoder.setInterval(1 * 1000 * 1000 / 25);
             }
             if (mediaEncoder != null) {
                 mediaEncoder.setListener(timeListener);
             }
+            //  这边需要sleep 200ms 的问题主要是，我们现在可以任意切换场景，切换场景的时候也需要停止录制再开始录制
+            // 由于在停止录制的时候，需要去清除跟释放之前的无用资源，当我们立即开始录制的话，由于之前的资源没有清理完成，
+            // mediaEncoder中的录制状态还没有改变成stop，再次开启的话就会出错(状态不对)，所以这边采用睡眠200ms的形式等待stop完成
+            // 为什么是200 ms呢？这个是根据多次测试的数据，取得最优值。
+            Thread.sleep(200);
 
             mMuxer.prepare();
             mMuxer.startRecording();
         } catch (final IOException e) {
             Log.e(TAG, "startCapture:", e);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -168,7 +176,6 @@ public class VideoUtil {
      */
     public void stopRecording() {
         if (mMuxer != null) {
-//            mVideoEncoder = null;
             mMuxer.stopRecording();
             mMuxer = null;
             endNum = 0;
@@ -186,7 +193,6 @@ public class VideoUtil {
      */
     public void cancelRecording() {
         if (mMuxer != null) {
-//            mVideoEncoder = null;
             mMuxer.stopRecording();
             mMuxer = null;
         }
@@ -317,6 +323,10 @@ public class VideoUtil {
 
     }
 
+    public void release() {
+        mGlSurfaceView = null;
+    }
+
     private EndListener endListener;
 
     public void setEndListener(EndListener listener) {
@@ -325,5 +335,7 @@ public class VideoUtil {
 
     public interface EndListener {
         void end();
+
+        void start();
     }
 }

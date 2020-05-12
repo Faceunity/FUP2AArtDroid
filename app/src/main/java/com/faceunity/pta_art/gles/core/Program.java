@@ -74,5 +74,9 @@ public abstract class Program {
     public void release() {
         GLES20.glDeleteProgram(mProgramHandle);
         mProgramHandle = -1;
+
+        if (mDrawable2d != null) {
+            mDrawable2d.release();
+        }
     }
 }

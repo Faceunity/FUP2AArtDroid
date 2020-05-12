@@ -46,14 +46,11 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
     private static final String TAG = OkHttpUtils.class.getSimpleName();
-    //    public static final String P12_PATH = "p2a.p12";
     public static final String PEM_PATH = "pta_ptoa.pem";
-    public static final String PEM_API2_PATH = "pta_api2.pem";
 
     private volatile static OkHttpUtils sOkHttpUtils;
 
     private OkHttpClient mOkHttpClient = null;
-    private OkHttpClient mOkHttpClient2 = null;
 
     /**
      * 返回是否是https
@@ -76,11 +73,6 @@ public class OkHttpUtils {
     public static OkHttpClient initOkHttpClient(Context context, boolean isHttps) {
         SSLSocketFactory sslSocketFactory = null;
         try {
-//            InputStream p12 = context.getAssets().open(P12_PATH);
-//            byte[] p12Bytes = new byte[p12.available()];
-//            p12.read(p12Bytes);
-//            p12.close();
-
 
             //p2a服务器需要的ca，手动传避免部分机型ca不全
             InputStream ca = context.getAssets().open(PEM_PATH);
@@ -89,8 +81,6 @@ public class OkHttpUtils {
             ca.close();
 
             TrustManagerFactory tmf = OkHttpUtils.getTrustManagerFactory(caBytes);
-//            sslSocketFactory = new CustomSslSocketFactory(OkHttpUtils.getKeyManagerFactory(p12Bytes).getKeyManagers(),
-//                    tmf == null ? null : tmf.getTrustManagers());
             sslSocketFactory = new CustomSslSocketFactory(null,
                     tmf == null ? null : tmf.getTrustManagers());
         } catch (Exception e) {
@@ -109,75 +99,32 @@ public class OkHttpUtils {
         return okHttpClient;
     }
 
-    public static OkHttpClient initOkHttpClient2(Context context, boolean isHttps) {
-        SSLSocketFactory sslSocketFactory = null;
-        try {
-//            InputStream p12 = context.getAssets().open(P12_PATH);
-//            byte[] p12Bytes = new byte[p12.available()];
-//            p12.read(p12Bytes);
-//            p12.close();
-
-
-            //p2a服务器需要的ca，手动传避免部分机型ca不全
-            InputStream ca = context.getAssets().open(PEM_API2_PATH);
-            byte[] caBytes = new byte[ca.available()];
-            ca.read(caBytes);
-            ca.close();
-
-            TrustManagerFactory tmf = OkHttpUtils.getTrustManagerFactory(caBytes);
-//            sslSocketFactory = new CustomSslSocketFactory(OkHttpUtils.getKeyManagerFactory(p12Bytes).getKeyManagers(),
-//                    tmf == null ? null : tmf.getTrustManagers());
-            sslSocketFactory = new CustomSslSocketFactory(null,
-                    tmf == null ? null : tmf.getTrustManagers());
-        } catch (Exception e) {
-        }
-
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectTimeout(60000L, TimeUnit.MILLISECONDS)
-                .writeTimeout(60000L, TimeUnit.MILLISECONDS)
-                .readTimeout(60000L, TimeUnit.MILLISECONDS);
-        OkHttpClient okHttpClient;
-        if (sslSocketFactory != null && isHttps) {
-            okHttpClient = builder.sslSocketFactory(sslSocketFactory).build();
-        } else {
-            okHttpClient = builder.build();
-        }
-        return okHttpClient;
-    }
-
-    public static OkHttpUtils initOkHttpUtils(OkHttpClient okHttpClient, OkHttpClient okHttpClient2) {
+    public static OkHttpUtils initOkHttpUtils(OkHttpClient okHttpClient) {
         if (sOkHttpUtils == null) {
             synchronized (OkHttpUtils.class) {
                 if (sOkHttpUtils == null) {
-                    sOkHttpUtils = new OkHttpUtils(okHttpClient, okHttpClient2);
+                    sOkHttpUtils = new OkHttpUtils(okHttpClient);
                 }
             }
         }
         return sOkHttpUtils;
     }
 
-    private OkHttpUtils(OkHttpClient okHttpClient, OkHttpClient okHttpClient2) {
+    private OkHttpUtils(OkHttpClient okHttpClient) {
         if (okHttpClient == null) {
             mOkHttpClient = new OkHttpClient();
-            mOkHttpClient2 = new OkHttpClient();
         } else {
             mOkHttpClient = okHttpClient;
-            mOkHttpClient2 = okHttpClient2;
         }
     }
 
     public static OkHttpUtils getInstance() {
-        return initOkHttpUtils(null, null);
+        return initOkHttpUtils(null);
     }
 
     public OkHttpClient getOkHttpClient() {
         return mOkHttpClient;
     }
-
-    public OkHttpClient getOkHttpClient2() {
-        return mOkHttpClient2;
-    }
-
 
     public static KeyManagerFactory getKeyManagerFactory(byte[] p12) {
         KeyManagerFactory kmf = null;
@@ -253,7 +200,7 @@ public class OkHttpUtils {
     public static void getAvatarToken(final Callback callback) {
         String url = Constant.web_url_get_token + "&type=" + Constant.netType;
         Log.i(TAG, "getAvatarToken url " + url);
-        getInstance().getOkHttpClient2().newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
+        getInstance().getOkHttpClient().newCall(new Request.Builder().url(url).get().build()).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 callback.onFailure(call, e);

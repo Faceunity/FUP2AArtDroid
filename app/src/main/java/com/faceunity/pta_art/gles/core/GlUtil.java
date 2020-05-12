@@ -155,14 +155,14 @@ public abstract class GlUtil {
         // Configure min/mag filtering, i.e. what scaling method do we use if what we're rendering
         // is smaller or larger than the source image.
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
+                               GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
+                               GLES20.GL_LINEAR);
         GlUtil.checkGlError("loadImageTexture");
 
         // Load the data from the buffer into the texture handle.
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, /*level*/ 0, format,
-                width, height, /*border*/ 0, format, GLES20.GL_UNSIGNED_BYTE, data);
+                            width, height, /*border*/ 0, format, GLES20.GL_UNSIGNED_BYTE, data);
         GlUtil.checkGlError("loadImageTexture");
 
         return textureHandle;
@@ -188,9 +188,9 @@ public abstract class GlUtil {
         // Configure min/mag filtering, i.e. what scaling method do we use if what we're rendering
         // is smaller or larger than the source image.
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
+                               GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
+                               GLES20.GL_LINEAR);
         GlUtil.checkGlError("loadImageTexture");
 
         // Load the data from the buffer into the texture handle.
@@ -323,6 +323,44 @@ public abstract class GlUtil {
         Matrix.setIdentityM(mvp, 0);
         Matrix.scaleM(mvp, 0, scale > 1 ? (1F / scale) : 1F, scale > 1 ? 1F : scale, 1F);
         return mvp;
+    }
+
+    public static float[] changeMVPMatrixW(float[] mvpMatrix, float viewWidth, float viewHeight, float textureWidth, float textureHeight) {
+//        float scale = viewWidth * textureHeight / viewHeight / textureWidth;
+//        if (scale == 1) {
+//            return mvpMatrix;
+//        } else {
+//            float[] mvp = new float[16];
+//            float[] tmp = new float[16];
+//            Matrix.setIdentityM(tmp, 0);
+//            Matrix.scaleM(tmp, 0, 1F, scale, 1F);
+//            Matrix.multiplyMM(mvp, 0, tmp, 0, mvpMatrix, 0);
+//            return mvp;
+//        }
+
+        float scale = viewHeight * textureWidth / viewWidth / textureHeight;
+        if (scale == 1) {
+            return mvpMatrix;
+        } else {
+            float[] mvp = new float[16];
+            float[] tmp = new float[16];
+            Matrix.setIdentityM(tmp, 0);
+            Matrix.scaleM(tmp, 0, scale, 1f, 1F);
+            Matrix.multiplyMM(mvp, 0, tmp, 0, mvpMatrix, 0);
+            return mvp;
+        }
+
+//        float scale = viewHeight * textureWidth / viewWidth / textureHeight;
+//        if (scale == 1) {
+//            return mvpMatrix;
+//        } else {
+//            float[] mvp = new float[16];
+//            float[] tmp = new float[16];
+//            Matrix.setIdentityM(tmp, 0);
+//            Matrix.scaleM(tmp, 0, scale > 1 ? scale : 1F, scale > 1 ? 1F : (1F / scale), 1F);
+//            Matrix.multiplyMM(mvp, 0, tmp, 0, mvpMatrix, 0);
+//            return mvp;
+//        }
     }
 
     public static int getSupportGLVersion(Context context) {

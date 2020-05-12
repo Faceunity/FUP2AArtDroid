@@ -21,6 +21,7 @@ public class BackgroundUtil {
 
     private int backgroundTexId;
     private float[] backgroundMVP;
+    private boolean useBitmapBackground = false;
 
     public BackgroundUtil(int width, int height) {
         this.width = width;
@@ -34,6 +35,7 @@ public class BackgroundUtil {
     }
 
     public void loadBackground(String path) {
+        useBitmapBackground = true;
         Bitmap src = BitmapUtil.loadBitmap(path, 720);
         backgroundTexId = GlUtil.createImageTexture(src);
         backgroundMVP = changeMVPMatrix(GlUtil.IDENTITY_MATRIX, width, height, src.getWidth(), src.getHeight());
@@ -41,6 +43,9 @@ public class BackgroundUtil {
 
     public int drawBackground(int texId) {
         if (!isHasBackground()) return texId;
+        if (!useBitmapBackground) {
+            return texId;
+        }
         int[] fboIdNow = new int[1];
         GLES20.glGetIntegerv(GLES20.GL_FRAMEBUFFER_BINDING, fboIdNow, 0);
         int[] viewPortNow = new int[4];
@@ -75,6 +80,10 @@ public class BackgroundUtil {
 
     public boolean isHasBackground() {
         return backgroundTexId > 0;
+    }
+
+    public void setUseBitmapBackground(boolean useBitmapBackground) {
+        this.useBitmapBackground = useBitmapBackground;
     }
 
     public void release() {

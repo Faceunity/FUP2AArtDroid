@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
  * Created by tujh on 2018/3/30.
  */
 public class FUApplication extends Application {
+
+    public static final boolean needRestartMainActivity = false;
+
     private static final String TAG = FUApplication.class.getSimpleName();
     private static FUApplication fuApplication;
     private int height;
@@ -31,8 +34,7 @@ public class FUApplication extends Application {
         fuApplication = this;
 
         boolean isHttps = OkHttpUtils.initNet();
-        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this, isHttps),
-                OkHttpUtils.initOkHttpClient2(this, isHttps));
+        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this, isHttps));
 
         //TODO 初始化部分
         long startTime = System.currentTimeMillis();
@@ -45,7 +47,9 @@ public class FUApplication extends Application {
         long endInitP2ATime = System.currentTimeMillis();
 
         //初始化 core data 数据---捏脸
-        PTAClientWrapper.setupData(this);
+        if (!needRestartMainActivity) {
+            PTAClientWrapper.setupData(this);
+        }
         long endInitCoreDataTime = System.currentTimeMillis();
 
         Log.i(TAG, "InitAllTime: " + (endInitCoreDataTime - startTime)
@@ -96,4 +100,5 @@ public class FUApplication extends Application {
         } catch (Exception e) {
         }
     }
+
 }

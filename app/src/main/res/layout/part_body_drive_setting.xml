@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.faceunity.pta_art.ui.BodyDriveSettingComponent xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/body_drive_setting_show_view"
+        android:layout_width="@dimen/x180"
+        android:layout_height="@dimen/x80"
+        android:background="@drawable/icon_btn_body_drive_setting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <View
+        android:id="@+id/body_drive_setting_bg_view"
+        android:layout_width="@dimen/x272"
+        android:layout_height="@dimen/x194"
+        android:background="@drawable/icon_drive_setting_bg"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@id/body_drive_setting_show_view"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/body_drive_setting_face_drive_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/x44"
+        android:layout_marginTop="@dimen/x46"
+        android:includeFontPadding="false"
+        android:text="面部驱动"
+        android:textColor="@color/color666666"
+        android:textSize="@dimen/text_size_24"
+        app:layout_constraintLeft_toLeftOf="@id/body_drive_setting_bg_view"
+        app:layout_constraintTop_toTopOf="@id/body_drive_setting_bg_view" />
+
+
+    <com.faceunity.pta_art.ui.SwitchButton
+        android:id="@+id/body_drive_setting_face_drive_sb"
+        android:layout_width="@dimen/x56"
+        android:layout_height="@dimen/x32"
+        android:layout_marginRight="@dimen/x44"
+        app:layout_constraintBottom_toBottomOf="@id/body_drive_setting_face_drive_tv"
+        app:layout_constraintRight_toRightOf="@id/body_drive_setting_bg_view"
+        app:layout_constraintTop_toTopOf="@id/body_drive_setting_face_drive_tv"
+
+        app:sb_background="#25000000"
+        app:sb_border_width="@dimen/x3"
+        app:sb_checked="true"
+        app:sb_checked_color="#1890FF"
+        app:sb_text_size="@dimen/text_size_18" />
+
+    <TextView
+        android:id="@+id/body_drive_setting_body_drive_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x40"
+        android:includeFontPadding="false"
+        android:text="全身驱动"
+        android:textColor="@color/color666666"
+        android:textSize="@dimen/text_size_24"
+        app:layout_constraintLeft_toLeftOf="@id/body_drive_setting_face_drive_tv"
+        app:layout_constraintTop_toBottomOf="@id/body_drive_setting_face_drive_tv" />
+
+    <com.faceunity.pta_art.ui.SwitchButton
+        android:id="@+id/body_drive_setting_body_drive_sb"
+        android:layout_width="@dimen/x56"
+        android:layout_height="@dimen/x32"
+        app:layout_constraintBottom_toBottomOf="@id/body_drive_setting_body_drive_tv"
+        app:layout_constraintRight_toRightOf="@id/body_drive_setting_face_drive_sb"
+        app:layout_constraintTop_toTopOf="@id/body_drive_setting_body_drive_tv"
+        app:sb_background="#1890FF"
+        app:sb_checked="true"
+        app:sb_border_width="@dimen/x3"
+        app:sb_checked_color="#1890FF"
+        app:sb_checked_text="全"
+        app:sb_text_size="@dimen/text_size_18"
+        app:sb_uncheck_color="#1890FF"
+        app:sb_unchecked_text="半" />
+
+    <TextView
+        android:id="@+id/body_drive_setting_following_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x40"
+        android:includeFontPadding="false"
+        android:text="跟随模式"
+        android:textColor="@color/color666666"
+        android:textSize="@dimen/text_size_24"
+        app:layout_constraintLeft_toLeftOf="@id/body_drive_setting_face_drive_tv"
+        app:layout_constraintTop_toBottomOf="@id/body_drive_setting_body_drive_tv"
+        android:visibility="gone"/>
+
+    <com.faceunity.pta_art.ui.SwitchButton
+        android:id="@+id/body_drive_setting_following_sb"
+        android:layout_width="@dimen/x56"
+        android:layout_height="@dimen/x32"
+        app:layout_constraintBottom_toBottomOf="@id/body_drive_setting_following_tv"
+        app:layout_constraintRight_toRightOf="@id/body_drive_setting_face_drive_sb"
+        app:layout_constraintTop_toTopOf="@id/body_drive_setting_following_tv"
+        app:sb_background="#25000000"
+        app:sb_border_width="@dimen/x3"
+        app:sb_checked_color="#1890FF"
+        android:visibility="gone"/>
+
+</com.faceunity.pta_art.ui.BodyDriveSettingComponent>

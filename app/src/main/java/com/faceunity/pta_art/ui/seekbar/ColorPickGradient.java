@@ -129,4 +129,8 @@ public class ColorPickGradient {
         int green = Color.green(color);
         return new double[]{red, green, blue};
     }
+
+    public static int[] getmColorArr() {
+        return mColorArr;
+    }
 }

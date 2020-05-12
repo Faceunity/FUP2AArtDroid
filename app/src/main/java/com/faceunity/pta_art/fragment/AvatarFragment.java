@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SimpleItemAnimator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,9 +70,12 @@ public class AvatarFragment extends BaseFragment
         mEditRecycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(mActivity, spanCount, GridLayoutManager.VERTICAL, false));
         mEditRecycler.setAdapter(mEditAdapter = new EditAdapter());
         ((SimpleItemAnimator) mEditRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
-        mAvatarHandle.resetAvatar();
+        mP2ACore.loadHalfLengthBodyCamera();
 
         mEditAdapter.scrollToPosition(mActivity.getShowIndex());
+
+        mAvatarHandle.setmIsNeedIdle(true);
+        mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
     }
 
     @Override
@@ -107,7 +109,7 @@ public class AvatarFragment extends BaseFragment
                 loadingDialog.dismiss();
                 mP2ACore = mActivity.getP2ACore();
                 mAvatarHandle = mActivity.getAvatarHandle();
-                mAvatarHandle.resetAll();
+                mP2ACore.loadWholeBodyCamera();
             }
         });
     }
@@ -132,9 +134,10 @@ public class AvatarFragment extends BaseFragment
         public void onBindViewHolder(@NonNull EditHolder holder, int pos) {
             final int position = holder.getLayoutPosition();
             holder.mItemImg.setBackgroundResource(mActivity.getShowIndex() == position ? R.drawable.main_item_select : 0);
+
             final AvatarPTA avatarP2A = mAvatarP2AS.get(position);
             if (avatarP2A.getOriginPhotoRes() > 0) {
-                holder.mItemImg.setImageResource(avatarP2A.getOriginPhotoRes());
+                Glide.with(holder.mItemImg).load(avatarP2A.getOriginPhotoRes()).into(holder.mItemImg);
             } else {
                 Glide.with(mActivity).load(new File(avatarP2A.getOriginPhoto())).
                         apply(requestOptions).into(holder.mItemImg);
@@ -193,5 +196,12 @@ public class AvatarFragment extends BaseFragment
 
     public void notifyDataSetChanged() {
         mEditAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        mAvatarHandle.setmIsNeedIdle(false);
+        mAvatarHandle.setAvatar(mActivity.getShowAvatarP2A());
     }
 }

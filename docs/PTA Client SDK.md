@@ -2,7 +2,7 @@
 
 本文主要介绍了如何快速跑通我们的FUPTA工程 、如何创建和编辑风格化形象、如何绘制风格化形象、SDK的分类及相关资源说明等。工程中会使用到三个库文件:p2a\_client SDK、Nama SDK、FUTtsEngine SDK，其中p2a\_client SDK 用来做风格化形象的生成，Nama SDK 用来做风格化形象的绘制，FUTtsEngine SDK用来做语音驱动。
 
-如果您之前已经接入过我们的V1.7.0版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.7.1更新说明文档.md)。
+如果您之前已经接入过我们的V1.7.1版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.8.0更新说明文档.md)。
 
 ## 快速开始
 
@@ -596,6 +596,72 @@ public static native int fuRenderBundlesWithCamera(byte[] img, int tex_in, int f
 
 `int ` 被处理过的的图像数据纹理ID。返回值小于等于0为异常，具体信息通过fuGetSystemError获取。
 
+## 身体驱动
+
+身体驱动指的是模型可以根据输入的相机数据或者是视频数据中的人物做出相应的动作和手势，增加了项目的可玩性跟交互性。
+
+示例代码如下：
+
+```java
+// 创建身体驱动道具
+public long createHuman3d() {
+    InputStream human3d = null;
+    try {
+        human3d = mContext.getAssets().open(FilePathFactory.BUNDLE_human3d);
+        byte[] human3dDate = new byte[human3d.available()];
+        human3d.read(human3dDate);
+        human3d.close();
+        return faceunity.fu3DBodyTrackerCreate(human3dDate);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
+// 开启身体追踪
+ faceunity.fuItemSetParam(controllerItem, "enter_human_pose_track_mode", 1.0);
+
+// 加载手势道具
+private String[] gestures = {
+  "new/gesture/anim_fist.bundle",
+  "new/gesture/anim_heart.bundle",
+  "new/gesture/anim_merge.bundle",
+  "new/gesture/anim_one.bundle",
+  "new/gesture/anim_palm.bundle",
+  "new/gesture/anim_six.bundle",
+  "new/gesture/anim_two.bundle",
+  "new/gesture/anim_eight.bundle",
+  "new/gesture/anim_rock.bundle",
+  "new/gesture/anim_thumb.bundle",
+  "new/gesture/anim_korheart.bundle",
+  "new/gesture/anim_ok.bundle",
+  "new/gesture/anim_hold.bundle",
+  "new/gesture/anim_gun.bundle",
+  "new/gesture/anim_greet.bundle",
+};
+
+for (int j = 0; j < gestures.length; j++) {
+    if (gestureItem[j] == null) {
+        gestureItem[j] = new FUItem();
+    }
+    loadItem(gestureItem[j], gestures[j]);
+}
+
+/**
+ * 运行身体驱动检测算法 
+ * human3d:faceunity.fu3DBodyTrackerCreate（human3d.bundle）方法创建的句柄
+ * img：输入的图像数据（如相机输入的数据）
+ * imgType：输入图像数据的类型（如NV21类型）
+ * rotationMode：图像方向（取avatarInfo.mRotationMode的第一个数据）
+ */
+faceunity.fu3DBodyTrackerRun(human3d, 0, img, w, h, faceunity.FU_FORMAT_NV21_BUFFER, (int) avatarInfo.mRotationMode[0]);
+
+//   设置是否开启全身模式 1 全身， 0 半身                
+faceunity.fuItemSetParam(controllerItem, "human_3d_track_set_scene", 0/1);
+```
+
+
+
 ## 形象应用
 
 形象应用功能包括：单人场景、多人场景、动画场景。
@@ -636,7 +702,7 @@ public static native int fuRenderBundlesWithCamera(byte[] img, int tex_in, int f
 ```
 ## CNN面部追踪
 
-通过加载face_capture.bundle（算法深度模型）能够更利于我们捕捉到图像中的人脸，我们还可以通过face_capture.bundle获取到对应的数据。
+通过加载face_capture.bundle（算法深度模型）能够更利于我们捕捉到图像中的人脸，我们还可以通过face_processor_capture.bundle获取到对应的数据。
 
 ### 创建面部追踪模型
 
@@ -649,7 +715,7 @@ public static native int fuRenderBundlesWithCamera(byte[] img, int tex_in, int f
 public long createFaceCapture() {
     InputStream face_capture = null;
     try {
-        face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_capture);
+        face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_processor_capture);
         byte[] face_capture_Date = new byte[face_capture.available()];
         face_capture.read(face_capture_Date);
         face_capture.close();
@@ -721,6 +787,45 @@ public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
 ```
 
 关于更多CNN面部追踪的使用方法，请查看[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
+
+## 美妆换色
+
+美妆换色指的是对美妆相关的bundle进行颜色的更换，使得捏脸更加的多样性。
+
+美妆换色相关代码：
+
+```java
+/**
+ * 设置美妆颜色
+ *
+ * @param color
+ */
+public void setMakeupColor(int makeupHandleId, double[] color) {
+    //设置美妆的颜色
+    //美妆参数名为json结构，
+    JSONObject jsonObject = new JSONObject();
+    try {
+        jsonObject.put("name", "global");
+        jsonObject.put("type", "face_detail");
+        jsonObject.put("param", "blend_color");
+        jsonObject.put("UUID", makeupHandleId);//需要修改的美妆道具bundle handle id
+    } catch (JSONException e) {
+        e.printStackTrace();
+    }
+    double[] makeupColor = new double[color.length];
+    for (int i = 0; i < color.length; i++) {
+        makeupColor[i] = color[i] * 1.0 / 255;
+    }
+    //美妆参数值为0-1之间的RGB设置，美妆颜色原始为RGB色值(sRGB空间)，RGB/255得到传给controller的值
+    //例如要替换的美妆颜色为[255,0,0], 传给controller的值为[1,0,0]
+    faceunity.fuItemSetParam(controllerItem, jsonObject.toString(), makeupColor);
+}
+```
+
++ `makeupHandleId` 表示美妆bundle ID
++ `color` 表示 需要更换的颜色值
+
+关于更多美妆换色的使用方法，请查看[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
 
 ## 注意
 

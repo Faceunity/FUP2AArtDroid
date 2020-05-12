@@ -3,11 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <View
-        android:id="@+id/v_bg"
+        android:id="@+id/v_bottom"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x322"
+        android:layout_height="@dimen/x110"
         android:background="@color/colorWhite"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <View
+        android:id="@+id/v_bg_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x2"
+        android:background="#E6E6E6"
+        app:layout_constraintBottom_toTopOf="@id/v_bottom" />
+
+    <View
+        android:id="@+id/v_bg_top"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x210"
+        android:background="@color/colorWhite"
+        app:layout_constraintBottom_toTopOf="@id/v_bg_bottom" />
+
+    <TextView
+        android:id="@+id/tv_body_drive"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x60"
+        android:layout_marginLeft="@dimen/x16"
+        android:layout_marginBottom="@dimen/x26"
+        android:background="@drawable/bg_body_drivve"
+        android:gravity="center"
+        android:text="身体驱动"
+        android:textColor="@color/tv_body_drive_bottom"
+        android:textSize="@dimen/x24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tv_text_drive" />
 
     <TextView
         android:id="@+id/tv_text_drive"
@@ -20,9 +49,9 @@
         android:text="文字驱动"
         android:textColor="@color/tv_body_drive_bottom"
         android:textSize="@dimen/x24"
-        app:layout_constraintRight_toLeftOf="@+id/tv_ar_drive"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        app:layout_constraintLeft_toRightOf="@id/tv_body_drive"
+        app:layout_constraintRight_toLeftOf="@+id/tv_ar_drive" />
 
     <TextView
         android:id="@+id/tv_ar_drive"
@@ -36,8 +65,8 @@
         android:textColor="@color/tv_body_drive_bottom"
         android:textSize="@dimen/x24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/tv_text_drive" />
+        app:layout_constraintLeft_toRightOf="@id/tv_text_drive"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <View
         android:id="@+id/v_interval"

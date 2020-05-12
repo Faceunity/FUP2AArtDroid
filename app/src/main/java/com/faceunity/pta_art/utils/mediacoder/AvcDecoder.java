@@ -9,10 +9,13 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.Surface;
+
+import com.faceunity.pta_art.FUApplication;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,24 +59,26 @@ public class AvcDecoder {
     private int coverFaceY = 0;
     private int coverFaceHeight = 0;
     private ExecutorService executorPools = Executors.newCachedThreadPool();
+    private boolean isRawFile = false;
 
     public void setDecoderParams(String mp4Path, int fileType) throws IOException {
+
         if (fileType != FILE_TypeI420 && fileType != FILE_TypeNV21 && fileType != FILE_TypeJPEG) {
             throw new IllegalArgumentException("only support FILE_TypeI420 " + "and FILE_TypeNV21 " + "and FILE_TypeJPEG");
         }
-        File mp4File = new File(mp4Path);
-        if (!mp4File.exists()) {
-            throw new RuntimeException("mp4 file do not exist " + mp4Path);
-        }
-        if (mp4File.isDirectory()) {
-            throw new IllegalArgumentException("mp4Path is not a mp4 file , it is a directory");
-        }
+        // 是否为预制视频
+        isRawFile = mp4Path.startsWith("android.resource://");
+        checkFile(mp4Path);
         INPUT_FILE_PATH = mp4Path;
         outputImageFileType = fileType;
-
-        File videoFile = new File(INPUT_FILE_PATH);
         extractor = new MediaExtractor();
-        extractor.setDataSource(videoFile.getPath());
+        if (isRawFile) {
+            final Uri uri = Uri.parse(INPUT_FILE_PATH);
+            extractor.setDataSource(FUApplication.getInstance(), uri, null);
+        } else {
+            File videoFile = new File(INPUT_FILE_PATH);
+            extractor.setDataSource(videoFile.getPath());
+        }
         int trackIndex = selectTrack(extractor);
         if (trackIndex < 0) {
             throw new RuntimeException("No video track found in " + INPUT_FILE_PATH);
@@ -88,6 +93,18 @@ public class AvcDecoder {
             Log.i(TAG, "set decode color format to type " + decodeColorFormat);
         } else {
             Log.i(TAG, "unable to set decode color format, color format type " + decodeColorFormat + " not supported");
+        }
+    }
+
+    private void checkFile(String mp4Path) {
+        if (!isRawFile) {
+            File mp4File = new File(mp4Path);
+            if (!mp4File.exists()) {
+                throw new RuntimeException("mp4 file do not exist " + mp4Path);
+            }
+            if (mp4File.isDirectory()) {
+                throw new IllegalArgumentException("mp4Path is not a mp4 file , it is a directory");
+            }
         }
     }
 
@@ -136,6 +153,7 @@ public class AvcDecoder {
     }
 
     public int[] getVideoWH() {
+        //getFrameTotalNum();
         int width = mediaFormat.getInteger(MediaFormat.KEY_WIDTH);
         int height = mediaFormat.getInteger(MediaFormat.KEY_HEIGHT);
         int rotation = 0;
@@ -162,8 +180,10 @@ public class AvcDecoder {
     public int getFrameTotalNum() {
         long duration = mediaFormat.getLong(MediaFormat.KEY_DURATION);
         int fps = mediaFormat.getInteger(MediaFormat.KEY_FRAME_RATE);
+        Log.i(TAG, "duration:" + duration + " fps:" + fps);
         return Math.round(duration / 1000000f * fps);
     }
+
 
     public void videoDecode(SurfaceTexture surfaceTexture) throws IOException {
         try {
@@ -303,7 +323,7 @@ public class AvcDecoder {
                                         compressToJpeg(OUTPUT_FILE_PATH, image);
                                         break;
                                 }
-                               // Log.d(TAG, "完成第" + outputFrameCount + "帧");
+                                // Log.d(TAG, "完成第" + outputFrameCount + "帧");
                             }
                             image.close();
                         } else {
@@ -321,6 +341,12 @@ public class AvcDecoder {
         }
     }
 
+    /**
+     * 获取视频轨道
+     *
+     * @param extractor
+     * @return
+     */
     private int selectTrack(MediaExtractor extractor) {
         int numTracks = extractor.getTrackCount();
         for (int i = 0; i < numTracks; i++) {
@@ -427,16 +453,6 @@ public class AvcDecoder {
         return data;
     }
 
-    private void dumpFile(String fileName, byte[] data) {
-//        try {
-//            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(data.length);
-//            byteBuffer.put(data);
-//            fc_out.write(byteBuffer);
-//        } catch (IOException ioe) {
-//            throw new RuntimeException("failed writing data to file " + fileName, ioe);
-//        }
-    }
-
     private void compressToJpeg(String fileName, Image image) {
         FileOutputStream outStream;
         try {
@@ -447,24 +463,6 @@ public class AvcDecoder {
         Rect rect = image.getCropRect();
         YuvImage yuvImage = new YuvImage(getDataFromImage(image, COLOR_FormatNV21), ImageFormat.NV21, rect.width(), rect.height(), null);
         yuvImage.compressToJpeg(rect, 100, outStream);
-    }
-
-    private byte[] rotationYuvByOpenCV(byte[] oldData, int width, int height, int rotation) {
-        byte[] newData = new byte[(int) (width * height * 1.5)];
-//        Mat mat = new Mat((int) (height * 1.5), width, CvType.CV_8UC1);
-//        mat.put(0, 0, oldData);
-//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_YUV2BGR_I420);
-//        Core.transpose(mat, mat);
-//        // 翻转模式，flipCode == 0垂直翻转（沿X轴翻转），flipCode>0水平翻转（沿Y轴翻转），flipCode<0水平垂直翻转（先沿X轴翻转，再沿Y轴翻转，等价于旋转180°）
-//        Core.flip(mat, mat, 1);
-//        if (isCoverFace) {
-//            Mat black = Mat.zeros(coverFaceHeight, mat.cols(), mat.type());
-//            Mat roi = new Mat(mat, new org.opencv.core.Rect(0, coverFaceY, black.width(), coverFaceHeight));
-//            black.copyTo(roi);
-//        }
-//        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2YUV_I420);
-//        mat.get(0, 0, newData);
-        return newData;
     }
 
     public interface DecodeListener {

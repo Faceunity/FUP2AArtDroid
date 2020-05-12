@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="1dp">
+
+    <ImageView
+        android:id="@+id/iml_imageview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="h,1:1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/iml_tv_duration"
+        android:paddingRight="8dp"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x40"
+        android:gravity="center_vertical|right"
+        android:text="00:00"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/text_size_24"
+        app:layout_constraintBottom_toBottomOf="@id/iml_imageview"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

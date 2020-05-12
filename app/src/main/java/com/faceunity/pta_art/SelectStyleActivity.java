@@ -35,15 +35,17 @@ public class SelectStyleActivity extends AppCompatActivity implements View.OnCli
             default:
                 return;
         }
-        final LoadingDialog dialog = new LoadingDialog();
-        dialog.setLoadingStr("数据初始化中");
-        dialog.show(getSupportFragmentManager(), LoadingDialog.TAG);
+        LoadingDialog.Builder builder = new LoadingDialog.Builder(this);
+        LoadingDialog dialog = builder.setLoadingStr("数据初始化中").create();
+        dialog.show();
         StyleSwitchUtil.switchStyle(getApplicationContext(), new Runnable() {
             @Override
             public void run() {
                 startActivity(new Intent(SelectStyleActivity.this, MainActivity.class));
                 overridePendingTransition(0, 0);
-                finish();
+                if (!FUApplication.needRestartMainActivity) {
+                    finish();
+                }
                 dialog.dismiss();
             }
         });

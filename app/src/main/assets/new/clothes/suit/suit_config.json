@@ -5,103 +5,138 @@
       "icon": "edit_face_item_none",
       "gender": 2,
       "body_match_level": 4
-    },{
-      "bundle":"new/clothes/suit/cloth_1.bundle",
-      "icon":"cloth_1",
+    },
+    {
+      "bundle": "new/clothes/suit/cloth_1.bundle",
+      "icon": "cloth_1",
       "gender": 0,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/cloth_2.bundle",
-      "icon":"cloth_2",
+      "bundle": "new/clothes/suit/cloth_2.bundle",
+      "icon": "cloth_2",
       "gender": 0,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/cloth_19.bundle",
-      "icon":"cloth_19",
+      "bundle": "new/clothes/suit/cloth_19.bundle",
+      "icon": "cloth_19",
       "gender": 0,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_1.bundle",
-      "icon":"taozhuang_1",
+      "bundle": "new/clothes/suit/taozhuang_1.bundle",
+      "icon": "taozhuang_1",
       "gender": 1,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_4.bundle",
-      "icon":"taozhuang_4",
+      "bundle": "new/clothes/suit/taozhuang_4.bundle",
+      "icon": "taozhuang_4",
       "gender": 1,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_5.bundle",
-      "icon":"taozhuang_5",
+      "bundle": "new/clothes/suit/taozhuang_5.bundle",
+      "icon": "taozhuang_5",
       "gender": 1,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_6.bundle",
-      "icon":"taozhuang_6",
+      "bundle": "new/clothes/suit/taozhuang_6.bundle",
+      "icon": "taozhuang_6",
       "gender": 0,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_8.bundle",
-      "icon":"taozhuang_8",
+      "bundle": "new/clothes/suit/taozhuang_8.bundle",
+      "icon": "taozhuang_8",
       "gender": 1,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_9.bundle",
-      "icon":"taozhuang_9",
+      "bundle": "new/clothes/suit/taozhuang_9.bundle",
+      "icon": "taozhuang_9",
       "gender": 1,
       "body_match_level": 1
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_jiaju_1.bundle",
-      "icon":"taozhuang_jiaju_1",
+      "bundle": "new/clothes/suit/taozhuang_10.bundle",
+      "icon": "taozhuang_10",
       "gender": 1,
       "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/taozhuang_lifu_4.bundle",
-      "icon":"taozhuang_lifu_4",
+      "bundle": "new/clothes/suit/taozhuang_11.bundle",
+      "icon": "taozhuang_11",
       "gender": 1,
       "body_match_level": 2
-
     },
     {
-      "bundle":"new/clothes/suit/yiqun_2.bundle",
-      "icon":"yiqun_2",
+      "bundle": "new/clothes/suit/taozhuang_12.bundle",
+      "icon": "taozhuang_12",
       "gender": 1,
-      "body_match_level":2
+      "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/yiqun_3.bundle",
-      "icon":"yiqun_3",
+      "bundle": "new/clothes/suit/taozhuang_13.bundle",
+      "icon": "taozhuang_13",
       "gender": 1,
-      "body_match_level":4
+      "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/yiqun_8.bundle",
-      "icon":"yiqun_8",
+      "bundle": "new/clothes/suit/taozhuang_14.bundle",
+      "icon": "taozhuang_14",
       "gender": 1,
-      "body_match_level":4
+      "body_match_level": 4
     },
     {
-      "bundle":"new/clothes/suit/yiqun_9.bundle",
-      "icon":"yiqun_9",
+      "bundle": "new/clothes/suit/taozhuang_15.bundle",
+      "icon": "taozhuang_15",
       "gender": 1,
-      "body_match_level":4
+      "body_match_level": 4
     },
     {
-
-      "bundle":"new/clothes/suit/yiqun_10.bundle",
-      "icon":"yiqun_10",
+      "bundle": "new/clothes/suit/taozhuang_jiaju_1.bundle",
+      "icon": "taozhuang_jiaju_1",
       "gender": 1,
-      "body_match_level":4
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/clothes/suit/taozhuang_lifu_4.bundle",
+      "icon": "taozhuang_lifu_4",
+      "gender": 1,
+      "body_match_level": 2
+    },
+    {
+      "bundle": "new/clothes/suit/yiqun_2.bundle",
+      "icon": "yiqun_2",
+      "gender": 1,
+      "body_match_level": 2
+    },
+    {
+      "bundle": "new/clothes/suit/yiqun_3.bundle",
+      "icon": "yiqun_3",
+      "gender": 1,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/clothes/suit/yiqun_8.bundle",
+      "icon": "yiqun_8",
+      "gender": 1,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/clothes/suit/yiqun_9.bundle",
+      "icon": "yiqun_9",
+      "gender": 1,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/clothes/suit/yiqun_10.bundle",
+      "icon": "yiqun_10",
+      "gender": 1,
+      "body_match_level": 4
     }
-    ]
+  ]
 }

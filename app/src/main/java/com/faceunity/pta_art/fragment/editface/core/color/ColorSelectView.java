@@ -71,6 +71,12 @@ public class ColorSelectView extends RecyclerView {
         scrollToPosition(mDefaultSelectColor);
     }
 
+    public void setColorList(double[][] colorList, int selectColorPosition) {
+        mColorAdapter.setmColorList(this.mColorList = colorList);
+        setColorItem(selectColorPosition);
+        mColorAdapter.notifyDataSetChanged();
+    }
+
     public void scrollToPosition(final int pos) {
         post(new Runnable() {
             @Override

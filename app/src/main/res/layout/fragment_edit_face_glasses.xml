@@ -1,52 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:animateLayoutChanges="true"
-    android:background="@color/colorF7F7F7"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/x8">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/glasses_frame_text"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/x34"
-        android:layout_marginLeft="@dimen/x30"
-        android:gravity="center"
-        android:text="镜框"
-        android:textColor="#666666"
-        android:textSize="@dimen/text_size_24"/>
 
     <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
-        android:id="@+id/glasses_frame_color_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x92"
-        android:layout_marginBottom="@dimen/x10"
-        android:scrollbars="none"/>
-
-    <TextView
-        android:id="@+id/glasses_text"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/x34"
-        android:layout_marginLeft="@dimen/x30"
-        android:gravity="center"
-        android:text="镜片"
-        android:textColor="#666666"
-        android:textSize="@dimen/text_size_24"/>
-
-    <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
-        android:id="@+id/glasses_color_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x92"
-        android:layout_marginBottom="@dimen/x10"
-        android:scrollbars="none"/>
+        android:id="@+id/color_recycler"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x100"
+        android:layout_marginLeft="@dimen/x170"
+        android:background="@color/colorWhite"
+        android:clipToPadding="false"
+        android:paddingLeft="@dimen/x58"
+        android:paddingRight="@dimen/x8"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/glass_color_switch_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/glass_color_switch_bg" />
 
 
-    <android.support.v7.widget.RecyclerView
+    <View
+        android:id="@+id/glass_color_switch_bg"
+        android:layout_width="@dimen/x220"
+        android:layout_height="@dimen/x100"
+        android:background="@drawable/edit_face_glass_switch_bg"
+        app:layout_constraintBottom_toTopOf="@id/glasses_recycler"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <com.faceunity.pta_art.ui.CustomGlassSwitchView
+        android:id="@+id/glass_color_switch"
+        android:layout_width="@dimen/x160"
+        android:layout_height="@dimen/x48"
+        app:backgroundColor="#F5F7FA"
+        app:borderColor="#EBEDF0"
+        app:borderWidth="@dimen/x2"
+        app:centerViewBackGroundColor="#8A9099"
+        app:checkedTextColor="#F5F7FA"
+        app:layout_constraintBottom_toBottomOf="@id/glass_color_switch_bg"
+        app:layout_constraintLeft_toLeftOf="@id/glass_color_switch_bg"
+        app:layout_constraintRight_toRightOf="@id/glass_color_switch_bg"
+        app:layout_constraintTop_toTopOf="@id/glass_color_switch_bg"
+        app:leftChecked="true"
+        app:leftText="镜框"
+        app:rightText="镜片"
+        app:textSize="@dimen/text_size_24"
+        app:unCheckedTextColor="#A3A8AF" />
+
+    <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/glasses_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x192"
+        android:layout_height="@dimen/x350"
         android:background="@color/colorWhite"
-        android:scrollbars="none"/>
-</LinearLayout>
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</android.support.constraint.ConstraintLayout>

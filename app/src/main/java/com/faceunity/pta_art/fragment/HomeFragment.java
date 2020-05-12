@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 import com.faceunity.pta_art.BuildConfig;
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.constant.FUPTAClient;
+import com.faceunity.pta_art.fragment.drive.ARFragment;
+import com.faceunity.pta_art.fragment.drive.BodyDriveFragment;
 
 /**
  * Created by tujh on 2018/8/22.
@@ -115,6 +118,11 @@ public class HomeFragment extends BaseFragment
     @Override
     public void onPause() {
         super.onPause();
-        mActivity.stopRecording();
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        mP2ACore.setNextHomeAnimationPosition();
+        return super.onSingleTapUp(e);
     }
 }

@@ -6,6 +6,9 @@ import com.faceunity.pta_art.constant.ColorConstant;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.wrapper.faceunity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +23,11 @@ public abstract class BasePTAHandle extends BaseHandle {
 
     public int controllerItem;
 
+    /**
+     * 美妆bundle
+     */
+    public int eyebrowHandleId, eyeshadowHandleId, lipglossHandleId,
+            eyelashHandleId;
     protected final List<Runnable> bindEvents = new ArrayList<>();
     protected final List<Runnable> destroyEvents = new ArrayList<>();
 
@@ -73,6 +81,7 @@ public abstract class BasePTAHandle extends BaseHandle {
         bindEvents.clear();
         destroyEvents.clear();
         mAvatarP2A = avatar;
+        setMakeupHandleId();
         setAvatarColor();
     }
 
@@ -93,9 +102,28 @@ public abstract class BasePTAHandle extends BaseHandle {
                 fuItemSetParam(PARAM_KEY_glass_frame_color, ColorConstant.getColor(ColorConstant.glass_frame_color, mAvatarP2A.getGlassesFrameColorValue()));
                 fuItemSetParam(PARAM_KEY_beard_color, ColorConstant.getColor(ColorConstant.beard_color, mAvatarP2A.getBeardColorValue()));
                 fuItemSetParam(PARAM_KEY_hat_color, ColorConstant.getColor(ColorConstant.hat_color, mAvatarP2A.getHatColorValue()));
+
+
+                /**
+                 * 美妆色卡相关
+                 */
+                if (eyebrowHandleId > 0) {
+                    setMakeupColor(eyebrowHandleId, ColorConstant.getMakeupColor(ColorConstant.makeup_color, mAvatarP2A.getEyebrowColorValue()));
+                }
+                if (eyeshadowHandleId > 0) {
+                    setMakeupColor(eyeshadowHandleId, ColorConstant.getMakeupColor(ColorConstant.makeup_color, mAvatarP2A.getEyeshadowColorValue()));
+                }
+                if (lipglossHandleId > 0) {
+                    setMakeupColor(lipglossHandleId, ColorConstant.getMakeupColor(ColorConstant.lip_color, mAvatarP2A.getLipglossColorValue()));
+                }
+                if (eyelashHandleId > 0) {
+                    setMakeupColor(eyelashHandleId, ColorConstant.getMakeupColor(ColorConstant.makeup_color, mAvatarP2A.getEyelashColorValue()));
+                }
             }
         });
     }
+
+    public abstract void setMakeupHandleId();
 
     public void fuItemSetParamFuItemHandler(final String key, final double[] values) {
         mFUItemHandler.post(new Runnable() {
@@ -136,6 +164,33 @@ public abstract class BasePTAHandle extends BaseHandle {
             }
         });
     }
+
+    /**
+     * 设置美妆颜色
+     *
+     * @param color
+     */
+    public void setMakeupColor(int makeupHandleId, double[] color) {
+        //设置美妆的颜色
+        //美妆参数名为json结构，
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", "global");
+            jsonObject.put("type", "face_detail");
+            jsonObject.put("param", "blend_color");
+            jsonObject.put("UUID", makeupHandleId);//需要修改的美妆道具bundle handle id
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        double[] makeupColor = new double[color.length];
+        for (int i = 0; i < color.length; i++) {
+            makeupColor[i] = color[i] * 1.0 / 255;
+        }
+        //美妆参数值为0-1之间的RGB设置，美妆颜色原始为RGB色值(sRGB空间)，RGB/255得到传给controller的值
+        //例如要替换的美妆颜色为[255,0,0], 传给controller的值为[1,0,0]
+        faceunity.fuItemSetParam(controllerItem, jsonObject.toString(), makeupColor);
+    }
+
 
     public int fuItemGetParamSkinColorIndex() {
         return (int) faceunity.fuItemGetParam(controllerItem, "skin_color_index");//从0开始

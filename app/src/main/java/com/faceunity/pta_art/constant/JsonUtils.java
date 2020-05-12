@@ -139,9 +139,12 @@ public class JsonUtils {
     private void resolveExpressionJson(JSONObject jsonObject, boolean isAnimate) {
         int resId = 0;//icon
         List<BundleRes> resList = new ArrayList<>();
-        String bg = "";
         resId = context.getResources().getIdentifier((String) jsonObject.opt("icon"), "drawable", context.getPackageName());
         String camera = jsonObject.optString("camera");//相机位置
+        int bg2d = jsonObject.optInt("bg_2d", 0);//2d相机背景
+        int bg3d = jsonObject.optInt("bg_3d", 0);//3d相机背景
+        int bgAni = jsonObject.optInt("bg_ani", 0);//动画相机背景
+        Scenes.ScenesBg scenesBg = new Scenes.ScenesBg(bg2d, bg3d, bgAni);
         JSONArray jsonArray = (JSONArray) (jsonObject.opt("BundleRes"));
         String path = "";
         int gender = 0;
@@ -176,11 +179,9 @@ public class JsonUtils {
                 e.printStackTrace();
             }
         }
-        bg = jsonObject.optString("bg");
-
         BundleRes[] bundleRes = new BundleRes[resList.size()];
         resList.toArray(bundleRes);
-        scenesList.add(new Scenes(resId, bundleRes, bg, camera, isAnimate));
+        scenesList.add(new Scenes(resId, bundleRes, scenesBg, camera, isAnimate));
     }
 
     public Scenes[] getScenesList() {

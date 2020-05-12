@@ -3,6 +3,7 @@ package com.faceunity.pta_art.helper;
 import com.faceunity.pta_art.entity.RecordEditBean;
 
 import java.lang.ref.WeakReference;
+import java.util.LinkedHashMap;
 import java.util.Stack;
 
 /**
@@ -56,6 +57,42 @@ public class RevokeHelper {
     }
 
     /**
+     * 记录操作的步骤
+     *
+     * @param type
+     * @param bundleName
+     * @param bundleValue
+     * @param colorName
+     * @param colorValue
+     * @param mMap        当前的捏脸系数
+     */
+    public void record(int type, String bundleName, double bundleValue,
+                       String colorName, double colorValue, LinkedHashMap<String, Float> mMap) {
+        RecordEditBean recordEditBean = new RecordEditBean();
+        recordEditBean.setType(type);
+        recordEditBean.setBundleName(bundleName);
+        recordEditBean.setBundleValue(bundleValue);
+        recordEditBean.setColorName(colorName);
+        recordEditBean.setColorValus(colorValue);
+        recordEditBean.setList(mMap);
+        recordBackStack.push(recordEditBean);
+        playLog(recordEditBean, "record:");
+    }
+
+    /**
+     * 记录捏脸
+     *
+     * @param type
+     * @param mMap
+     */
+    public void record(int type, LinkedHashMap<String, Float> mMap) {
+        RecordEditBean recordEditBean = new RecordEditBean();
+        recordEditBean.setType(type);
+        recordEditBean.setList(mMap);
+        recordBackStack.push(recordEditBean);
+    }
+
+    /**
      * 撤销
      */
     public void revokeLast() {
@@ -100,7 +137,7 @@ public class RevokeHelper {
     }
 
     private void playLog(RecordEditBean recordBean, String tag) {
-//        Log.i("ssss", tag + " bundleName:" + recordBean.getBundleName()
+//        Log.i("tag", tag + " bundleName:" + recordBean.getBundleName()
 //                + "--bundleValue=" + recordBean.getBundleValue()
 //                + "--colorName=" + recordBean.getColorName()
 //                + "--colorValue=" + recordBean.getColorValus());

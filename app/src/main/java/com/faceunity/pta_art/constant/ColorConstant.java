@@ -27,6 +27,7 @@ public abstract class ColorConstant {
     public static double[][] glass_frame_color;
     public static double[][] glass_color;
     public static double[][] hat_color;
+    public static double[][] makeup_color;
     public static StaBsBlendBean sta_bs_blend;
 
     public static void init(Context context) {
@@ -46,6 +47,7 @@ public abstract class ColorConstant {
             glass_frame_color = parseJson(jsonObject, "glass_frame_color");
             glass_color = parseJson(jsonObject, "glass_color");
             hat_color = parseJson(jsonObject, "hat_color");
+            makeup_color = parseJson(jsonObject, "makeup_color");
 
             ColorPickGradient.init(skin_color);
             /**
@@ -95,6 +97,18 @@ public abstract class ColorConstant {
         return c;
     }
 
+    public static double[] getMakeupColor(double[][] colors, double value) {
+        int index = (int) value;
+        if (index >= colors.length - 1) {
+            index = colors.length - 1;
+        }
+        if (index <= 0) {
+            index = 0;
+        }
+        double[] c = Arrays.copyOf(colors[index], 3);
+        return c;
+    }
+
     /**
      * 取到某点的颜色值
      *
@@ -103,4 +117,16 @@ public abstract class ColorConstant {
     public static double[] getRadioColor(double radio) {
         return ColorPickGradient.getColor(radio);
     }
+
+    public static void release() {
+        skin_color = null;
+        lip_color = null;
+        iris_color = null;
+        hair_color = null;
+        beard_color = null;
+        glass_frame_color = null;
+        glass_color = null;
+        hat_color = null;
+    }
+
 }

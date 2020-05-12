@@ -3,6 +3,7 @@ package com.faceunity.pta_art.constant;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.faceunity.pta_art.FUApplication;
 import com.faceunity.pta_art.core.client.PTAClientWrapper;
 
 /**
@@ -17,6 +18,9 @@ public abstract class StyleSwitchUtil {
                 //风格选择后初始化 P2A client
                 ColorConstant.init(context);
                 //初始化P2A Client
+                if (FUApplication.needRestartMainActivity) {
+                    PTAClientWrapper.setupData(context);
+                }
                 PTAClientWrapper.setupStyleData(context);
 
                 if (runnable != null) {

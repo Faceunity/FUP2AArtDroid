@@ -47,7 +47,7 @@ public class AvatarPTA implements Serializable {
     private int eyelinerIndex = 0;
     private int eyeshadowIndex = 0;
     private int faceMakeupIndex = 0;
-    private int lipglossIndex = 0;
+    private int lipglossIndex = 1;
     private int pupilIndex = 0;
     private String expressionFile = "";
     private String[] otherFiles;
@@ -60,6 +60,17 @@ public class AvatarPTA implements Serializable {
     private double glassesFrameColorValue = 0;
     private double beardColorValue = 0;
     private double hatColorValue = 0;
+
+    //美妆相关的色卡值
+    private double eyebrowColorValue = 0;
+    private double eyeshadowColorValue = 0;
+    private double lipglossColorValue = 0;
+    private double eyelashColorValue = 0;
+
+    // 背景
+    private int background2DIndex = -1;
+    private int background3DIndex = -1;
+    private int backgroundAniIndex = -1;
 
     public AvatarPTA() {
         hairIndex = -1;
@@ -79,11 +90,14 @@ public class AvatarPTA implements Serializable {
         faceMakeupIndex = -1;
         lipglossIndex = -1;
         pupilIndex = -1;
+        background2DIndex = -1;
+        background3DIndex = -1;
+        backgroundAniIndex = -1;
     }
 
     public AvatarPTA(String bundleDir, int originPhotoRes, int gender, String headFile, int hairIndex, int beardIndex,
                      int clothesIndex, int clothesUpperIndex, int clothesLowerIndex,
-                     int shoeIndex, int decorationsIndex) {
+                     int shoeIndex, int decorationsIndex, int background2DIndex) {
         this.bundleDir = bundleDir;
         this.originPhotoRes = originPhotoRes;
         this.gender = gender;
@@ -96,8 +110,15 @@ public class AvatarPTA implements Serializable {
         this.clothesLowerIndex = clothesLowerIndex;
         this.shoeIndex = shoeIndex;
         this.decorationsIndex = decorationsIndex;
-        this.bodyLevel = 0;
+        this.bodyLevel = 3;
         this.isCreateAvatar = false;
+        this.background2DIndex = background2DIndex;
+
+        if (gender == gender_girl) {
+            this.lipglossColorValue = 1;
+        } else {
+            this.lipglossColorValue = 6;
+        }
     }
 
     public AvatarPTA(String bundleDir, int gender, String headFile) {
@@ -112,6 +133,12 @@ public class AvatarPTA implements Serializable {
 
         this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.gender = gender;
+
+        if (gender == gender_girl) {
+            this.lipglossColorValue = 1;
+        } else {
+            this.lipglossColorValue = 6;
+        }
     }
 
     public boolean isCreateAvatar() {
@@ -155,12 +182,6 @@ public class AvatarPTA implements Serializable {
 
     public String getHeadFile() {
         return headFile;
-    }
-
-    public void setMingXing(String headFile, String bodyFile, String expressionFile) {
-        this.headFile = headFile;
-        this.bodyFile = bodyFile;
-        this.expressionFile = expressionFile;
     }
 
     public String getBodyFile() {
@@ -325,6 +346,62 @@ public class AvatarPTA implements Serializable {
         this.otherFiles = expression.others;
     }
 
+    public double getEyebrowColorValue() {
+        return eyebrowColorValue;
+    }
+
+    public void setEyebrowColorValue(double eyebrowColorValue) {
+        this.eyebrowColorValue = eyebrowColorValue;
+    }
+
+    public double getEyeshadowColorValue() {
+        return eyeshadowColorValue;
+    }
+
+    public void setEyeshadowColorValue(double eyeshadowColorValue) {
+        this.eyeshadowColorValue = eyeshadowColorValue;
+    }
+
+    public double getLipglossColorValue() {
+        return lipglossColorValue;
+    }
+
+    public void setLipglossColorValue(double lipglossColorValue) {
+        this.lipglossColorValue = lipglossColorValue;
+    }
+
+    public double getEyelashColorValue() {
+        return eyelashColorValue;
+    }
+
+    public void setEyelashColorValue(double eyelashColorValue) {
+        this.eyelashColorValue = eyelashColorValue;
+    }
+
+    public int getBackground2DIndex() {
+        return background2DIndex;
+    }
+
+    public void setBackground2DIndex(int background2DIndex) {
+        this.background2DIndex = background2DIndex;
+    }
+
+    public int getBackground3DIndex() {
+        return background3DIndex;
+    }
+
+    public void setBackground3DIndex(int background3DIndex) {
+        this.background3DIndex = background3DIndex;
+    }
+
+    public int getBackgroundAniIndex() {
+        return backgroundAniIndex;
+    }
+
+    public void setBackgroundAniIndex(int backgroundAniIndex) {
+        this.backgroundAniIndex = backgroundAniIndex;
+    }
+
     public String getHairFile() {
         List<BundleRes> lists = FilePathFactory.hairBundleRes(gender);
         String name = lists == null || lists.isEmpty() || hairIndex < 0 || hairIndex >= lists.size() ? "" : lists.get(hairIndex).name;
@@ -389,6 +466,19 @@ public class AvatarPTA implements Serializable {
 
     public String getPupilFile() {
         return getStringByIndex(FilePathFactory.pupilBundleRes(gender), pupilIndex);
+    }
+
+    public String getBackgroundFile() {
+        if (background2DIndex > 0) {
+            return getStringByIndex(FilePathFactory.scenes2DBundleRes(), background2DIndex);
+        }
+        if (background3DIndex > 0) {
+            return getStringByIndex(FilePathFactory.scenes3dBundleRes(), background3DIndex);
+        }
+        if (backgroundAniIndex > 0) {
+            return getStringByIndex(FilePathFactory.scenesAniBundleRes(), backgroundAniIndex);
+        }
+        return FilePathFactory.BUNDLE_default_bg;
     }
 
     private String getStringByIndex(List<BundleRes> lists, int index) {
@@ -507,6 +597,10 @@ public class AvatarPTA implements Serializable {
         avatarP2A.shoeIndex = this.shoeIndex;
         avatarP2A.decorationsIndex = this.decorationsIndex;
         avatarP2A.bodyLevel = this.bodyLevel;
+        avatarP2A.background2DIndex = this.background2DIndex;
+        avatarP2A.background3DIndex = this.background3DIndex;
+        avatarP2A.backgroundAniIndex = this.backgroundAniIndex;
+
 
         avatarP2A.skinColorValue = this.skinColorValue;
         avatarP2A.lipColorValue = this.lipColorValue;
@@ -514,7 +608,6 @@ public class AvatarPTA implements Serializable {
         avatarP2A.hairColorValue = this.hairColorValue;
         avatarP2A.glassesColorValue = this.glassesColorValue;
         avatarP2A.glassesFrameColorValue = this.glassesFrameColorValue;
-        avatarP2A.beardColorValue = this.beardColorValue;
         avatarP2A.hatColorValue = this.hatColorValue;
 
         avatarP2A.eyelinerIndex = this.eyelinerIndex;
@@ -522,6 +615,14 @@ public class AvatarPTA implements Serializable {
         avatarP2A.faceMakeupIndex = this.faceMakeupIndex;
         avatarP2A.lipglossIndex = this.lipglossIndex;
         avatarP2A.pupilIndex = this.pupilIndex;
+
+        //美妆相关的色卡值
+        avatarP2A.beardColorValue = this.beardColorValue;
+        avatarP2A.eyebrowColorValue = this.eyebrowColorValue;
+        avatarP2A.eyeshadowColorValue = this.eyeshadowColorValue;
+        avatarP2A.lipglossColorValue = this.lipglossColorValue;
+        avatarP2A.eyelashColorValue = this.eyelashColorValue;
+
         return avatarP2A;
     }
 
@@ -544,13 +645,21 @@ public class AvatarPTA implements Serializable {
                 avatarP2A.hairColorValue != this.hairColorValue ||
                 avatarP2A.glassesColorValue != this.glassesColorValue ||
                 avatarP2A.glassesFrameColorValue != this.glassesFrameColorValue ||
-                avatarP2A.beardColorValue != this.beardColorValue ||
                 avatarP2A.hatColorValue != this.hatColorValue ||
                 avatarP2A.eyelinerIndex != this.eyelinerIndex ||
                 avatarP2A.eyeshadowIndex != this.eyeshadowIndex ||
                 avatarP2A.faceMakeupIndex != this.faceMakeupIndex ||
                 avatarP2A.lipglossIndex != this.lipglossIndex ||
-                avatarP2A.pupilIndex != this.pupilIndex;
+                avatarP2A.pupilIndex != this.pupilIndex ||
+                avatarP2A.background2DIndex != this.background2DIndex ||
+                avatarP2A.background3DIndex != this.background3DIndex ||
+                avatarP2A.backgroundAniIndex != this.backgroundAniIndex ||
+
+                avatarP2A.beardColorValue != this.beardColorValue ||
+                avatarP2A.eyebrowColorValue != this.eyebrowColorValue ||
+                avatarP2A.eyeshadowColorValue != this.eyeshadowColorValue ||
+                avatarP2A.lipglossColorValue != this.lipglossColorValue ||
+                avatarP2A.eyelashColorValue != this.eyelashColorValue;
     }
 }
 

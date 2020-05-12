@@ -116,10 +116,6 @@ public class EditFaceParameter {
         mMap.put(negativeKey, negativeValue = (value > 0 ? 0 : Math.abs(value)));
         mAvatarHandle.fuItemSetParamFaceShape(positiveKey, positiveValue);
         mAvatarHandle.fuItemSetParamFaceShape(negativeKey, negativeValue);
-
-//        Log.i("ssss", "setParamFaceShape: mMap: positiveKey:" + positiveKey + "--positiveValue:" +
-//                mMap.get(positiveKey) + "--negativeKey=" + negativeKey + "--negativeValue:"
-//                + mMap.get(negativeKey));
     }
 
     public void setParamFaceShape(EditFacePoint point, float distanceX, float distanceY) {
@@ -369,19 +365,44 @@ public class EditFaceParameter {
      * 重置会上次的捏脸状态
      */
     public void resetToTemp() {
+        reset(tempMap);
+    }
+
+    public void reset(LinkedHashMap<String, Float> mList) {
         for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
             String key = entry.getKey();
-            float v = getValue(tempMap.get(key));
+            float v = getValue(mList.get(key));
             entry.setValue(v);
             if (key.contains("_L")) {
                 String rightKey = key.replace("_L", "_R");
                 if (mMap.containsKey(rightKey) && getValue(mMap.get(rightKey)) == 0.0f) {
-                    tempMap.put(rightKey, v);
+                    mList.put(rightKey, v);
                 }
             }
             mAvatarHandle.fuItemSetParamFaceShape(key, v);
         }
+    }
+
+
+    public LinkedHashMap getTemp() {
+        LinkedHashMap mList = new LinkedHashMap<>();
+        for (Iterator iterator = tempMap.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
+            entry.setValue(getValue(tempMap.get(entry.getKey())));
+            mList.put(entry.getKey(), entry.getValue());
+        }
+        return mList;
+    }
+
+    public LinkedHashMap getMap() {
+        LinkedHashMap mList = new LinkedHashMap<>();
+        for (Iterator iterator = mMap.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, Float> entry = (Map.Entry<String, Float>) iterator.next();
+            entry.setValue(getValue(mMap.get(entry.getKey())));
+            mList.put(entry.getKey(), entry.getValue());
+        }
+        return mList;
     }
 
     public float getValue(Object v) {
@@ -389,6 +410,30 @@ public class EditFaceParameter {
             return 0.0f;
         } else {
             return (float) v;
+        }
+    }
+
+
+    public void release() {
+        HeadBone_stretch = "";
+        HeadBone_shrink = "";
+        HeadBone_wide = "";
+        HeadBone_narrow = "";
+        Head_wide = "";
+        Head_narrow = "";
+        head_shrink = "";
+        head_stretch = "";
+        if (mMap != null) {
+            mMap.clear();
+        }
+        if (mDefaultMap != null) {
+            mDefaultMap.clear();
+        }
+        if (tempMap != null) {
+            tempMap.clear();
+        }
+        if (mLastMap != null) {
+            mLastMap.clear();
         }
     }
 }

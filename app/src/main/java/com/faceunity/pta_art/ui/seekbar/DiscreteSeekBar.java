@@ -315,6 +315,10 @@ public class DiscreteSeekBar extends View {
         //invalidate();
     }
 
+    public void setTrackColor(int[] colorArray){
+        mTrack.setStartColorArray(colorArray);
+    }
+
     public void setThumbColor(double[] color) {
         int thumbColor = Color.parseColor(toHex((int) color[0], (int) color[1],
                 (int) color[2]));

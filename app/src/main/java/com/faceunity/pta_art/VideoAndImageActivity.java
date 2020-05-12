@@ -2,6 +2,7 @@ package com.faceunity.pta_art;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.faceunity.pta_art.constant.Constant;
 import com.faceunity.pta_art.utils.BitmapUtil;
 import com.faceunity.pta_art.utils.DateUtil;
 import com.faceunity.pta_art.utils.FileUtil;
+import com.faceunity.pta_art.utils.SurfaceViewOutlineProvider;
 import com.faceunity.pta_art.utils.ToastUtil;
 
 import java.io.File;
@@ -53,10 +55,13 @@ public class VideoAndImageActivity extends AppCompatActivity {
         }
         surfaceview = findViewById(R.id.surfaceview);
         if (isAnimationScenes) {
-            surfaceview.setZOrderOnTop(true);
+            surfaceview.setOutlineProvider(new SurfaceViewOutlineProvider(getResources().getDimensionPixelSize(R.dimen.x16)));
+            surfaceview.setClipToOutline(true);
+            surfaceview.getHolder().setFormat(PixelFormat.RGBA_8888);
             mediaPlayer = new MediaPlayer();
             holder = surfaceview.getHolder();
             holder.addCallback(new MyCallBack());
+
         } else {
             mShowBitmap = BitmapUtil.loadBitmap(path);
             surfaceview.setVisibility(View.GONE);
@@ -151,6 +156,7 @@ public class VideoAndImageActivity extends AppCompatActivity {
             mediaPlayer.setDataSource(path);
             mediaPlayer.setDisplay(holder);
             mediaPlayer.prepareAsync();
+
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {

@@ -24,8 +24,9 @@ public class CountDownTimer extends android.os.CountDownTimer {
 
     @Override
     public void onTick(long millisUntilFinished) {
-        if (!TextUtils.isEmpty(tag))
-            Log.i("ssss", "tag:" + tag + "--time:" + (millisUntilFinished / 1000));
+        if (!TextUtils.isEmpty(tag)) {
+//            Log.i("tag", "tag:" + tag + "--time:" + (millisUntilFinished / 1000));
+        }
         if (listener != null) {
             listener.onTick("(" + (millisUntilFinished / 1000) + "s)");
         }

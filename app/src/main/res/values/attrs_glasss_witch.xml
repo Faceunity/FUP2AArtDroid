@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomGlassSwitchView">
+        <attr name="backgroundColor" format="reference|color" />
+        <attr name="borderColor" format="reference|color" />
+        <attr name="checkedTextColor" format="reference|color" />
+        <attr name="unCheckedTextColor" format="reference|color" />
+        <attr name="centerViewBackGroundColor" format="reference|color" />
+
+        <attr name="borderWidth" format="dimension" />
+
+        <attr name="textSize" format="dimension" />
+
+        <attr name="leftText" format="string" />
+        <attr name="rightText" format="string" />
+
+        <attr name="leftChecked" format="boolean" />
+
+    </declare-styleable>
+</resources>

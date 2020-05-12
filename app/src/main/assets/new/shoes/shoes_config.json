@@ -36,6 +36,18 @@
       "body_match_level": 4
     },
     {
+      "bundle": "new/shoes/xiezi_pixie_gaogen.bundle",
+      "icon": "xiezi_pixie_gaogen",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
+      "bundle": "new/shoes/xiezi_pixie_zhong.bundle",
+      "icon": "xiezi_pixie_zhong",
+      "gender": 2,
+      "body_match_level": 4
+    },
+    {
       "bundle": "new/shoes/xiezi_tuoxie_1.bundle",
       "icon": "xiezi_tuoxie_1",
       "gender": 2,

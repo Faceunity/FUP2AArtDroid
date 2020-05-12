@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/body_filter_back"
+        android:layout_width="@dimen/x108"
+        android:layout_height="@dimen/x108"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/x20"
+        android:scaleType="centerInside"
+        android:src="@drawable/icon_circle_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include layout="@layout/part_text_bottom" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/body_drive_bottom_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x138"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toTopOf="@id/iv_re_back" />
+
+    <com.faceunity.pta_art.ui.BottomTitleGroup
+        android:id="@+id/body_drive_bottom_title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/x72"
+        app:layout_constraintBottom_toTopOf="@id/body_drive_bottom_recycler"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:padding="@dimen/x24"
+        app:text_color="@color/bottom_title_text_color"
+        app:text_size="@dimen/x24" />
+
+</android.support.constraint.ConstraintLayout>
+
+
+

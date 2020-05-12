@@ -22,4 +22,13 @@
     <color name="c333333">#333333</color>
     <color name="cCCF66969">#CCF66969</color>
     <color name="cE6F66969">#E6F66969</color>
+
+    <color name="edit_face_bottom_title_checked">#4C96FF</color>
+    <color name="edit_face_bottom_title_normal">#B8C0CC</color>
+
+    <color name="customer_switch_center_view">#8A9099</color>
+    <color name="customer_switch_checked_text_color">#F5F7FA</color>
+    <color name="customer_switch_unchecked_text_color">#A3A8AF</color>
+    <color name="customer_switch_background">#F5F7FA</color>
+    <color name="customer_switch_border">#EBEDF0</color>
 </resources>

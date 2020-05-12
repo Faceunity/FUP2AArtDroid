@@ -1,66 +1,83 @@
 package com.faceunity.pta_art.ui;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.faceunity.pta_art.R;
 
 /**
- * Created by tujh on 2018/6/12.
+ * Created by jiangyongxing on 2020/3/24.
+ * 描述：
  */
-public class LoadingDialog extends DialogFragment {
-    public static final String TAG = LoadingDialog.class.getSimpleName();
+public class LoadingDialog extends Dialog {
 
-    private LoadingLayout mLoadingLayout;
-    private DismissListener mDismissListener;
-
-    private String loadingStr = "模型保存中";
-
-    public void setLoadingStr(String loadingStr) {
-        this.loadingStr = loadingStr;
+    protected LoadingDialog(@NonNull Context context) {
+        super(context);
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenTheme);
+    protected LoadingDialog(@NonNull Context context, int themeResId) {
+        super(context, themeResId);
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        View rootView = inflater.inflate(R.layout.layout_loading_popup, container, false);
-        mLoadingLayout = rootView.findViewById(R.id.dialog_loading_layout);
-        mLoadingLayout.setLoadingStr(loadingStr);
-        mLoadingLayout.startLoadingAnimation();
-        setCancelable(false);
-        return rootView;
+    protected LoadingDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
+        super(context, cancelable, cancelListener);
     }
 
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        mLoadingLayout.stopLoadingAnimation();
-        if (mDismissListener != null) {
-            mDismissListener.dismissListener();
+
+    public static class Builder {
+
+        private Context context;
+        private LoadingDialog mDialog;
+        private LoadingLayout mLoadingLayout;
+
+        private String loadingStr = "模型保存中";
+
+        public Builder(Context context) {
+            this.context = context;
         }
+
+        public Builder setLoadingStr(String loadingStr) {
+            this.loadingStr = loadingStr;
+            return this;
+        }
+
+        /**
+         * Create the custom dialog
+         */
+        public LoadingDialog create() {
+            mDialog = new LoadingDialog(context, R.style.DialogBackground);
+            Window window = mDialog.getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.setContentView(R.layout.layout_loading_popup);
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            mLoadingLayout = window.findViewById(R.id.dialog_loading_layout);
+            mLoadingLayout.setLoadingStr(loadingStr);
+
+            mDialog.setCancelable(false);
+
+            mDialog.setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    mLoadingLayout.stopLoadingAnimation();
+                }
+            });
+            mDialog.setOnShowListener(new OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    mLoadingLayout.startLoadingAnimation();
+                }
+            });
+            return mDialog;
+        }
+
+
     }
 
-    public void setDismissListener(DismissListener dismissListener) {
-        mDismissListener = dismissListener;
-    }
-
-    public interface DismissListener {
-
-        void dismissListener();
-    }
 }

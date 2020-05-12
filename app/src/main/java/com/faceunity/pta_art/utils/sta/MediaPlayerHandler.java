@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.faceunity.pta_art.utils.sta.player.BaseMediaPlayer;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -18,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class MediaPlayerHandler {
     private static final String TAG = "MediaPlayerHandler";
-    private final Context mContext;
+    private final WeakReference<Context> contextWeakReference;
     private Handler mPlayerHandler;
     private long mCurrentPosition;
     private long mDuration;
@@ -56,7 +57,7 @@ public class MediaPlayerHandler {
     };
 
     public MediaPlayerHandler(Context context) {
-        mContext = context;
+        contextWeakReference = new WeakReference<>(context);
     }
 
     public void setDataSource(String pathOrUrl) {
@@ -166,7 +167,7 @@ public class MediaPlayerHandler {
         mPlayerHandler.post(new Runnable() {
             @Override
             public void run() {
-                mBasePlayer = BaseMediaPlayer.createPlayer(playerType, mContext);
+                mBasePlayer = BaseMediaPlayer.createPlayer(playerType);
                 mBasePlayer.setOnPreparedListener(onPreparedListener);
                 mBasePlayer.setOnCompletionListener(onCompletionListener);
                 mBasePlayer.setOnErrorListener(onErrorListener);

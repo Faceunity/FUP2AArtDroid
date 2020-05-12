@@ -92,4 +92,11 @@ public abstract class EditParamFactory {
             R.drawable.mouth_5, R.drawable.mouth_6, R.drawable.mouth_7, R.drawable.mouth_8, R.drawable.mouth_9, R.drawable.mouth_10};
     private static int[] sParamNoseRes = {R.drawable.nose_1, R.drawable.nose_2, R.drawable.nose_3, R.drawable.nose_4,
             R.drawable.nose_5, R.drawable.nose_6, R.drawable.nose_7, R.drawable.nose_8, R.drawable.nose_9, R.drawable.nose_10};
+
+    public static void release() {
+        mEditParamFace = null;
+        mEditParamMouth = null;
+        mEditParamEye = null;
+        mEditParamNose = null;
+    }
 }

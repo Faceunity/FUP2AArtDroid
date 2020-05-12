@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.faceunity.pta_art.R;
 
 /**
@@ -41,7 +42,7 @@ public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemH
     @Override
     public void onBindViewHolder(@NonNull ItemHolder holder, int pos) {
         final int position = holder.getLayoutPosition();
-        holder.mItemImg.setImageResource(getRes(position));
+        Glide.with(holder.itemView.getContext()).load(getRes(position)).into(holder.mItemImg);
         holder.mSelect.setVisibility(mSelectPosition == position ? View.VISIBLE : View.GONE);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

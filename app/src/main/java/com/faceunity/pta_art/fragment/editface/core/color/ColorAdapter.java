@@ -103,4 +103,8 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ColorHolder>
 
         void colorSelectListener(int position);
     }
+
+    public void setmColorList(double[][] mColorList) {
+        this.mColorList = mColorList;
+    }
 }
