@@ -1,6 +1,5 @@
 package com.faceunity.pta_art.utils.sta;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,15 +19,13 @@ import java.util.List;
  * @author luteng on 2019/10/10 17:51
  */
 public class AliTtsHandler {
-    private Context mContext;
     private String mText;
     private AliTtsCallback aliTtsCallback;
     private OnTtsCallback mOnTtsCallback;
     private FUTtsEngine fuTtsEngine;
     private String voice = "Siqi";
 
-    public AliTtsHandler(Context context) {
-        mContext = context;
+    public AliTtsHandler() {
         aliTtsCallback = new AliTtsCallback();
         initTts();
     }
@@ -94,8 +91,6 @@ public class AliTtsHandler {
          * @param expressionList
          */
         void onSuccess(File aacFile, List<float[]> expressionList);
-
-        void onSuccess(byte[] pcm, List<float[]> expressionList);
 
         /**
          * 失败

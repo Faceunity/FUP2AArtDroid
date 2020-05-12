@@ -63,18 +63,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/edit_face_bottom_title"
-        android:layout_marginBottom="@dimen/x2" />
+        android:background="@color/colorWhite" />
 
     <LinearLayout
         android:id="@+id/ll_model_redo"
         android:layout_width="@dimen/x200"
         android:layout_height="@dimen/x76"
+        android:layout_above="@id/edit_face_center_type"
         android:layout_alignBottom="@id/edit_shape_position"
         android:layout_marginLeft="@dimen/x20"
+        android:layout_marginBottom="@dimen/x20"
         android:background="@drawable/white_bg"
         android:gravity="center"
-        android:layout_above="@id/edit_face_bottom_layout"
-        android:layout_marginBottom="@dimen/x20"
         android:orientation="horizontal">
 
         <ImageView
@@ -100,6 +100,19 @@
             android:scaleType="centerInside"
             android:src="@drawable/sl_redo_right" />
     </LinearLayout>
+
+
+    <com.faceunity.pta_art.ui.BottomTitleGroup
+        android:id="@+id/edit_face_center_type"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x80"
+        android:layout_above="@id/edit_face_bottom_layout"
+        android:background="#F5F7FA"
+        app:padding="@dimen/x52"
+        app:text_color="@color/bottom_title_text_color"
+        app:text_size="@dimen/text_size_28" />
+
+
     <ImageButton
         android:id="@+id/edit_face_back"
         android:layout_width="@dimen/x108"
@@ -124,19 +137,13 @@
         android:scaleType="centerInside"
         android:src="@drawable/edit_face_save" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x2"
-        android:layout_above="@+id/edit_face_bottom_title"
-        android:background="#E5E5E5" />
-
     <com.faceunity.pta_art.ui.BottomTitleGroup
         android:id="@+id/edit_face_bottom_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:padding="@dimen/x40"
+        app:padding="@dimen/x32"
         app:text_color="@color/bottom_title_text_color"
         app:text_size="@dimen/text_size_28" />
 </RelativeLayout>

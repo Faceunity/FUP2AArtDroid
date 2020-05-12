@@ -24,8 +24,11 @@ public abstract class FUPTAClient {
     public static final String FACE_INFO_TEXTURE_TIME = "texture_time";
     public static final String FACE_INFO_ESTIMATE_BUNDLE_TIME = "estimate_bundle_time";
 
-    private static boolean isCoreInit = false;
-    private static boolean isStyleInit = false;
+    /**
+     * 如果需要重复启动SDK界面，需要重新初始化Client库并将isCoreInit、isStyleInit设置为false
+     */
+    public static boolean isCoreInit = false;
+    public static boolean isStyleInit = false;
 
     /**
      * 初始化 p2aClient Core data

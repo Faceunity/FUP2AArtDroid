@@ -3,6 +3,10 @@ package com.faceunity.pta_art;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,38 +23,45 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
+import com.faceunity.pta_art.constant.ColorConstant;
 import com.faceunity.pta_art.constant.Constant;
+import com.faceunity.pta_art.constant.FUPTAClient;
+import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.AvatarHandle;
 import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.pta_art.core.PTACore;
 import com.faceunity.pta_art.entity.AvatarPTA;
+import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.entity.DBHelper;
 import com.faceunity.pta_art.fragment.AvatarFragment;
 import com.faceunity.pta_art.fragment.BaseFragment;
-import com.faceunity.pta_art.fragment.BodyDriveFragment;
 import com.faceunity.pta_art.fragment.EditFaceFragment;
 import com.faceunity.pta_art.fragment.GroupPhotoFragment;
 import com.faceunity.pta_art.fragment.HomeFragment;
 import com.faceunity.pta_art.fragment.TakePhotoFragment;
-import com.faceunity.pta_art.gles.core.GlUtil;
+import com.faceunity.pta_art.fragment.VideoListFragment;
+import com.faceunity.pta_art.fragment.drive.ARFragment;
+import com.faceunity.pta_art.fragment.drive.BodyDriveFragment;
+import com.faceunity.pta_art.fragment.drive.TextDriveFragment;
 import com.faceunity.pta_art.renderer.CameraRenderer;
+import com.faceunity.pta_art.utils.SurfaceViewOutlineProvider;
 import com.faceunity.pta_art.utils.ToastUtil;
-import com.faceunity.pta_art.utils.VideoUtil;
-import com.faceunity.pta_helper.video.MediaEncoder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends AppCompatActivity implements SensorEventListener,
         CameraRenderer.OnCameraRendererStatusListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private RelativeLayout mMainLayout;
-    private View mGroupPhotoRound;
     private GLSurfaceView mGLSurfaceView;
     private CameraRenderer mCameraRenderer;
     private FUPTARenderer mFUP2ARenderer;
@@ -71,13 +82,16 @@ public class MainActivity extends AppCompatActivity implements
     private AvatarPTA mShowAvatarP2A;
 
     /**
+     * 添加重力感应
+     */
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+
+    /**
      * 是否可以点击
      */
     private View v_is_canClick;
     private boolean isCanClick = true;
-
-    private double maxScale = -26.77;//最大缩放值
-    private double minScale = -1400;//最小缩放值
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        mGroupPhotoRound = findViewById(R.id.group_photo_round);
         mGLSurfaceView = findViewById(R.id.main_gl_surface);
         mGLSurfaceView.setEGLContextClientVersion(3);
         mCameraRenderer = new CameraRenderer(this, mGLSurfaceView);
@@ -105,12 +118,9 @@ public class MainActivity extends AppCompatActivity implements
         mGLSurfaceView.setRenderer(mCameraRenderer);
         mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
-        videoUtil = new VideoUtil(mGLSurfaceView);
-
         mDBHelper = new DBHelper(this);
         mAvatarP2As = mDBHelper.getAllAvatarP2As();
         mShowAvatarP2A = mAvatarP2As.get(mShowIndex = 0);
-
         mFUP2ARenderer = new FUPTARenderer(this);
         mP2ACore = new PTACore(this, mFUP2ARenderer);
         mFUP2ARenderer.setFUCore(mP2ACore);
@@ -118,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements
         mAvatarHandle.setAvatar(getShowAvatarP2A(), new Runnable() {
             @Override
             public void run() {
+                mAvatarHandle.openLight(FilePathFactory.BUNDLE_light);
                 mHomeFragment.checkGuide();
             }
         });
@@ -145,47 +156,100 @@ public class MainActivity extends AppCompatActivity implements
                     touchMode = 1;
                     return false;
                 }
-                if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
+                if (BodyDriveFragment.TAG.equals(mShowFragmentFlag) || ARFragment.TAG.equals(mShowFragmentFlag) ||
+                        TextDriveFragment.TAG.equals(mShowFragmentFlag)) {
                     return false;
                 }
                 float rotDelta = -distanceX / screenWidth;
-                float translateDelta = distanceY / screenHeight;
                 mAvatarHandle.setRotDelta(rotDelta);
-                mAvatarHandle.setTranslateDelta(translateDelta);
-                return distanceX != 0 || translateDelta != 0;
+                return distanceX != 0;
             }
         });
         mScaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
             @Override
             public boolean onScale(ScaleGestureDetector detector) {
-                if (touchMode != 2) {
-                    touchMode = 2;
-                    return false;
-                }
                 float scale = detector.getScaleFactor() - 1;
-                mAvatarHandle.setScaleDelta(scale, maxScale, minScale);
                 return scale != 0;
             }
         });
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mP2ACore.setAniLoadCompletedListener(listener);
+
+        mP2ACore.setAniRefreshNowListener(new PTACore.AniRefreshNowListener() {
+            @Override
+            public void refreshNow(int currentHomeAnimationPosition) {
+                listener.loadCompleted(0, currentHomeAnimationPosition, true);
+            }
+        });
     }
+
+    private PTACore.AniLoadCompletedListener listener = new PTACore.AniLoadCompletedListener() {
+        @Override
+        public void loadCompleted(int loadCount, int nextAnimationPosition, boolean haveNextAni) {
+            if (haveNextAni) {
+                List<String> homeSwitchAnimation = FilePathFactory.getHomeSwitchAnimation();
+                if (nextAnimationPosition >= homeSwitchAnimation.size()) {
+                    return;
+                }
+                mAvatarHandle.setExpression(mShowAvatarP2A, new BundleRes(homeSwitchAnimation.get(nextAnimationPosition)), 1);
+            } else {
+                mAvatarHandle.clearExpression(mShowAvatarP2A, true);
+            }
+        }
+    };
+
 
     @Override
     public void onResume() {
         super.onResume();
         mCameraRenderer.openCamera();
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mSensorManager.unregisterListener(this);
         mCameraRenderer.releaseCamera();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mCameraRenderer.onDestroy();
+        Glide.get(FUApplication.getInstance()).clearMemory();
+        super.onDestroy();
     }
+
+
+    private volatile boolean isClose = false;
+    private volatile int closeNum = 5;
+    private CountDownLatch destroyCount;
+
+    public void onFinish() {
+        if (mCameraRenderer != null) {
+            mCameraRenderer.setNeedStopDrawToScreen(true);
+        }
+        mP2ACore.queueNextEvent(new Runnable() {
+            @Override
+            public void run() {
+                closeNum = 5;
+                isClose = true;
+                mP2ACore.release();
+                mP2ACore.face_capture = 0;
+            }
+        });
+        destroyCount = new CountDownLatch(1);
+        try {
+            destroyCount.await(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        finish();
+    }
+
 
     private int touchMode = 0;
 
@@ -193,15 +257,16 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onTouchEvent(MotionEvent event) {
         if (isCanController && (HomeFragment.TAG.equals(mShowFragmentFlag)
                 || EditFaceFragment.TAG.equals(mShowFragmentFlag)
-                || AvatarFragment.TAG.equals(mShowFragmentFlag))
-        ) {
+                || AvatarFragment.TAG.equals(mShowFragmentFlag))) {
             if (event.getPointerCount() == 2) {
                 mScaleGestureDetector.onTouchEvent(event);
-            } else if (event.getPointerCount() == 1)
+            } else if (event.getPointerCount() == 1) {
                 mGestureDetector.onTouchEvent(event);
-        } else if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
-            if (event.getPointerCount() == 1)
-                mGestureDetector.onTouchEvent(event);
+            }
+        } else if ((BodyDriveFragment.TAG.equals(mShowFragmentFlag) ||
+                ARFragment.TAG.equals(mShowFragmentFlag) ||
+                TextDriveFragment.TAG.equals(mShowFragmentFlag)) && event.getPointerCount() == 1) {
+            mGestureDetector.onTouchEvent(event);
         }
         return super.onTouchEvent(event);
     }
@@ -220,6 +285,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public CameraRenderer getCameraRenderer() {
         return mCameraRenderer;
+    }
+
+    public GLSurfaceView getmGLSurfaceView() {
+        return mGLSurfaceView;
     }
 
     @Override
@@ -241,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
                 mP2ACore.setCurrentInstancceId(0);
                 mP2ACore.bind();
                 mFUP2ARenderer.setFUCore(mP2ACore);
-                mAvatarHandle.resetAllMin();
+                mP2ACore.loadWholeBodyCamera();
             }
         }
     }
@@ -265,28 +334,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    //视频录制
-    private VideoUtil videoUtil;
-
-
-    public void startRecording(MediaEncoder.TimeListener timeListener) {
-    }
-
-    private long startTime, startRecord, endRecord;
-
-    public void initReordTime() {
-        startTime = System.currentTimeMillis();
-    }
-
-    public void cancelRecording() {
-        videoUtil.cancelRecording();
-    }
-
-    public void stopRecording() {
-        videoUtil.stopRecording();
-    }
-
-
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mFUP2ARenderer.onSurfaceCreated();
@@ -298,14 +345,37 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public int onDrawFrame(byte[] cameraNV21Byte, int cameraTextureId, int cameraWidth, int cameraHeight, int rotation) {
-        if (BodyDriveFragment.TAG.equals(mShowFragmentFlag)) {
-            mCameraRenderer.refreshLandmarks(((BodyDriveFragment) mBaseFragment).getLandmarksData());
+        if (isClose) {
+            closeNum--;
+            if (closeNum <= 0) {
+                destroyCount.countDown();
+            }
         } else {
             mCameraRenderer.refreshLandmarks(mP2ACore.getLandmarksData());
         }
         int fuTextureId = mFUP2ARenderer.onDrawFrame(cameraNV21Byte, cameraTextureId, cameraWidth, cameraHeight, rotation);
-        videoUtil.sendRecordingData(fuTextureId, GlUtil.IDENTITY_MATRIX);
         return fuTextureId;
+    }
+
+    public void refresh(float[] LandmarksData) {
+        mCameraRenderer.refreshLandmarks(LandmarksData);
+    }
+
+    public void refreshVideo(float[] LandmarksData, int width, int height) {
+        mCameraRenderer.refreshVideoLandmarks(LandmarksData, width, height);
+    }
+
+    public void setBodyStatus(int num) {
+    }
+
+    private boolean isAR;
+
+    public void setIsAR(boolean isAR) {
+        this.isAR = isAR;
+    }
+
+    public boolean getIsAR() {
+        return isAR;
     }
 
     @Override
@@ -328,12 +398,23 @@ public class MainActivity extends AppCompatActivity implements
             mBaseFragment.onBackPressed();
             return;
         }
-        finish();
-        android.os.Process.killProcess(android.os.Process.myPid());
-        Runtime.getRuntime().gc();
+
+        FilePathFactory.clearCache();
+        ColorConstant.release();
+
+        if (FUApplication.needRestartMainActivity) {
+            FUPTAClient.isCoreInit = false;
+            FUPTAClient.isStyleInit = false;
+            onFinish();
+        } else {
+            finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            Runtime.getRuntime().gc();
+        }
     }
 
     public void showHomeFragment() {
+//        mP2ACore.changeBgItem(true);
         if (mCameraRenderer.getCurrentCameraType() == Camera.CameraInfo.CAMERA_FACING_BACK) {
             mCameraRenderer.changeCamera();
         }
@@ -351,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements
         }
         mShowFragmentFlag = HomeFragment.TAG;
         transaction.commit();
-        mAvatarHandle.resetAllMin();
+        mP2ACore.loadWholeBodyCamera();
     }
 
     public void showBaseFragment(String tag) {
@@ -365,30 +446,45 @@ public class MainActivity extends AppCompatActivity implements
             transaction.hide(mHomeFragment);
         }
         if (mBaseFragment != null) {
-            if (AvatarFragment.TAG.equals(mShowFragmentFlag)) {
+            if (VideoListFragment.TAG.equals(tag)) {
                 transaction.hide(mBaseFragment);
             } else {
                 transaction.remove(mBaseFragment);
             }
         }
         Fragment fragment = manager.findFragmentByTag(tag);
+        // 在跳转新的页面的时候，判断是否需要重新调用setAvatar方法
+        boolean needResetAvatar = true;
         if (fragment == null) {
             if (EditFaceFragment.TAG.equals(tag)) {
+                needResetAvatar = false;
                 mBaseFragment = new EditFaceFragment();
-            } else if (BodyDriveFragment.TAG.equals(tag)) {
-                mBaseFragment = new BodyDriveFragment();
-            } else if (TakePhotoFragment.TAG.equals(tag)) {
+            }
+//            else if (BodyDriveFragment.TAG.equals(tag)) {
+//                mBaseFragment = new BodyDriveFragment();
+//            }
+            else if (TakePhotoFragment.TAG.equals(tag)) {
                 mBaseFragment = new TakePhotoFragment();
             } else if (GroupPhotoFragment.TAG.equals(tag)) {
                 mBaseFragment = new GroupPhotoFragment();
             } else if (AvatarFragment.TAG.equals(tag)) {
                 mBaseFragment = new AvatarFragment();
+            } else if (VideoListFragment.TAG.equals(tag)) {
+                mBaseFragment = new VideoListFragment();
+            } else if (BodyDriveFragment.TAG.equals(tag)) {
+                mBaseFragment = new BodyDriveFragment();
+            } else if (ARFragment.TAG.equals(tag)) {
+                mBaseFragment = new ARFragment();
+            } else if (TextDriveFragment.TAG.equals(tag)) {
+                mBaseFragment = new TextDriveFragment();
             }
             transaction.add(R.id.main_fragment_layout, mBaseFragment, tag);
         } else {
             transaction.show(mBaseFragment = (BaseFragment) fragment);
         }
+        mAvatarHandle.clearExpression(mShowAvatarP2A, needResetAvatar);
         mShowFragmentFlag = tag;
+//        mP2ACore.changeBgItem(false);
         transaction.commit();
     }
 
@@ -437,9 +533,11 @@ public class MainActivity extends AppCompatActivity implements
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
         params.width = isMin ? getResources().getDimensionPixelSize(R.dimen.x480) : RelativeLayout.LayoutParams.MATCH_PARENT;
         params.height = isMin ? getResources().getDimensionPixelSize(R.dimen.x592) : RelativeLayout.LayoutParams.MATCH_PARENT;
-        params.topMargin = isMin ? getResources().getDimensionPixelSize(R.dimen.x158) : 0;
+        params.topMargin = isMin ? getResources().getDimensionPixelSize(R.dimen.x130) : 0;
         mGLSurfaceView.setLayoutParams(params);
-        mGroupPhotoRound.setVisibility(isMin ? View.VISIBLE : View.GONE);
+
+        mGLSurfaceView.setOutlineProvider(new SurfaceViewOutlineProvider(isMin ? getResources().getDimensionPixelSize(R.dimen.x16) : 0));
+        mGLSurfaceView.setClipToOutline(isMin);
     }
 
     public void setCanController(boolean canController) {
@@ -475,4 +573,33 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    //手机物理旋转角度
+    private int mSensorOrientation = 0;
+
+    public int getSensorOrientation() {
+        return mSensorOrientation;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+            if (Math.abs(x) > 3 || Math.abs(y) > 3) {
+                if (Math.abs(x) > Math.abs(y)) {
+//                    mSensorOrientation = x > 0 ? 0 : 180;
+                    mSensorOrientation = x > 0 ? 1 : 3;
+                } else {
+//                    mSensorOrientation = y > 0 ? 90 : 270;
+                    mSensorOrientation = y > 0 ? 0 : 2;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }

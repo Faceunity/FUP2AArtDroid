@@ -3,12 +3,9 @@ package com.faceunity.pta_art.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.opengl.EGL14;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +18,16 @@ import com.faceunity.pta_art.core.AvatarHandle;
 import com.faceunity.pta_art.core.PTAMultipleCore;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.Scenes;
+import com.faceunity.pta_art.fragment.groupavatar.GroupPhotoScenesFragment;
 import com.faceunity.pta_art.gles.core.GlUtil;
 import com.faceunity.pta_art.renderer.CameraRenderer;
 import com.faceunity.pta_art.ui.GroupPhotoAvatar;
 import com.faceunity.pta_art.ui.GroupPhotoScenes;
-import com.faceunity.pta_art.utils.DateUtil;
 import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.utils.ToastUtil;
-import com.faceunity.pta_helper.video.MediaEncoder;
-import com.faceunity.pta_helper.video.MediaMuxerWrapper;
-import com.faceunity.pta_helper.video.MediaVideoEncoder;
+import com.faceunity.pta_art.utils.VideoUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 
@@ -57,7 +51,8 @@ public class GroupPhotoFragment extends BaseFragment {
     private AvatarHandle mCurrentAvatarHandler;
     private int isLoadComplete;
 
-    private static final int IMAGE_REQUEST_CODE = 0x102;
+    public static final int IMAGE_REQUEST_CODE = 0x102;
+    private VideoUtil videoUtil;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -66,6 +61,7 @@ public class GroupPhotoFragment extends BaseFragment {
             String filePath = FileUtil.getFileAbsolutePath(mActivity, data.getData());
             File file = new File(filePath);
             if (file.exists()) {
+                mAvatarLayout.removeBgBundlePosition();
                 if (mP2AMultipleCore != null) {
                     mP2AMultipleCore.loadBackgroundImage(filePath);
                     //startGifEncoder();
@@ -101,15 +97,15 @@ public class GroupPhotoFragment extends BaseFragment {
                 mScenes = scenes;
                 mCurrentAvatar = null;
                 currentRoleId = -1;
-                mAvatarLayout.setScenes(mScenes);
                 mActivity.setGLSurfaceViewSize(true);
+                mAvatarLayout.setScenes(mScenes);
                 mP2AMultipleCore = createPTAMultipleCore();
                 mP2ACore.unBind();
                 mFUP2ARenderer.setFUCore(mP2AMultipleCore);
                 mAvatarHandleSparse = mP2AMultipleCore.createAvatarMultiple(mScenes, mAvatarHandle.controllerItem);
                 mAvatarP2As = new AvatarPTA[mScenes.bundles.length];
                 isLoadComplete = 0;
-
+                mAvatarLayout.selectedDefaultScenesBg(scenes);
                 mAvatarLayout.postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -124,6 +120,7 @@ public class GroupPhotoFragment extends BaseFragment {
         });
 
         mAvatarLayout = view.findViewById(R.id.group_photo_avatar);
+        mAvatarLayout.setFragmentManager(getChildFragmentManager());
         mAvatarLayout.setBackRunnable(new Runnable() {
             @Override
             public void run() {
@@ -139,6 +136,10 @@ public class GroupPhotoFragment extends BaseFragment {
                     currentRoleId = roleId;
                     syncPlayAnim(avatar, roleId);
                 } else {
+                    // 停止相机动画
+                    if (mCurrentAvatarHandler != null) {
+                        mCurrentAvatarHandler.setCameraAnim(3);
+                    }
                     mCurrentAvatar = null;
                     currentRoleId = -1;
                     mCurrentAvatarHandler = null;
@@ -163,7 +164,7 @@ public class GroupPhotoFragment extends BaseFragment {
                         public void run() {
                             Intent intent = new Intent(mActivity, VideoAndImageActivity.class);
                             intent.putExtra("isAnimationScenes", isAnimationScenes);
-                            intent.putExtra("path", mOutFile.getAbsolutePath());
+                            intent.putExtra("path", videoUtil.getOutPath());
                             startActivity(intent);
                         }
                     });
@@ -189,28 +190,26 @@ public class GroupPhotoFragment extends BaseFragment {
                 }
             }
         });
-        mAvatarLayout.setBackgroundRunnable(new Runnable() {
+        mAvatarLayout.setBgBundleChangeListener(new GroupPhotoScenesFragment.OnBgBundleChangeListener() {
             @Override
-            public void run() {
-                Intent intent2 = new Intent();
-                intent2.addCategory(Intent.CATEGORY_OPENABLE);
-                intent2.setType("image/*");
-                if (Build.VERSION.SDK_INT < 19) {
-                    intent2.setAction(Intent.ACTION_GET_CONTENT);
-                } else {
-                    intent2.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            public void onBgBundleChangeListener(String path) {
+                mP2AMultipleCore.loadBundleBg(path);
+                if (isAnimationScenes) {
+                    startVideoEncoder();
                 }
-                startActivityForResult(intent2, IMAGE_REQUEST_CODE);
             }
         });
+
+        initVideoUtil();
 
         return view;
     }
 
+    private int currentFrame = 0;
 
     private PTAMultipleCore createPTAMultipleCore() {
         if (mP2AMultipleCore == null) {
-            mP2AMultipleCore = new PTAMultipleCore(mActivity, mFUP2ARenderer, mScenes.bg) {
+            mP2AMultipleCore = new PTAMultipleCore(mActivity, mFUP2ARenderer) {
 
                 @Override
                 public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
@@ -221,6 +220,7 @@ public class GroupPhotoFragment extends BaseFragment {
                         if (nowFrameId >= 1.0f) {
                             //录制mp4完成
                             stopRecording();
+                            currentFrame = 0;
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -228,21 +228,40 @@ public class GroupPhotoFragment extends BaseFragment {
                                 }
                             });
                         } else {
-                            if (mVideoEncoder != null) {
-                                //录制mp4
-                                mVideoEncoder.frameAvailableSoon(fuTex, GlUtil.IDENTITY_MATRIX, GlUtil.IDENTITY_MATRIX);
+                            // 等待3帧再进行录制，防止出现录制到黑屏
+                            if (currentFrame > 3) {
+                                videoUtil.sendRecordingData(fuTex, GlUtil.IDENTITY_MATRIX);
                             }
+                            currentFrame++;
                         }
                     }
                     return fuTex;
                 }
             };
         } else {
-            mP2AMultipleCore.updateBg(mScenes.bg);
+            mP2AMultipleCore.updateBg();
         }
         return mP2AMultipleCore;
     }
 
+    private void initVideoUtil() {
+        videoUtil = new VideoUtil(mActivity.getmGLSurfaceView());
+        videoUtil.setEndListener(null);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopRecording();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isAnimationScenes) {
+            startVideoEncoder();
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -255,7 +274,7 @@ public class GroupPhotoFragment extends BaseFragment {
 
     public void backToHome() {
         stopRecording();
-         if (mP2AMultipleCore != null) {
+        if (mP2AMultipleCore != null) {
             mP2AMultipleCore.release();
             mP2AMultipleCore = null;
         }
@@ -268,7 +287,8 @@ public class GroupPhotoFragment extends BaseFragment {
         mScenesLayout.setVisibility(View.VISIBLE);
         mAvatarLayout.setVisibility(View.GONE);
         mActivity.setCanClick(false, true);
-
+        // 必须重新设置相机动画为开启状态，要不然就首页设置的相机缩放可能就没有效果了
+        mAvatarHandleSparse.get(0).setCameraAnim(1);
         mAvatarLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -285,19 +305,20 @@ public class GroupPhotoFragment extends BaseFragment {
     }
 
     private void startVideoEncoder() {
-        mAvatarLayout.updateNextBtn(false);
         for (int i = 0; i < mAvatarP2As.length; i++) {
             if (mAvatarP2As[i] != null && mCurrentAvatar != null && mAvatarP2As[i].equals(mCurrentAvatar)) {
                 stopRecording();
                 mAvatarP2As[i] = null;
                 mCurrentAvatarHandler = null;
-//                mP2AMultipleCore.unBindInstancceId(currentRoleId);
                 isLoadComplete--;
                 break;
             }
         }
-        if (mCurrentAvatar == null)
+        if (mCurrentAvatar == null) {
+            // 借助AvatarHandle对象停止当前的相机动画
+            mAvatarHandleSparse.get(0).setCameraAnim(3);
             return;
+        }
         syncPlayAnim(mCurrentAvatar, currentRoleId);
     }
 
@@ -312,6 +333,7 @@ public class GroupPhotoFragment extends BaseFragment {
             if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && avatar.getGender() == mScenes.bundles[i].gender))) {
                 avatar.setExpression(mScenes.bundles[i]);
                 final AvatarHandle avatarHandle = mAvatarHandleSparse.get(roleId);
+                avatarHandle.setNeedNextEventCallback(false);
                 mP2AMultipleCore.setCurrentInstancceId(roleId);
                 mActivity.setCanClick(false, true);
                 avatarHandle.setAvatar(mAvatarP2As[i] = avatar, new Runnable() {
@@ -325,6 +347,7 @@ public class GroupPhotoFragment extends BaseFragment {
                                 mActivity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        mAvatarLayout.updateNextBtn(false);
                                         mCurrentAvatarHandler = avatarHandle;
                                         startRecording();
                                     }
@@ -340,18 +363,17 @@ public class GroupPhotoFragment extends BaseFragment {
                                 if (isSels[j]) {
                                     int f_roleId = usedRole.get(j);
                                     if (f_roleId != roleId) {
-                                        mAvatarHandleSparse.get(usedRole.get(j)).setAnimState(3, usedRole.get(j));
-                                        mAvatarHandleSparse.get(usedRole.get(j)).seekToAnimBegin(mAvatarHandleSparse.get(usedRole.get(j)).expressionItem.handle);
-                                        if (mAvatarHandleSparse.get(usedRole.get(j)).otherItem[1] != null) {
-                                            mAvatarHandleSparse.get(usedRole.get(j)).seekToAnimBegin(mAvatarHandleSparse.get(usedRole.get(j)).otherItem[1].handle);
+                                        mAvatarHandleSparse.get(f_roleId).setAnimState(3, f_roleId);
+                                        mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).expressionItem.handle);
+                                        if (mAvatarHandleSparse.get(f_roleId).otherItem[1] != null) {
+                                            mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).otherItem[1].handle);
                                         }
                                     }
                                 }
                             }
                             mAvatarHandleSparse.get(roleId).setAnimState(3, roleId);
                             mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).expressionItem.handle);
-                            mAvatarHandleSparse.get(roleId).setCameraAnim(2);
-                            mAvatarHandleSparse.get(roleId).setCameraAnim(1);
+                            mAvatarHandleSparse.get(roleId).setCameraAnim(4);
 
                             if (mAvatarHandleSparse.get(roleId).otherItem[1] != null) {
                                 /**
@@ -370,72 +392,45 @@ public class GroupPhotoFragment extends BaseFragment {
         }
     }
 
-    private File mOutFile;
-    private MediaVideoEncoder mVideoEncoder;
-
-    /**
-     * 录制封装回调
-     */
-    private final MediaEncoder.MediaEncoderListener mMediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
-        @Override
-        public void onPrepared(final MediaEncoder encoder) {
-            if (encoder instanceof MediaVideoEncoder) {
-                final MediaVideoEncoder videoEncoder = (MediaVideoEncoder) encoder;
-                mP2AMultipleCore.queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        videoEncoder.setEglContext(EGL14.eglGetCurrentContext());
-                        mVideoEncoder = videoEncoder;
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void onStopped(final MediaEncoder encoder) {
-            if (encoder instanceof MediaVideoEncoder) {
-                mVideoEncoder = null;
-                Log.e(TAG, "stop encoder success");
-            }
-        }
-
-        @Override
-        public void onError(String s) {
-            Log.e(TAG, "error:" + s);
-        }
-    };
-
-    private MediaMuxerWrapper mMuxer;
-
     /**
      * 开始录制
      */
     private void startRecording() {
-        try {
-            stopRecording();
-            String videoFileName = DateUtil.getCurrentDate() + "_tmp.mp4";
-            mOutFile = new File(Constant.TmpPath, videoFileName);
-            mMuxer = new MediaMuxerWrapper(mOutFile.getAbsolutePath());
+        int dimensionPixelSize592 = getResources().getDimensionPixelSize(R.dimen.x592);
+        int dimensionPixelSize480 = getResources().getDimensionPixelSize(R.dimen.x480);
+        int textureWidth = mCameraRenderer.getCameraHeight();
+        int textureHeight = mCameraRenderer.getCameraWidth();
 
-            // for video capturing
-            new MediaVideoEncoder(mMuxer, mMediaEncoderListener, mCameraRenderer.getCameraHeight(), mCameraRenderer.getCameraWidth());
-            //new MediaAudioEncoder(mMuxer, mMediaEncoderListener);//去除音频录制
+        int viewWidth = dimensionPixelSize480 - (dimensionPixelSize480 % 3);
+        int viewHeight = dimensionPixelSize592 - (dimensionPixelSize592 % 3);
 
-            mMuxer.prepare();
-            mMuxer.startRecording();
-        } catch (final IOException e) {
-            Log.e(TAG, "startCapture:", e);
+        int scale = textureWidth * viewHeight / viewWidth / textureHeight;
+
+        int videoWidth = 0;
+        int videoHeight = 0;
+
+        if (scale < 1) {
+            //取宽度作为最小值
+            videoWidth = Math.min(textureWidth, viewWidth);
+            videoHeight = videoWidth * viewHeight / viewWidth;
+        } else {
+            // 取高度作为最小值
+            videoHeight = Math.min(textureHeight, viewHeight);
+            videoWidth = videoHeight * viewWidth / viewHeight;
         }
+
+        int cropX = -(textureWidth - videoWidth) / 2;
+        int cropY = -(textureHeight - videoHeight) / 2;
+        videoUtil.startRecording(videoWidth, videoHeight,
+                                 cropX, cropY,
+                                 textureWidth, textureHeight,
+                                 0, null, null);
     }
 
     /**
      * 停止录制
      */
     private void stopRecording() {
-        if (mMuxer != null) {
-            mMuxer.stopRecording();
-            mMuxer = null;
-        }
+        videoUtil.stopRecording();
     }
-
 }

@@ -85,7 +85,7 @@ public class FBOUtils {
         }
     }
 
-    private void deleteFBO() {
+    public void deleteFBO() {
         if (fboId == null || fboTex == null || renderBufferId == null) {
             return;
         }

@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.faceunity.pta_art.R;
 
+import java.lang.ref.SoftReference;
+
 /**
  * Created by tujh on 2018/6/15.
  */
@@ -21,21 +23,50 @@ public class LoadingLayout extends FrameLayout {
     private TextView mLoadingText;
     private ImageView mLoadingImg;
     private AnimationDrawable mLoadingAnimation;
+    private LoadingAnimRunnable mLoadingAnimRunnable = new LoadingAnimRunnable(this);
 
-    private Runnable mLoadingAnimRunnable = new Runnable() {
+    private static class LoadingAnimRunnable implements Runnable {
+
+        private final SoftReference<LoadingLayout> loadingLayoutSoftReference;
         int time;
+
+        public LoadingAnimRunnable(LoadingLayout loadingLayout) {
+            loadingLayoutSoftReference = new SoftReference<>(loadingLayout);
+        }
 
         @Override
         public void run() {
-            StringBuilder str = new StringBuilder(mLoadingStr);
+            LoadingLayout loadingLayout = loadingLayoutSoftReference.get();
+            if (loadingLayout == null) {
+                return;
+            }
+            StringBuilder str = new StringBuilder(loadingLayout.mLoadingStr);
             int t = (++time % 4);
             for (int i = 0; i < t; i++) {
                 str.append(".");
             }
-            mLoadingText.setText(str);
-            mLoadingText.postDelayed(mLoadingAnimRunnable, 500);
+            loadingLayout.mLoadingText.setText(str);
+            loadingLayout.mLoadingText.postDelayed(loadingLayout.mLoadingAnimRunnable, 500);
         }
-    };
+
+
+    }
+
+//    private static class Runnable mLoadingAnimRunnable ex Runnable() {
+//        int time;
+//
+//
+//        @Override
+//        public void run() {
+//            StringBuilder str = new StringBuilder(mLoadingStr);
+//            int t = (++time % 4);
+//            for (int i = 0; i < t; i++) {
+//                str.append(".");
+//            }
+//            mLoadingText.setText(str);
+//            mLoadingText.postDelayed(mLoadingAnimRunnable, 500);
+//        }
+//    };
 
     public LoadingLayout(Context context) {
         this(context, null);
@@ -57,6 +88,7 @@ public class LoadingLayout extends FrameLayout {
     public void stopLoadingAnimation() {
         mLoadingAnimation.stop();
         mLoadingText.removeCallbacks(mLoadingAnimRunnable);
+//        tryRecycleAnimationDrawable(mLoadingAnimation);
     }
 
     public void startLoadingAnimation() {
@@ -67,4 +99,5 @@ public class LoadingLayout extends FrameLayout {
     public void setLoadingStr(String loadingStr) {
         mLoadingStr = loadingStr;
     }
+
 }

@@ -140,6 +140,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/guide_img"
+        android:clickable="true"
         android:elevation="@dimen/x50"
         android:visibility="gone" />
 </RelativeLayout>

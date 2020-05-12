@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,7 +13,9 @@
         android:background="@android:color/transparent"
         android:padding="@dimen/x12"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_back" />
+        android:src="@drawable/group_photo_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/group_photo_avatar_next"
@@ -26,7 +29,9 @@
         android:gravity="center"
         android:text="下一步"
         android:textColor="@color/group_photo_next_background_text"
-        android:textSize="@dimen/text_size_28" />
+        android:textSize="@dimen/text_size_28"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/group_photo_avatar_point"
@@ -34,21 +39,35 @@
         android:layout_height="@dimen/x40"
         android:layout_below="@+id/group_photo_avatar_next"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/x694"
+        android:layout_marginTop="@dimen/x732"
         android:gravity="center"
         android:textColor="#666666"
-        android:textSize="@dimen/text_size_28" />
+        android:textSize="@dimen/text_size_28"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/group_photo_avatar_background"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/x60"
-        android:layout_below="@+id/group_photo_avatar_next"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/x684"
-        android:layout_marginRight="@dimen/x18"
-        android:scaleType="centerInside"
-        android:src="@drawable/group_photo_background" />
+    <android.support.design.widget.TabLayout
+        android:id="@+id/group_photo_avatar_tablayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x80"
+        android:layout_marginTop="@dimen/x42"
+        app:tabTextColor="@color/group_photo_tablayout_text_color"
+        android:background="#F5F7FA"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_avatar_point"
+        app:tabIndicatorColor="@color/translate"
+        app:tabMaxWidth="@dimen/x160"
+        app:tabPaddingEnd="@dimen/x52"
+        app:tabPaddingStart="@dimen/x52" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/group_photo_avatar_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_avatar_tablayout" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/group_photo_avatar_recycler"
@@ -57,5 +76,6 @@
         android:layout_below="@+id/group_photo_avatar_point"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/x42"
-        android:background="#FFFFFF" />
-</RelativeLayout>
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_avatar_tablayout" />
+</android.support.constraint.ConstraintLayout>

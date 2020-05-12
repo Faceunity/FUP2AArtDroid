@@ -9,13 +9,17 @@ import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 
+import com.faceunity.pta_art.gles.FBOUtils;
 import com.faceunity.pta_art.gles.ProgramLandmarks;
 import com.faceunity.pta_art.gles.ProgramTexture2d;
 import com.faceunity.pta_art.gles.ProgramTextureOES;
 import com.faceunity.pta_art.gles.core.GlUtil;
 import com.faceunity.pta_art.utils.CameraUtils;
 import com.faceunity.pta_art.utils.FPSUtil;
+import com.faceunity.pta_art.utils.SmallCameraPositionManager;
+import com.faceunity.pta_art.utils.ToastUtil;
 import com.faceunity.pta_helper.pic.PictureEncoder;
 import com.faceunity.wrapper.faceunity;
 
@@ -39,6 +43,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
 
     private Activity mActivity;
     private GLSurfaceView mGLSurfaceView;
+    private final SmallCameraPositionManager mSmallCameraPositionManager;
 
     public interface OnCameraRendererStatusListener {
         void onSurfaceCreated(GL10 gl, EGLConfig config);
@@ -61,6 +66,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private int mViewWidth = 1280;
     private int mViewHeight = 720;
 
+    private boolean isOpenCamera;
     private boolean isChangeCamera;
     private final Object mCameraLock = new Object();
     private Camera mCamera;
@@ -70,9 +76,13 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private int mCurrentCameraType = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private int mCameraWidth = 1280;
     private int mCameraHeight = 720;
+    private int arTextureHeight = 1280;
+    private int arTextureWidth = 720;
+//    private HandlerThread mCameraThread;
+//    private Handler mCameraHandler;
 
     private byte[] mCameraNV21Byte;
-    private faceunity.RotatedImage mCameraNV21Image;//cpu buffer
+    private faceunity.RotatedImage mRotatedImage;//cpu buffer
     private SurfaceTexture mSurfaceTexture;
     private int mCameraTextureId;
 
@@ -80,7 +90,6 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private static final float[] mtxAvatar = {0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F};
     private final float[] mtx = {0.0F, -1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F};
     private float[] mvp = new float[16];
-    private float[] mvpForCameraWindow = new float[16];
 
     private ProgramTexture2d mFullFrameRectTexture2D;
     private ProgramTextureOES mFullFrameRectTextureOES;
@@ -88,12 +97,16 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     private boolean isShowCamera = false;
     private boolean isShowLandmarks = false;
     private boolean isNeedStopDrawFrame = false;
+    private boolean isNeedStopDrawToScreen = false;
 
     private FPSUtil mFPSUtil;
 
     public CameraRenderer(Activity activity, GLSurfaceView GLSurfaceView) {
         mActivity = activity;
         mGLSurfaceView = GLSurfaceView;
+        //视频渲染接口
+        videoRenderer = new VideoRenderer(mGLSurfaceView);
+        mSmallCameraPositionManager = new SmallCameraPositionManager(mViewHeight, mViewWidth);
     }
 
     public void onDestroy() {
@@ -111,14 +124,16 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
             e.printStackTrace();
         }
         mGLSurfaceView.onPause();
+        mActivity = null;
     }
 
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         mCameraNV21Byte = data;
         mCamera.addCallbackBuffer(data);
-        if (!isNeedStopDrawFrame)
+        if (!isNeedStopDrawFrame && !isShowVideo) {
             mGLSurfaceView.requestRender();
+        }
     }
 
     @Override
@@ -127,47 +142,39 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         mFullFrameRectTextureOES = new ProgramTextureOES();
         mProgramLandmarks = new ProgramLandmarks();
         mCameraTextureId = GlUtil.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
-        mCameraNV21Image = new faceunity.RotatedImage();
+        videoRenderer.onSurfaceCreated();
+        mRotatedImage = new faceunity.RotatedImage();
         cameraStartPreview();
 
         mOnCameraRendererStatusListener.onSurfaceCreated(gl, config);
         mFPSUtil = new FPSUtil();
     }
 
-    int cameraWindowWidth;
-    int cameraWindowHeight;
-
-
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-
         GLES20.glViewport(0, 0, mViewWidth = width, mViewHeight = height);
-        mOnCameraRendererStatusListener.onSurfaceChanged(gl, width, height);
+        mSmallCameraPositionManager.updataWH(mViewHeight, mViewWidth);
+        videoRenderer.onSurfaceChanged(mSmallCameraPositionManager);
+        // 固定身体驱动-视频驱动的模式下的纹理高度为1280，宽度根据屏幕比例进行计算
+        arTextureWidth = arTextureHeight * width / height;
         mvp = GlUtil.changeMVPMatrix(GlUtil.IDENTITY_MATRIX, mViewWidth, mViewHeight, mCameraHeight, mCameraWidth);
+        videoRenderer.onSurfaceChange(width, height);
+        mOnCameraRendererStatusListener.onSurfaceChanged(gl, width, height);
         mFPSUtil.resetLimit();
-        float scale = (height * 1.0f / width);
-        float defaultScale = 16 / 9.0f;
-        if (scale > defaultScale) {
-            // 可能是全面屏，屏幕比16/9 要长
-            cameraWindowWidth = width;
-            cameraWindowHeight = (int) (width * defaultScale);
-        } else {
-            // 这个手机的屏幕比较宽
-            cameraWindowHeight = height;
-            cameraWindowWidth = (int) (height / defaultScale);
-        }
-        mvpForCameraWindow = GlUtil.changeMVPMatrix(GlUtil.IDENTITY_MATRIX, cameraWindowWidth, cameraWindowHeight, mCameraHeight, mCameraWidth);
-
-        GLES20.glClearColor(255, 255, 255, 255);
     }
+
+    private int rendWidth, rendHeight;//渲染的宽和高
+    private boolean isBodyDrive = false;//是否是身体驱动
 
     @Override
     public void onDrawFrame(GL10 gl) {
         if (mFullFrameRectTexture2D == null) return;
         if (isChangeCamera || mCameraNV21Byte == null) {
-            drawToScreen();
-            return;
-        } else if (mCameraNV21Byte != null) {
+            if (!isShowVideo) {
+                drawToScreen();
+                return;
+            }
+        } else if (!isShowVideo) {
             try {
                 mSurfaceTexture.updateTexImage();
                 mSurfaceTexture.getTransformMatrix(mtx);
@@ -175,52 +182,145 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 return;
             }
         }
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        rendWidth = mCameraHeight;
+        rendHeight = mCameraWidth;//渲染的宽和高
 
         //对双输入的cpu buffer进行旋转、镜像，使其与texture对齐
         int NVFormat = faceunity.FU_FORMAT_NV21_BUFFER;
-        int rotateMode;
+        int rotateMode = faceunity.FU_ROTATION_MODE_0;
         int flipX;
         int flipY;
         if (!isNeedStopDrawFrame) {
+            if (isShowVideo) {
+                if (videoRenderer.getVideoNV21Byte() == null) {
+                    return;
+                }
+                //绘制视频YUV
+                int videoRotation = 0;
+                flipX = 0;
+                flipY = 0;
+                switch (videoRenderer.getVideoRotation()) {
+                    case 90:
+                        rotateMode = faceunity.FU_ROTATION_MODE_90;
+                        break;
+                    case 180:
+                        rotateMode = faceunity.FU_ROTATION_MODE_180;
+                        break;
+                    case 270:
+                        rotateMode = faceunity.FU_ROTATION_MODE_270;
+                        break;
+                    default:
+                        break;
+                }
+                faceunity.fuSetOutputResolution(mCameraHeight, mCameraWidth);
+                faceunity.fuSetInputCameraMatrix(flipX, flipY, videoRenderer.getVideoRotation());
+                if (rotateMode == 0) {
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(videoRenderer.getVideoNV21Byte(), 0, videoRenderer.getVideoWidth(), videoRenderer.getVideoHeight(),
+                                                                               videoRotation);
+                } else {
+                    faceunity.fuRotateImage(mRotatedImage, videoRenderer.getVideoNV21Byte(), NVFormat, videoRenderer.getVideoWidth(), videoRenderer.getVideoHeight(), rotateMode, flipX, flipY);
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mRotatedImage.mData, 0, mRotatedImage.mWidth, mRotatedImage.mHeight,
+                                                                               videoRotation);
+                }
+            } else {
+                if (mCameraNV21Byte == null) {
+                    return;
+                }
+                rotateMode = mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? faceunity.FU_ROTATION_MODE_270 : faceunity.FU_ROTATION_MODE_90;
+                flipX = mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? 1 : 0;
+                flipY = 0;
 
-            if (mCameraNV21Byte == null) {
-                return;
+                faceunity.fuRotateImage(mRotatedImage, mCameraNV21Byte, NVFormat, mCameraWidth, mCameraHeight, rotateMode, flipX, flipY);
+                //设置texture的绘制方式
+                faceunity.fuSetInputCameraMatrix(flipX, flipY, rotateMode);
+
+                rendWidth = mRotatedImage.mWidth;
+                rendHeight = mRotatedImage.mHeight;
+                faceunity.fuSetOutputResolution(rendWidth, rendHeight);
+                if (offlineNum >= 0 && mIsNeedTakePic) {
+                    rendWidth = offlineW;
+                    rendHeight = offlineH;
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(null, 0, rendWidth, rendHeight, -1);
+                } else {
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mRotatedImage.mData, mCameraTextureId, rendWidth, rendHeight, -1);
+                }
             }
-
-            rotateMode = mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? faceunity.FU_ROTATION_MODE_270 : faceunity.FU_ROTATION_MODE_90;
-            flipX = mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? 1 : 0;
-            flipY = 0;
-            //旋转buffer
-            faceunity.fuRotateImage(mCameraNV21Image, mCameraNV21Byte, NVFormat, mCameraWidth, mCameraHeight, rotateMode, flipX, flipY);
-//                faceunity.fuSetOutputResolution(1080, 1920);//调整输出纹理的大小
-            //设置输入时的纹理矩阵
-            faceunity.fuSetInputCameraMatrix(flipX, flipY, rotateMode);
-            mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mCameraNV21Image.mData, mCameraTextureId, mCameraNV21Image.mWidth, mCameraNV21Image.mHeight, -1);
         }
         drawToScreen();
+
         if (isShowCamera && mCameraNV21Byte != null) {
-            mFullFrameRectTextureOES.drawFrame(mCameraTextureId, mtx, mvpForCameraWindow, 0, mViewHeight - cameraWindowHeight / 3, cameraWindowWidth / 3, cameraWindowHeight / 3);
+            if (!isShowVideo)
+                mFullFrameRectTextureOES.drawFrame(mCameraTextureId, mtx, mvp,
+                                                   mSmallCameraPositionManager.getStartX(),
+                                                   mSmallCameraPositionManager.getStartY(),
+                                                   mSmallCameraPositionManager.getPreviewCameraWidth(),
+                                                   mSmallCameraPositionManager.getPreviewCameraHeight());
             if (isShowLandmarks) {
-                mProgramLandmarks.drawFrame(0, mViewHeight - cameraWindowHeight / 3, cameraWindowWidth / 3, cameraWindowHeight / 3);
+                mProgramLandmarks.drawFrame(mSmallCameraPositionManager.getStartX(),
+                                            mSmallCameraPositionManager.getStartY(),
+                                            mSmallCameraPositionManager.getPreviewCameraWidth(),
+                                            mSmallCameraPositionManager.getPreviewCameraHeight());
             }
         }
 
-        if (mCameraNV21Image != null)
-            checkPic(mFuTextureId, GlUtil.IDENTITY_MATRIX, mCameraNV21Image.mWidth, mCameraNV21Image.mHeight);
-        else {
-            checkPic(mFuTextureId, GlUtil.IDENTITY_MATRIX, mCameraHeight, mCameraWidth);
+        if (mRotatedImage != null) {
+            if (offlineNum == -1) {
+                checkPic(mFuTextureId, GlUtil.IDENTITY_MATRIX, mRotatedImage.mWidth, mRotatedImage.mHeight);
+            } else {
+                checkPicOffline(mFuTextureId, GlUtil.IDENTITY_MATRIX, rendWidth, rendHeight);
+            }
+        } else {
+            if (offlineNum == -1) {
+                checkPic(mFuTextureId, mtx, mCameraHeight, mCameraWidth);
+            } else {
+                checkPicOffline(mFuTextureId, mtx, mCameraHeight, mCameraWidth);
+            }
         }
 
-        if (!isNeedStopDrawFrame) {
+        if (!isNeedStopDrawFrame && !isShowVideo) {
             mGLSurfaceView.requestRender();
         }
-        mFPSUtil.limit();
+        if (!isShowVideo) {
+            mFPSUtil.limit();
+        }
     }
 
     private void drawToScreen() {
-        if (mFuTextureId > 0) {
+        /**
+         * 拍照时停止绘制纹理到屏幕
+         * 拍照完成后恢复渲染
+         */
+        if (mIsNeedTakePic) {
+            return;
+        }
+        if (offlineNum >= 0) {
+            offlineNum--;
+            return;
+        }
+        /**
+         * 拍照时，不清除原来的屏幕内容
+         * 如果在拍照时清屏，则会造成闪屏
+         */
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        if (isNeedStopDrawToScreen) {
+            // 绘制上一帧的数据
+            mFullFrameRectTexture2D.drawFrame(fboTextureId, GlUtil.IDENTITY_MATRIX, mLastMvp);
+            return;
+        }
+
+        if (isShowVideo) {
             mFullFrameRectTexture2D.drawFrame(mFuTextureId, GlUtil.IDENTITY_MATRIX, mvp);
+            //绘制视频buffer
+            videoRenderer.drawVideo(videoRenderer.getVideoRotation() == 0 ?
+                                            videoRenderer.getVideoNV21Byte() : mRotatedImage.mData);
+        } else if (mFuTextureId > 0) {
+            //纹理矩阵传单位阵接口，因为已经预先把纹理和buffer旋转成竖直的
+            mFullFrameRectTexture2D.drawFrame(mFuTextureId, GlUtil.IDENTITY_MATRIX, mvp);
+            if (isBodyDrive) {
+                videoRenderer.drawCamera(rendWidth, rendHeight, mRotatedImage.mData);
+            }
         } else {
             mFullFrameRectTextureOES.drawFrame(mCameraTextureId, mtx, mvp);
         }
@@ -252,6 +352,10 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
             mProgramLandmarks.release();
             mProgramLandmarks = null;
         }
+        if (fboUtils != null) {
+            fboUtils.deleteFBO();
+            fboUtils = null;
+        }
         mOnCameraRendererStatusListener.onSurfaceDestroy();
     }
 
@@ -263,6 +367,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     public void openCamera(final int cameraType) {
         try {
             synchronized (mCameraLock) {
+                isOpenCamera = true;
                 mCameraNV21Byte = null;
                 Camera.CameraInfo info = new Camera.CameraInfo();
                 int cameraId = 0;
@@ -292,6 +397,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 CameraUtils.setCameraDisplayOrientation(mActivity, cameraId, mCamera);
 
                 Camera.Parameters parameters = mCamera.getParameters();
+                CameraUtils.setFocusModes(parameters);
 
                 int[] size = CameraUtils.choosePreviewSize(parameters, mCameraWidth, mCameraHeight);
                 mCameraWidth = size[0];
@@ -352,6 +458,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     public void releaseCamera() {
         try {
             synchronized (mCameraLock) {
+                isOpenCamera = false;
                 mCameraNV21Byte = null;
                 if (mCamera != null) {
                     mCamera.stopPreview();
@@ -374,10 +481,6 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         releaseCamera();
         openCamera(mCurrentCameraType == Camera.CameraInfo.CAMERA_FACING_FRONT ? Camera.CameraInfo.CAMERA_FACING_BACK : Camera.CameraInfo.CAMERA_FACING_FRONT);
         isChangeCamera = false;
-    }
-
-    public boolean isChangeCamera() {
-        return isChangeCamera;
     }
 
     public int getCameraOrientation() {
@@ -403,8 +506,29 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
     public void setNeedStopDrawFrame(boolean needStopDrawFrame) {
         isNeedStopDrawFrame = needStopDrawFrame;
         if (!isNeedStopDrawFrame) {
-            mGLSurfaceView.requestRender();
+            if (!isShowVideo)
+                mGLSurfaceView.requestRender();
         }
+    }
+
+
+    private float[] mLastMvp;
+    private FBOUtils fboUtils;
+    private int fboTextureId;
+
+    public void setNeedStopDrawToScreen(boolean needStopDrawToScreen) {
+        mGLSurfaceView.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                if (needStopDrawToScreen) {
+                    mLastMvp = mvp;
+                    fboUtils = new FBOUtils();
+                    fboUtils.init();
+                    fboTextureId = fboUtils.drawFBO(mFuTextureId, mCameraHeight, mCameraWidth, 0);
+                }
+                isNeedStopDrawToScreen = needStopDrawToScreen;
+            }
+        });
     }
 
     public boolean isNeedStopDrawFrame() {
@@ -440,6 +564,32 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         mTakePicing = true;
     }
 
+    private int offlineNum = -1;
+    private TakePhotoCallBackOffline takePhotoCallBackOffline;
+    private int offlineW, offlineH;//自定义离屏拍照的大小
+
+    /**
+     * 离屏拍照
+     *
+     * @param takePhotoOffline
+     */
+    public void takePicForOffline(TakePhotoCallBackOffline takePhotoOffline,
+                                  int offlineW, int offlineH) {
+        if (mTakePicing) {
+            return;
+        }
+        //拍照完成的回调
+        takePhotoCallBackOffline = takePhotoOffline;
+        //是否开始拍照
+        mIsNeedTakePic = true;
+        //是否正在拍照
+        mTakePicing = true;
+        //拍照开始渲染的帧数
+        offlineNum = 0;
+        this.offlineW = offlineW;
+        this.offlineH = offlineH;
+    }
+
     private void checkPic(int textureId, float[] mtx, final int texWidth, final int texHeight) {
         if (!mIsNeedTakePic) {
             return;
@@ -457,11 +607,123 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         });
     }
 
+    private void checkPicOffline(int textureId, float[] mtx, final int texWidth, final int texHeight) {
+        if (!mIsNeedTakePic) {
+            return;
+        }
+        if (offlineNum < 3) {
+            offlineNum++;
+            return;
+        }
+        mIsNeedTakePic = false;
+        if (takePhotoCallBackOffline != null) {
+            takePhotoCallBackOffline.endTackPhoto();
+        }
+        PictureEncoder.encoderPicture(textureId, mtx, GlUtil.IDENTITY_MATRIX, texWidth, texHeight, new PictureEncoder.OnEncoderPictureListener() {
+            @Override
+            public void onEncoderPictureListener(Bitmap bitmap) {
+                if (takePhotoCallBackOffline != null) {
+                    takePhotoCallBackOffline.takePhotoCallBack(bitmap);
+                }
+                mTakePicing = false;
+            }
+        });
+    }
+
     public interface TakePhotoCallBack {
         void takePhotoCallBack(Bitmap bmp);
     }
 
+    public interface TakePhotoCallBackOffline {
+        void takePhotoCallBack(Bitmap bmp);
+
+        void endTackPhoto();
+    }
+
     public void refreshLandmarks(float[] landmarks) {
         mProgramLandmarks.refresh(landmarks, mCameraHeight, mCameraWidth, mCameraOrientation, mCurrentCameraType);
+    }
+
+    public void refreshVideoLandmarks(float[] landmarks, int width, int height) {
+        videoRenderer.refreshLandmarks(landmarks, width, height, isShowVideo ? 270 : mCameraOrientation, isShowVideo ? 1 : mCurrentCameraType);
+    }
+
+    //视频渲染
+    private boolean isShowVideo = false;
+    private VideoRenderer videoRenderer;
+    private VideoRenderer.VideoListener listener;
+    private String path;
+    private boolean isDecodeFinish;
+//    private boolean IsVertical = true;//是否是竖屏
+
+    public void setVideoPath(String videoPath) {
+        this.path = videoPath;
+        if (listener == null) {
+            listener = new VideoRenderer.VideoListener() {
+                @Override
+                public void onComplete() {
+                    setVideoPath(path);
+                }
+
+                @Override
+                public void onEnd() {
+                    isDecodeFinish = true;
+                }
+
+                @Override
+                public void onError(String error) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtil.showCenterToast(mActivity,
+                                                      error);
+                        }
+                    });
+                }
+            };
+        }
+        if (TextUtils.isEmpty(videoPath)) {
+            videoRenderer.resetByte();
+            isDecodeFinish = videoRenderer.isDecodeFinish();
+            while (!isDecodeFinish) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            isShowVideo = false;
+        } else {
+            isShowVideo = true;
+            videoRenderer.setPath(videoPath, listener);
+            videoRenderer.play();
+        }
+    }
+
+    public void setStopVideo(boolean isNeedStopVideo) {
+        videoRenderer.setNeedStopDrawFrame(isNeedStopVideo);
+        if (isNeedStopVideo) {
+            videoRenderer.resetByte();
+        }
+    }
+
+    /**
+     * 显示视频驱动的点位
+     */
+    public void setVideoLandmarks(boolean isShowLandmarks) {
+        videoRenderer.setShowLandmarks(isShowLandmarks);
+    }
+
+    public void setBodyDrive(boolean isBodyDrive) {
+        this.isBodyDrive = isBodyDrive;
+    }
+
+    public boolean isShowVideo() {
+        return isShowVideo;
+    }
+
+
+    public SmallCameraPositionManager getmSmallCameraPositionManager() {
+        return mSmallCameraPositionManager;
     }
 }

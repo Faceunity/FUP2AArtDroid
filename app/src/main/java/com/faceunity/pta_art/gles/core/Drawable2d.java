@@ -79,4 +79,13 @@ public class Drawable2d {
         return mVertexCount;
     }
 
+    public void release() {
+        if (mTexCoordArray != null) {
+            mTexCoordArray.clear();
+        }
+        if (mVertexArray != null) {
+            mVertexArray.clear();
+        }
+    }
+
 }

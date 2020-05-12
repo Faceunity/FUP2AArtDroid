@@ -1,7 +1,5 @@
 package com.faceunity.pta_art.utils.sta.player;
 
-import android.content.Context;
-
 /**
  * 播放器接口
  *
@@ -36,7 +34,7 @@ public abstract class BaseMediaPlayer {
     protected OnCompletionListener mOnCompletionListener;
     protected OnPreparedListener mOnPreparedListener;
 
-    public static BaseMediaPlayer createPlayer(int type, Context context) {
+    public static BaseMediaPlayer createPlayer(int type) {
         switch (type) {
             case BaseMediaPlayer.TYPE_PCM:
                 return new PcmPlayer();

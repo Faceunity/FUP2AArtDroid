@@ -5,7 +5,7 @@ import android.content.Context;
 import com.faceunity.pta_art.constant.Constant;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.entity.AvatarPTA;
-import com.faceunity.pta_art.fragment.EditFaceFragment;
+import com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -133,25 +133,25 @@ public abstract class EditFacePointFactory {
 
     public static EditFacePoint[] getEditPoints(int id, int gender, boolean isFront) {
         switch (id) {
-            case EditFaceFragment.TITLE_FACE_INDEX:
+            case EditFaceItemManager.TITLE_FACE_INDEX:
                 return Constant.style == Constant.style_art ?
                         (gender == AvatarPTA.gender_boy ?
                                 isFront ? EditFacePointFactory.mMaleFaceFrontPoints : EditFacePointFactory.mMaleFaceSidePoints
                                 : isFront ? EditFacePointFactory.mFemaleFaceFrontPoints : EditFacePointFactory.mFemaleFaceSidePoints)
                         : isFront ? EditFacePointFactory.mMidFaceFrontPoints : EditFacePointFactory.mMidFaceSidePoints;
-            case EditFaceFragment.TITLE_EYE_INDEX:
+            case EditFaceItemManager.TITLE_EYE_INDEX:
                 return Constant.style == Constant.style_art ?
                         (gender == AvatarPTA.gender_boy ?
                                 isFront ? EditFacePointFactory.mMaleEyeFrontPoints : EditFacePointFactory.mMaleEyeSidePoints
                                 : isFront ? EditFacePointFactory.mFemaleEyeFrontPoints : EditFacePointFactory.mFemaleEyeSidePoints)
                         : isFront ? EditFacePointFactory.mMidEyeFrontPoints : EditFacePointFactory.mMidEyeSidePoints;
-            case EditFaceFragment.TITLE_MOUTH_INDEX:
+            case EditFaceItemManager.TITLE_MOUTH_INDEX:
                 return Constant.style == Constant.style_art ?
                         (gender == AvatarPTA.gender_boy ?
                                 isFront ? EditFacePointFactory.mMaleMouthFrontPoints : EditFacePointFactory.mMaleMouthSidePoints
                                 : isFront ? EditFacePointFactory.mFemaleMouthFrontPoints : EditFacePointFactory.mFemaleMouthSidePoints)
                         : isFront ? EditFacePointFactory.mMidMouthFrontPoints : EditFacePointFactory.mMidMouthSidePoints;
-            case EditFaceFragment.TITLE_NOSE_INDEX:
+            case EditFaceItemManager.TITLE_NOSE_INDEX:
                 return Constant.style == Constant.style_art ?
                         (gender == AvatarPTA.gender_boy ?
                                 isFront ? EditFacePointFactory.mMaleNoseFrontPoints : EditFacePointFactory.mMaleNoseSidePoints
@@ -159,5 +159,36 @@ public abstract class EditFacePointFactory {
                         : isFront ? EditFacePointFactory.mMidNoseFrontPoints : EditFacePointFactory.mMidNoseSidePoints;
         }
         return new EditFacePoint[0];
+    }
+
+
+    public static void release() {
+
+        mMaleFaceFrontPoints = null;
+        mMaleFaceSidePoints = null;
+        mMaleEyeFrontPoints = null;
+        mMaleEyeSidePoints = null;
+        mMaleMouthFrontPoints = null;
+        mMaleMouthSidePoints = null;
+        mMaleNoseFrontPoints = null;
+        mMaleNoseSidePoints = null;
+
+        mFemaleFaceFrontPoints = null;
+        mFemaleFaceSidePoints = null;
+        mFemaleEyeFrontPoints = null;
+        mFemaleEyeSidePoints = null;
+        mFemaleMouthFrontPoints = null;
+        mFemaleMouthSidePoints = null;
+        mFemaleNoseFrontPoints = null;
+        mFemaleNoseSidePoints = null;
+
+        mMidFaceFrontPoints = null;
+        mMidFaceSidePoints = null;
+        mMidEyeFrontPoints = null;
+        mMidEyeSidePoints = null;
+        mMidMouthFrontPoints = null;
+        mMidMouthSidePoints = null;
+        mMidNoseFrontPoints = null;
+        mMidNoseSidePoints = null;
     }
 }

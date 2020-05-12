@@ -9,8 +9,8 @@
     <com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x120"
-        android:background="@color/colorF7F7F7"
+        android:layout_height="@dimen/x100"
+        android:background="@color/colorWhite"
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
         android:scrollbars="none"
@@ -19,7 +19,7 @@
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/color_item_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x362"
+        android:layout_height="@dimen/x350"
         android:background="@color/colorWhite"
         android:scrollbars="none"/>
 </LinearLayout>

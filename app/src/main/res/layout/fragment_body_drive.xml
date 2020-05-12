@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -45,9 +44,26 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:padding="@dimen/x24"
         app:text_color="@color/bottom_title_text_color"
-        app:text_size="@dimen/text_size_24" />
+        app:text_size="@dimen/x24" />
 
-    <include layout="@layout/part_text_bottom" />
+
+    <include
+        android:id="@+id/body_drive_setting_view"
+        layout="@layout/part_body_drive_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/body_drive_bottom_title" />
+
+    <TextView
+        android:id="@+id/tv_no_body_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
 
 

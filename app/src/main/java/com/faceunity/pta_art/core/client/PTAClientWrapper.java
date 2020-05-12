@@ -83,11 +83,15 @@ public abstract class PTAClientWrapper {
         avatarP2A.setShoeIndex(Constant.style == Constant.style_art ? 0 : FilePathFactory.indexOfGender(FilePathFactory.shoeBundleRes(avatarP2A.getGender()), avatarP2A.getGender()));
         if (avatarP2A.getGender() == AvatarPTA.gender_boy) {
             avatarP2A.setClothesUpperIndex(1);
+            avatarP2A.setLipglossColorValue(6);
         } else {
             avatarP2A.setClothesUpperIndex(5);
+            avatarP2A.setLipglossColorValue(1);
         }
         avatarP2A.setClothesLowerIndex(1);
         avatarP2A.setShoeIndex(1);
+        avatarP2A.setBackground2DIndex(1);
+        avatarP2A.setBodyLevel(3);
     }
 
     public static double[] changeFloat2Double(float[] color) {

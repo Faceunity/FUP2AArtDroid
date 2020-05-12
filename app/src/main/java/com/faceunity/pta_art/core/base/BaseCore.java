@@ -5,6 +5,7 @@ import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.wrapper.faceunity;
 
@@ -30,6 +31,12 @@ public abstract class BaseCore {
     protected faceunity.AvatarInfo avatarInfo = new faceunity.AvatarInfo();
     protected float[] faceRectData = new float[4];
     public long face_capture;//创建面部追踪模型
+
+    protected int wholeBodyCameraItem;
+    protected int smallWholeBodyCameraItem;
+    protected int halfLengthBodyCameraItem;
+    protected int bigHalfLengthBodyCameraItem;
+    protected int currentCameraItem;
 
     public BaseCore(Context context, FUPTARenderer fuP2ARenderer) {
         this.mContext = context.getApplicationContext();
@@ -244,5 +251,52 @@ public abstract class BaseCore {
                 }
             }
         };
+    }
+
+
+    /**
+     * 相机bundle - 全身
+     */
+    public void loadWholeBodyCamera() {
+        if (currentCameraItem != 0 && currentCameraItem == wholeBodyCameraItem) {
+            return;
+        }
+        wholeBodyCameraItem = createAndLoadCameraItem(wholeBodyCameraItem, FilePathFactory.CAMERA_WHOLE_BODY);
+    }
+
+    /**
+     * 相机bundle - 全身-更小
+     */
+    public void loadSmallWholeBodyCamera() {
+        if (currentCameraItem != 0 && currentCameraItem == smallWholeBodyCameraItem) {
+            return;
+        }
+        smallWholeBodyCameraItem = createAndLoadCameraItem(smallWholeBodyCameraItem, FilePathFactory.CAMERA_SMALL_WHOLE_BODY);
+
+    }
+
+    /**
+     * 相机bundle - 半身
+     */
+    public void loadHalfLengthBodyCamera() {
+        if (currentCameraItem != 0 && currentCameraItem == halfLengthBodyCameraItem) {
+            return;
+        }
+
+        halfLengthBodyCameraItem = createAndLoadCameraItem(halfLengthBodyCameraItem, FilePathFactory.CAMERA_HALF_LENGTH_BODY);
+    }
+
+    /**
+     * 相机bundle - 半身-更大
+     */
+    public void loadBigHalfLengthBodyCamera() {
+        if (currentCameraItem != 0 && currentCameraItem == bigHalfLengthBodyCameraItem) {
+            return;
+        }
+        bigHalfLengthBodyCameraItem = createAndLoadCameraItem(bigHalfLengthBodyCameraItem, FilePathFactory.CAMERA_BIG_HALF_LENGTH_BODY);
+    }
+
+    protected int createAndLoadCameraItem(int itemId, String bundlePath) {
+        return 0;
     }
 }

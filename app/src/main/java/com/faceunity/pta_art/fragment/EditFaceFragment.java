@@ -38,6 +38,7 @@ import com.faceunity.pta_art.fragment.editface.EditFaceItemFragment;
 import com.faceunity.pta_art.fragment.editface.EditShapeFragment;
 import com.faceunity.pta_art.fragment.editface.core.ColorValuesChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.EditFaceBaseFragment;
+import com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager;
 import com.faceunity.pta_art.fragment.editface.core.ItemChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.shape.EditFaceParameter;
 import com.faceunity.pta_art.fragment.editface.core.shape.EditFacePoint;
@@ -54,11 +55,57 @@ import com.faceunity.pta_art.utils.ToastUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_BEARD;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_CLOTH;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_CLOTHLOWER;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_CLOTHUPPER;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_DECORATIONS;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_EYE;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_EYEBROW;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_EYELASH;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_EYELINER;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_EYESHADOW;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_FACE;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_FACEMAKEUP;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_GLASSES;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_HAIR;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_HAT;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_LIPGLOSS;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_MOUTH;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_NOSE;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_PUPIL;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_SCENES_2D;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_SCENES_3D;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_SCENES_ANIMATION;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.BUNDLE_NAME_SHOSE;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_BEARD_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_CLOTHES_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_CLOTHES_LOWER_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_CLOTHES_UPPER_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_DECORATIONS_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_EYEBROW_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_EYELASH_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_EYELINER_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_EYESHADOW_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_EYE_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_FACEMAKEUP_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_FACE_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_GLASSES_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_HAIR_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_HAT_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_LIPGLOSS_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_MOUTH_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_NOSE_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_PUPIL_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_SCENES_2D;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_SCENES_3D;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_SCENES_ANIMATION;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.TITLE_SHOE_INDEX;
 
 
 /**
@@ -74,87 +121,12 @@ public class EditFaceFragment extends BaseFragment
     private ImageButton mSaveBtn;
     private BottomTitleGroup mEditFaceTitle;
 
-    public static final int TITLE_HAIR_INDEX = 0;
-    public static final int TITLE_FACE_INDEX = 1;
-    public static final int TITLE_EYE_INDEX = 2;
-    public static final int TITLE_MOUTH_INDEX = 3;
-    public static final int TITLE_NOSE_INDEX = 4;
-    public static final int TITLE_EYELASH_INDEX = 5;
-    public static final int TITLE_EYEBROW_INDEX = 6;
-    public static final int TITLE_BEARD_INDEX = 7;
-
-    public static final int TITLE_EYELINER_INDEX = 8;
-    public static final int TITLE_EYESHADOW_INDEX = 9;
-    public static final int TITLE_PUPIL_INDEX = 10;
-    public static final int TITLE_LIPGLOSS_INDEX = 11;
-    public static final int TITLE_FACEMAKEUP_INDEX = 12;
-
-    public static final int TITLE_GLASSES_INDEX = 13;
-    public static final int TITLE_HAT_INDEX = 14;
-    public static final int TITLE_CLOTHES_INDEX = 15;
-    public static final int TITLE_CLOTHES_UPPER_INDEX = 16;
-    public static final int TITLE_CLOTHES_LOWER_INDEX = 17;
-    public static final int TITLE_SHOE_INDEX = 18;
-    public static final int TITLE_DECORATIONS_INDEX = 19;
-
-    private static final int EditFaceSelectBottomCount = 20;
-
     private int mEditFaceSelectBottomId = TITLE_HAIR_INDEX;
     private SparseArray<EditFaceBaseFragment> mEditFaceBaseFragments = new SparseArray<>();
 
-    private static final String[] title_final = new String[]{
-            "发型", "脸型", "眼型", "嘴型", "鼻型",
-            "睫毛", "眉毛", "胡子", "眼线", "眼影",
-            "美瞳", "唇妆", "脸妆", "眼镜", "帽子",
-            "套装", "上衣", "下衣", "鞋子", "饰品"};
-    private String[] title;
-    private int[] title_id;
-    private int lastFragmentId = -1;
+    private EditFaceItemManager mEditFaceItemManager;
+    private BottomTitleGroup mCenterItemGroup;
 
-    private void updateTitle(int gender) {
-        List<Integer> titleT = new ArrayList<>();
-        if (FilePathFactory.hairBundleRes(gender).size() > 1)
-            titleT.add(TITLE_HAIR_INDEX);
-        titleT.add(TITLE_FACE_INDEX);
-        titleT.add(TITLE_EYE_INDEX);
-        titleT.add(TITLE_MOUTH_INDEX);
-        titleT.add(TITLE_NOSE_INDEX);
-        if (FilePathFactory.eyelashBundleRes(gender).size() > 1)
-            titleT.add(TITLE_EYELASH_INDEX);
-
-        if (FilePathFactory.eyebrowBundleRes(gender).size() > 1) {
-            titleT.add(TITLE_EYEBROW_INDEX);
-        }
-        if (FilePathFactory.beardBundleRes(gender).size() > 1) {
-            titleT.add(TITLE_BEARD_INDEX);
-        }
-
-        titleT.add(TITLE_EYELINER_INDEX);
-        titleT.add(TITLE_EYESHADOW_INDEX);
-        titleT.add(TITLE_PUPIL_INDEX);
-        titleT.add(TITLE_LIPGLOSS_INDEX);
-        titleT.add(TITLE_FACEMAKEUP_INDEX);
-
-        if (FilePathFactory.glassesBundleRes(gender).size() > 1)
-            titleT.add(TITLE_GLASSES_INDEX);
-        if (FilePathFactory.hatBundleRes(gender).size() > 1)
-            titleT.add(TITLE_HAT_INDEX);
-        if (FilePathFactory.clothesBundleRes(gender).size() > 1)
-            titleT.add(TITLE_CLOTHES_INDEX);
-        titleT.add(TITLE_CLOTHES_UPPER_INDEX);
-        titleT.add(TITLE_CLOTHES_LOWER_INDEX);
-        if (FilePathFactory.shoeBundleRes(gender).size() > 1)
-            titleT.add(TITLE_SHOE_INDEX);
-        titleT.add(TITLE_DECORATIONS_INDEX);
-
-
-        title = new String[titleT.size()];
-        title_id = new int[titleT.size()];
-
-        for (int i = 0; i < titleT.size(); i++) {
-            title[i] = title_final[title_id[i] = titleT.get(i)];
-        }
-    }
 
     private Runnable task;
 
@@ -165,7 +137,6 @@ public class EditFaceFragment extends BaseFragment
     private CheckBox mIsFrontBox;
     private boolean isResetFront = false;
     private boolean isFront = true;
-    private boolean isNeedScale = true;
     private PTACore mEditP2ACore;
     //捏脸撤销按钮
     private LinearLayout ll_redo;
@@ -195,7 +166,6 @@ public class EditFaceFragment extends BaseFragment
         mFragmentLayout = view.findViewById(R.id.edit_face_bottom_layout);
 
         mEditFaceTitle = view.findViewById(R.id.edit_face_bottom_title);
-        updateTitle(mAvatarP2A.getGender());
         mEditFaceTitle.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -205,7 +175,15 @@ public class EditFaceFragment extends BaseFragment
                 mEditFaceSelectBottomId = checkedId;
             }
         });
-        mEditFaceTitle.setResStrings(title, title_id, mEditFaceSelectBottomId);
+
+        mEditFaceItemManager = new EditFaceItemManager();
+        mEditFaceItemManager.init(mAvatarP2A.getGender());
+        int[][] titleIdAndIcons = mEditFaceItemManager.getTitleIdAndIcons(EditFaceItemManager.EDIT_FACE_TYPE_PINCH);
+        mEditFaceTitle.setResIcon(titleIdAndIcons[1], titleIdAndIcons[0], mEditFaceSelectBottomId);
+
+        mCenterItemGroup = view.findViewById(R.id.edit_face_center_type);
+        mCenterItemGroup.setResStrings(mEditFaceItemManager.getCenterTypeStr(), mEditFaceItemManager.getCenterTypeIds(), 0);
+
 
         showFragment(mEditFaceSelectBottomId);
         updateSaveBtn();
@@ -219,10 +197,10 @@ public class EditFaceFragment extends BaseFragment
                 int fuTex = super.onDrawFrame(img, tex, w, h, rotation);
                 if (mEditFacePoints != null) {
                     parsePoint(mEditFacePoints,
-                            w,
-                            h,
-                            view.getWidth(),
-                            view.getHeight()
+                               w,
+                               h,
+                               view.getWidth(),
+                               view.getHeight()
                     );
                     mEditPointLayout.setPointList(mEditFacePoints);
                 }
@@ -293,6 +271,23 @@ public class EditFaceFragment extends BaseFragment
         iv_model_redo_right.setEnabled(false);
         helper.setListener(this);
 
+
+        mCenterItemGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                mEditFaceItemManager.centerTypeSelectedPosition = checkedId;
+                int[][] idAndIcons = mEditFaceItemManager.getTitleIdAndIcons(checkedId);
+                mEditFaceTitle.setResIcon(idAndIcons[1], idAndIcons[0], mEditFaceItemManager.getSelectedFragmentId());
+                mEditFaceTitle.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mEditFaceTitle.smoothScrollToByCheckedId(mEditFaceItemManager.getSelectedFragmentId(), false);
+                    }
+                });
+                showFragment(mEditFaceItemManager.getSelectedFragmentId());
+                mEditFaceSelectBottomId = mEditFaceItemManager.getSelectedFragmentId();
+            }
+        });
         return view;
     }
 
@@ -348,11 +343,18 @@ public class EditFaceFragment extends BaseFragment
 
     public void backToHome(AvatarPTA avatarP2A) {
         helper.clearRevoke();
+        mAvatarHandle.clearExpression(avatarP2A, false);
         mActivity.showHomeFragment();
         mAvatarHandle.setNeedFacePUP(false);
         mActivity.setCanController(true);
         mFUP2ARenderer.setFUCore(mP2ACore);
-        mAvatarHandle.setAvatar(avatarP2A);
+
+        mActivity.setShowAvatarP2A(avatarP2A);
+        mAvatarHandle.setAvatar(avatarP2A, false, true, null);
+
+        mEditFaceParameter.release();
+        EditFacePointFactory.release();
+        EditParamFactory.release();
     }
 
     @Override
@@ -372,6 +374,12 @@ public class EditFaceFragment extends BaseFragment
                         isResetFront = true;
                         mIsFrontBox.setChecked(true);
                     }
+                    helper.record(-1, mEditFaceParameter.getTemp());
+                    iv_model_redo_left.setEnabled(true);
+                    iv_redo_left.setEnabled(false);
+                    iv_redo_right.setEnabled(false);
+                    mEditFaceParameter.clearRevoke();
+
                     mAvatarHandle.setPose(false);
                     mAvatarHandle.setAvatar(mAvatarP2A);
                     setEditFacePoints(null, false);
@@ -432,6 +440,10 @@ public class EditFaceFragment extends BaseFragment
             }
             if (show == null) {
                 switch (id) {
+                    case TITLE_HAIR_INDEX:
+                        show = new EditFaceColorItemFragment();
+                        ((EditFaceColorItemFragment) show).initData(ColorConstant.hair_color, (int) mAvatarP2A.getHairColorValue(), mColorValuesChangeListener, FilePathFactory.hairBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHairIndex(), mItemChangeListener);
+                        break;
                     case TITLE_FACE_INDEX:
                         show = new EditShapeFragment();
                         double value = -1;
@@ -454,41 +466,59 @@ public class EditFaceFragment extends BaseFragment
                         break;
                     case TITLE_MOUTH_INDEX:
                         show = new EditShapeFragment();
-                        double mouthValue;
-                        if (mAvatarP2A.getLipColorValue() < 0) {
-                            mouthValue = mAvatarHandle.fuItemGetParamLipColorIndex();
-                            mAvatarP2A.setLipColorValue(mouthValue);
-                            mDefaultAvatarP2A.setLipColorValue(mouthValue);
-                        } else {
-                            mouthValue = mAvatarP2A.getLipColorValue();
-                        }
-                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamMouth, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamMouth), ColorConstant.lip_color, mouthValue, mColorValuesChangeListener);
+                        ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamMouth, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamMouth));
                         break;
                     case TITLE_NOSE_INDEX:
                         show = new EditShapeFragment();
                         ((EditShapeFragment) show).initDate(EditParamFactory.mEditParamNose, mEditFaceStatusChaneListener, checkSelectPos(EditParamFactory.mEditParamNose));
                         break;
-                    case TITLE_HAIR_INDEX:
+                    case TITLE_EYEBROW_INDEX:
                         show = new EditFaceColorItemFragment();
-                        ((EditFaceColorItemFragment) show).initData(ColorConstant.hair_color, (int) mAvatarP2A.getHairColorValue(), mColorValuesChangeListener,
-                                FilePathFactory.hairBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHairIndex(), mItemChangeListener);
+                        ((EditFaceColorItemFragment) show).initData(ColorConstant.makeup_color, (int) mAvatarP2A.getEyebrowColorValue(), mColorValuesChangeListener,
+                                                                    FilePathFactory.eyebrowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyebrowIndex(), mItemChangeListener);
                         break;
-                    case TITLE_HAT_INDEX:
+                    case TITLE_EYELASH_INDEX:
                         show = new EditFaceColorItemFragment();
-                        ((EditFaceColorItemFragment) show).initData(ColorConstant.hat_color, (int) mAvatarP2A.getHatColorValue(), mColorValuesChangeListener,
-                                FilePathFactory.hatBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHatIndex(), mItemChangeListener);
+                        ((EditFaceColorItemFragment) show).initData(ColorConstant.makeup_color, (int) mAvatarP2A.getEyelashColorValue(), mColorValuesChangeListener,
+                                                                    FilePathFactory.eyelashBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyelashIndex(), mItemChangeListener);
                         break;
                     case TITLE_BEARD_INDEX:
                         show = new EditFaceItemFragment();
                         ((EditFaceItemFragment) show).initData(FilePathFactory.beardBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getBeardIndex(), mItemChangeListener);
                         break;
-                    case TITLE_EYEBROW_INDEX:
+                    // 美妆部分
+                    case TITLE_EYELINER_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyebrowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyebrowIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyelinerBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyelinerIndex(), mItemChangeListener);
                         break;
-                    case TITLE_EYELASH_INDEX:
+                    case TITLE_EYESHADOW_INDEX:
+                        show = new EditFaceColorItemFragment();
+                        ((EditFaceColorItemFragment) show).initData(ColorConstant.makeup_color, (int) mAvatarP2A.getEyeshadowColorValue(), mColorValuesChangeListener,
+                                                                    FilePathFactory.eyeshadowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyeshadowIndex(), mItemChangeListener);
+                        break;
+                    case TITLE_PUPIL_INDEX:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyelashBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyelashIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.pupilBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getPupilIndex(), mItemChangeListener);
+                        break;
+                    case TITLE_LIPGLOSS_INDEX:
+                        show = new EditFaceColorItemFragment();
+                        ((EditFaceColorItemFragment) show).initData(ColorConstant.lip_color, (int) mAvatarP2A.getLipglossColorValue(), mColorValuesChangeListener,
+                                                                    FilePathFactory.lipglossBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getLipglossIndex(), mItemChangeListener);
+                        break;
+                    case TITLE_FACEMAKEUP_INDEX:
+                        show = new EditFaceItemFragment();
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.facemakeupBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getFaceMakeupIndex(), mItemChangeListener);
+                        break;
+                    // 换装部分
+                    case TITLE_GLASSES_INDEX:
+                        show = new EditFaceGlassesFragment();
+                        ((EditFaceGlassesFragment) show).initData(ColorConstant.glass_color, (int) mAvatarP2A.getGlassesColorValue(), mColorValuesChangeListener,
+                                                                  ColorConstant.glass_frame_color, (int) mAvatarP2A.getGlassesFrameColorValue(),
+                                                                  FilePathFactory.glassesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getGlassesIndex(), mItemChangeListener);
+                        break;
+                    case TITLE_HAT_INDEX:
+                        show = new EditFaceItemFragment();
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.hatBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getHatIndex(), mItemChangeListener);
                         break;
                     case TITLE_CLOTHES_INDEX:
                         show = new EditFaceItemFragment();
@@ -510,31 +540,18 @@ public class EditFaceFragment extends BaseFragment
                         show = new EditFaceItemFragment();
                         ((EditFaceItemFragment) show).initData(FilePathFactory.decorationsBundleRes(), mAvatarP2A.getDecorationsIndex(), mItemChangeListener);
                         break;
-                    case TITLE_GLASSES_INDEX:
-                        show = new EditFaceGlassesFragment();
-                        ((EditFaceGlassesFragment) show).initData(ColorConstant.glass_color, (int) mAvatarP2A.getGlassesColorValue(), mColorValuesChangeListener,
-                                ColorConstant.glass_frame_color, (int) mAvatarP2A.getGlassesFrameColorValue(), mColorValuesChangeListener,
-                                FilePathFactory.glassesBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getGlassesIndex(), mItemChangeListener);
-                        break;
-                    case TITLE_EYELINER_INDEX:
+
+                    case TITLE_SCENES_2D:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyelinerBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyelinerIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.scenes2DBundleRes(), mAvatarP2A.getBackground2DIndex(), mItemChangeListener);
                         break;
-                    case TITLE_EYESHADOW_INDEX:
+                    case TITLE_SCENES_3D:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.eyeshadowBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getEyeshadowIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.scenes3dBundleRes(), mAvatarP2A.getBackground3DIndex(), mItemChangeListener);
                         break;
-                    case TITLE_FACEMAKEUP_INDEX:
+                    case TITLE_SCENES_ANIMATION:
                         show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.facemakeupBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getFaceMakeupIndex(), mItemChangeListener);
-                        break;
-                    case TITLE_LIPGLOSS_INDEX:
-                        show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.lipglossBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getLipglossIndex(), mItemChangeListener);
-                        break;
-                    case TITLE_PUPIL_INDEX:
-                        show = new EditFaceItemFragment();
-                        ((EditFaceItemFragment) show).initData(FilePathFactory.pupilBundleRes(mAvatarP2A.getGender()), mAvatarP2A.getPupilIndex(), mItemChangeListener);
+                        ((EditFaceItemFragment) show).initData(FilePathFactory.scenesAniBundleRes(), mAvatarP2A.getBackgroundAniIndex(), mItemChangeListener);
                         break;
                 }
                 if (show != null) {
@@ -549,34 +566,31 @@ public class EditFaceFragment extends BaseFragment
                 transaction.show(show);
             }
             transaction.commit();
-            if (id == -1) {
-                isNeedScale = false;
-            }
-            setEditFacePoints(null, false);
-
-            if (id == -1 || id == TITLE_FACE_INDEX) {
-//                mAvatarHandle.resetAll();
-                // 在衣服、上衣、下衣、鞋子、配饰界面下，列表收起时，人物要放大半身状态
-                // 但是在列表收起状态下，对人物进行缩放，点击屏幕时候，不对模型进行恢复
-                if (lastFragmentId != -1 &&
-                        (mEditFaceSelectBottomId == TITLE_CLOTHES_INDEX
-                                || mEditFaceSelectBottomId == TITLE_CLOTHES_UPPER_INDEX
-                                || mEditFaceSelectBottomId == TITLE_CLOTHES_LOWER_INDEX
-                                || mEditFaceSelectBottomId == TITLE_SHOE_INDEX
-                                || mEditFaceSelectBottomId == TITLE_DECORATIONS_INDEX
-                                || mEditFaceSelectBottomId == TITLE_GLASSES_INDEX)) {
-                    mAvatarHandle.resetAll();
-                }
-            } else if (id == TITLE_CLOTHES_INDEX || id == TITLE_CLOTHES_LOWER_INDEX
-                    || id == TITLE_CLOTHES_UPPER_INDEX || id == TITLE_SHOE_INDEX
-                    || id == TITLE_DECORATIONS_INDEX
-                    || id == TITLE_GLASSES_INDEX
-                    || id == TITLE_HAT_INDEX) {
-                mAvatarHandle.resetAllMinBottom();
+            if (id != -1) {
+                mEditFaceItemManager.setSelectedFragmentID(id);
+                mCenterItemGroup.setVisibility(View.VISIBLE);
             } else {
-                mAvatarHandle.resetAll();
+                mCenterItemGroup.setVisibility(View.GONE);
             }
-            lastFragmentId = id;
+            if (id == -1) {
+                mP2ACore.loadWholeBodyCamera();
+            } else if (id == TITLE_CLOTHES_INDEX
+                    || id == TITLE_CLOTHES_UPPER_INDEX
+                    || id == TITLE_CLOTHES_LOWER_INDEX
+                    || id == TITLE_SHOE_INDEX
+                    || id == TITLE_DECORATIONS_INDEX) {
+                mAvatarHandle.setExpression(mAvatarP2A, new BundleRes(FilePathFactory.EXPRESSION_ANI_DRESS_UP), Integer.MAX_VALUE);
+                mP2ACore.loadSmallWholeBodyCamera();
+
+            } else if (id == TITLE_SCENES_2D
+                    || id == TITLE_SCENES_3D
+                    || id == TITLE_SCENES_ANIMATION) {
+                mAvatarHandle.clearExpression(mAvatarP2A, true);
+                mP2ACore.loadSmallWholeBodyCamera();
+            } else {
+                mAvatarHandle.clearExpression(mAvatarP2A, true);
+                mP2ACore.loadHalfLengthBodyCamera();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -608,29 +622,30 @@ public class EditFaceFragment extends BaseFragment
             if (pos == 0) {
                 mAvatarHandle.setPose(true);
                 mAvatarHandle.setAvatar(mAvatarP2A);
+                mP2ACore.loadBigHalfLengthBodyCamera();
                 updateEditPoint(false);
             } else {
                 iv_model_redo_left.setEnabled(true);
                 switch (id) {
                     case TITLE_FACE_INDEX:
                         helper.record(id,
-                                "face", lastPos,
-                                "", 0.0);
+                                      BUNDLE_NAME_FACE, lastPos,
+                                      "", 0.0, mEditFaceParameter.getMap());
                         break;
                     case TITLE_EYE_INDEX:
                         helper.record(id,
-                                "eye", lastPos,
-                                "", 0.0);
+                                      BUNDLE_NAME_EYE, lastPos,
+                                      "", 0.0, mEditFaceParameter.getMap());
                         break;
                     case TITLE_MOUTH_INDEX:
                         helper.record(id,
-                                "mouth", lastPos,
-                                "", 0.0);
+                                      BUNDLE_NAME_MOUTH, lastPos,
+                                      "", 0.0, mEditFaceParameter.getMap());
                         break;
                     case TITLE_NOSE_INDEX:
                         helper.record(id,
-                                "nose", lastPos,
-                                "", 0.0);
+                                      BUNDLE_NAME_NOSE, lastPos,
+                                      "", 0.0, mEditFaceParameter.getMap());
                         break;
                 }
 
@@ -641,7 +656,6 @@ public class EditFaceFragment extends BaseFragment
     };
 
     private LoadingDialog mLoadingDialogHair;
-    private boolean isStartLoading = false;
 
     ItemChangeListener mItemChangeListener = new ItemChangeListener() {
         @Override
@@ -650,59 +664,116 @@ public class EditFaceFragment extends BaseFragment
             iv_model_redo_left.setEnabled(true);
             switch (id) {
                 case TITLE_HAIR_INDEX:
-                    helper.record(TITLE_HAIR_INDEX,
-                            "hair", mAvatarP2A.getHairIndex(),
-                            "", 0.0);
+                    // 主要是考虑到了发帽
+                    if (mAvatarP2A.getHatIndex() == 0) {
+                        helper.record(TITLE_HAIR_INDEX,
+                                      BUNDLE_NAME_HAIR, mAvatarP2A.getHairIndex(),
+                                      "", 0.0);
+                    } else {
+                        helper.record(TITLE_HAT_INDEX,
+                                      BUNDLE_NAME_HAT, mAvatarP2A.getHatIndex(),
+                                      "", 0.0);
+                        mAvatarP2A.setHatIndex(0);
+                        EditFaceItemFragment hatFragment = (EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_HAT_INDEX);
+                        if (hatFragment != null) {
+                            hatFragment.setItem(0);
+                        }
+
+                    }
                     mAvatarP2A.setHairIndex(pos);
 
                     if (pos > 0 && mAvatarP2A.getHairFile().startsWith(Constant.filePath)) {
                         File file = new File(mAvatarP2A.getHairFile());
                         if (!file.exists() || file.length() <= 0) {
                             if (mLoadingDialogHair == null) {
-                                mLoadingDialogHair = new LoadingDialog();
-                                mLoadingDialogHair.setLoadingStr("头发生成中...");
+                                LoadingDialog.Builder builder = new LoadingDialog.Builder(mActivity);
+                                builder.setLoadingStr("头发生成中...");
+                                mLoadingDialogHair = builder.create();
                             }
-                            mLoadingDialogHair.show(getChildFragmentManager(), LoadingDialog.TAG);
-                            isStartLoading = true;
+                            mLoadingDialogHair.show();
                             downHair(pos);
                             return;
                         }
                     }
                     break;
-                case TITLE_BEARD_INDEX:
-                    helper.record(TITLE_BEARD_INDEX,
-                            "beard", mAvatarP2A.getBeardIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setBeardIndex(pos);
+                case TITLE_EYELASH_INDEX:
+                    helper.record(TITLE_EYELASH_INDEX,
+                                  BUNDLE_NAME_EYELASH, mAvatarP2A.getEyelashIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setEyelashIndex(pos);
                     break;
                 case TITLE_EYEBROW_INDEX:
                     helper.record(TITLE_EYEBROW_INDEX,
-                            "eyebrow", mAvatarP2A.getLipglossIndex(),
-                            "", 0.0);
+                                  BUNDLE_NAME_EYEBROW, mAvatarP2A.getEyebrowIndex(),
+                                  "", 0.0);
                     mAvatarP2A.setEyebrowIndex(pos);
                     break;
-                case TITLE_EYELASH_INDEX:
-                    helper.record(TITLE_EYELASH_INDEX,
-                            "eyelash", mAvatarP2A.getLipglossIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setEyelashIndex(pos);
+                case TITLE_BEARD_INDEX:
+                    helper.record(TITLE_BEARD_INDEX,
+                                  BUNDLE_NAME_BEARD, mAvatarP2A.getBeardIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setBeardIndex(pos);
                     break;
+                // 美妆部分
+                case TITLE_EYELINER_INDEX:
+                    helper.record(TITLE_EYELINER_INDEX,
+                                  BUNDLE_NAME_EYELINER, mAvatarP2A.getEyelinerIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setEyelinerIndex(pos);
+                    break;
+                case TITLE_EYESHADOW_INDEX:
+                    helper.record(TITLE_EYESHADOW_INDEX,
+                                  BUNDLE_NAME_EYESHADOW, mAvatarP2A.getEyeshadowIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setEyeshadowIndex(pos);
+                    break;
+                case TITLE_PUPIL_INDEX:
+                    helper.record(TITLE_PUPIL_INDEX,
+                                  BUNDLE_NAME_PUPIL, mAvatarP2A.getPupilIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setPupilIndex(pos);
+                    break;
+                case TITLE_LIPGLOSS_INDEX:
+                    helper.record(TITLE_LIPGLOSS_INDEX,
+                                  BUNDLE_NAME_LIPGLOSS, mAvatarP2A.getLipglossIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setLipglossIndex(pos);
+                    break;
+                case TITLE_FACEMAKEUP_INDEX:
+                    helper.record(TITLE_FACEMAKEUP_INDEX,
+                                  BUNDLE_NAME_FACEMAKEUP, mAvatarP2A.getFaceMakeupIndex(),
+                                  "", 0.0);
+                    mAvatarP2A.setFaceMakeupIndex(pos);
+                    break;
+                // 换装部分
                 case TITLE_GLASSES_INDEX:
                     helper.record(TITLE_GLASSES_INDEX,
-                            "glasses", mAvatarP2A.getGlassesIndex(),
-                            "", 0.0);
+                                  BUNDLE_NAME_GLASSES, mAvatarP2A.getGlassesIndex(),
+                                  "", 0.0);
                     mAvatarP2A.setGlassesIndex(pos);
                     break;
                 case TITLE_HAT_INDEX:
-                    helper.record(TITLE_HAT_INDEX,
-                            "hat", mAvatarP2A.getHatIndex(),
-                            "", 0.0);
+                    // 主要是考虑到了发帽
+                    if (mAvatarP2A.getHairIndex() != 0) {
+                        helper.record(TITLE_HAIR_INDEX,
+                                      BUNDLE_NAME_HAIR, mAvatarP2A.getHairIndex(),
+                                      "", 0.0);
+                        mAvatarP2A.setHairIndex(0);
+                        EditFaceColorItemFragment hatFragment = (EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_HAIR_INDEX);
+                        if (hatFragment != null) {
+                            hatFragment.setItem(0);
+                        }
+                    } else {
+                        helper.record(TITLE_HAT_INDEX,
+                                      BUNDLE_NAME_HAT, mAvatarP2A.getHatIndex(),
+                                      "", 0.0);
+                    }
                     mAvatarP2A.setHatIndex(pos);
                     break;
                 case TITLE_CLOTHES_INDEX:
                     helper.record(TITLE_CLOTHES_INDEX,
-                            "cloth", mAvatarP2A.getClothesIndex(),
-                            "", 0.0);
+                                  BUNDLE_NAME_CLOTH, mAvatarP2A.getClothesIndex(),
+                                  "", 0.0);
                     EditFaceItemFragment clothes_lower_fragment, clothes_upper_fragment;
                     if (pos == 0) {
                         if (mAvatarP2A.getClothesUpperIndex() == 0) {
@@ -744,15 +815,15 @@ public class EditFaceFragment extends BaseFragment
                     if (pos == 0) {
                         if (mAvatarP2A.getClothesIndex() == 0) {
                             ToastUtil.showCenterToast(mActivity,
-                                    "必须有一件上衣");
+                                                      "必须有一件上衣");
                             return;
                         }
                     } else {
                         if (mAvatarP2A.getClothesIndex() != 0) {
                             hasRecord = true;
                             helper.record(TITLE_CLOTHES_INDEX,
-                                    "cloth", mAvatarP2A.getClothesIndex(),
-                                    "", 0.0);
+                                          BUNDLE_NAME_CLOTH, mAvatarP2A.getClothesIndex(),
+                                          "", 0.0);
                             mAvatarP2A.setClothesIndex(0);
                             EditFaceItemFragment clothes_suit_fragment = ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_CLOTHES_INDEX));
                             if (clothes_suit_fragment != null) {
@@ -770,8 +841,8 @@ public class EditFaceFragment extends BaseFragment
 
                     if (!hasRecord) {
                         helper.record(TITLE_CLOTHES_UPPER_INDEX,
-                                "clothUpper", mAvatarP2A.getClothesUpperIndex(),
-                                "", 0.0);
+                                      BUNDLE_NAME_CLOTHUPPER, mAvatarP2A.getClothesUpperIndex(),
+                                      "", 0.0);
                     }
                     mAvatarP2A.setClothesUpperIndex(pos);
                     setBodyLevelForClothes(pos, FilePathFactory.clothUpperBundleRes());
@@ -780,15 +851,15 @@ public class EditFaceFragment extends BaseFragment
                     if (pos == 0) {
                         if (mAvatarP2A.getClothesIndex() == 0) {
                             ToastUtil.showCenterToast(mActivity,
-                                    "必须有一件裤子");
+                                                      "必须有一件裤子");
                             return;
                         }
                     } else {
                         if (mAvatarP2A.getClothesIndex() != 0) {
                             hasRecord = true;
                             helper.record(TITLE_CLOTHES_INDEX,
-                                    "cloth", mAvatarP2A.getClothesIndex(),
-                                    "", 0.0);
+                                          BUNDLE_NAME_CLOTH, mAvatarP2A.getClothesIndex(),
+                                          "", 0.0);
                             mAvatarP2A.setClothesIndex(0);
                             EditFaceItemFragment clothes_suit_fragment = ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_CLOTHES_INDEX));
                             if (clothes_suit_fragment != null) {
@@ -809,53 +880,84 @@ public class EditFaceFragment extends BaseFragment
                     }
                     if (!hasRecord) {
                         helper.record(TITLE_CLOTHES_LOWER_INDEX,
-                                "clothLower", mAvatarP2A.getClothesLowerIndex(),
-                                "", 0.0);
+                                      BUNDLE_NAME_CLOTHLOWER, mAvatarP2A.getClothesLowerIndex(),
+                                      "", 0.0);
                     }
                     mAvatarP2A.setClothesLowerIndex(pos);
                     break;
                 case TITLE_SHOE_INDEX:
                     helper.record(TITLE_SHOE_INDEX,
-                            "shose", mAvatarP2A.getShoeIndex(),
-                            "", 0.0);
+                                  BUNDLE_NAME_SHOSE, mAvatarP2A.getShoeIndex(),
+                                  "", 0.0);
                     mAvatarP2A.setShoeIndex(pos);
                     break;
                 case TITLE_DECORATIONS_INDEX:
                     helper.record(TITLE_DECORATIONS_INDEX,
-                            "decorations", mAvatarP2A.getDecorationsIndex(),
-                            "", 0.0);
+                                  BUNDLE_NAME_DECORATIONS, mAvatarP2A.getDecorationsIndex(),
+                                  "", 0.0);
                     mAvatarP2A.setDecorationsIndex(pos);
                     break;
-                case TITLE_EYELINER_INDEX:
-                    helper.record(TITLE_EYELINER_INDEX,
-                            "eyeliner", mAvatarP2A.getEyelinerIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setEyelinerIndex(pos);
+
+                case TITLE_SCENES_2D:
+                    if (mAvatarP2A.getBackgroundAniIndex() != -1) {
+                        helper.record(TITLE_SCENES_ANIMATION,
+                                      BUNDLE_NAME_SCENES_ANIMATION, mAvatarP2A.getBackgroundAniIndex(),
+                                      "", 0.0);
+                    } else if (mAvatarP2A.getBackground3DIndex() != -1) {
+                        helper.record(TITLE_SCENES_3D,
+                                      BUNDLE_NAME_SCENES_3D, mAvatarP2A.getBackground3DIndex(),
+                                      "", 0.0);
+                    } else {
+                        helper.record(TITLE_SCENES_2D,
+                                      BUNDLE_NAME_SCENES_2D, mAvatarP2A.getBackground2DIndex(),
+                                      "", 0.0);
+                    }
+
+                    mAvatarP2A.setBackground2DIndex(pos);
+                    mAvatarP2A.setBackground3DIndex(-1);
+                    mAvatarP2A.setBackgroundAniIndex(-1);
                     break;
-                case TITLE_EYESHADOW_INDEX:
-                    helper.record(TITLE_EYESHADOW_INDEX,
-                            "eyeshadow", mAvatarP2A.getEyeshadowIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setEyeshadowIndex(pos);
+
+                case TITLE_SCENES_3D:
+                    if (mAvatarP2A.getBackgroundAniIndex() != -1) {
+                        helper.record(TITLE_SCENES_ANIMATION,
+                                      BUNDLE_NAME_SCENES_ANIMATION, mAvatarP2A.getBackgroundAniIndex(),
+                                      "", 0.0);
+                    } else if (mAvatarP2A.getBackground3DIndex() != -1) {
+                        helper.record(TITLE_SCENES_3D,
+                                      BUNDLE_NAME_SCENES_3D, mAvatarP2A.getBackground3DIndex(),
+                                      "", 0.0);
+                    } else {
+                        helper.record(TITLE_SCENES_2D,
+                                      BUNDLE_NAME_SCENES_3D, mAvatarP2A.getBackground2DIndex(),
+                                      "", 0.0);
+                    }
+
+                    mAvatarP2A.setBackground3DIndex(pos);
+                    mAvatarP2A.setBackground2DIndex(-1);
+                    mAvatarP2A.setBackgroundAniIndex(-1);
                     break;
-                case TITLE_FACEMAKEUP_INDEX:
-                    helper.record(TITLE_FACEMAKEUP_INDEX,
-                            "facemakeup", mAvatarP2A.getFaceMakeupIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setFaceMakeupIndex(pos);
+
+                case TITLE_SCENES_ANIMATION:
+                    if (mAvatarP2A.getBackgroundAniIndex() != -1) {
+                        helper.record(TITLE_SCENES_ANIMATION,
+                                      BUNDLE_NAME_SCENES_ANIMATION, mAvatarP2A.getBackgroundAniIndex(),
+                                      "", 0.0);
+                    } else if (mAvatarP2A.getBackground3DIndex() != -1) {
+                        helper.record(TITLE_SCENES_3D,
+                                      BUNDLE_NAME_SCENES_3D, mAvatarP2A.getBackground3DIndex(),
+                                      "", 0.0);
+                    } else {
+                        helper.record(TITLE_SCENES_2D,
+                                      BUNDLE_NAME_SCENES_2D, mAvatarP2A.getBackground2DIndex(),
+                                      "", 0.0);
+                    }
+
+                    mAvatarP2A.setBackgroundAniIndex(pos);
+                    mAvatarP2A.setBackground2DIndex(-1);
+                    mAvatarP2A.setBackground3DIndex(-1);
                     break;
-                case TITLE_LIPGLOSS_INDEX:
-                    helper.record(TITLE_LIPGLOSS_INDEX,
-                            "lipgloss", mAvatarP2A.getLipglossIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setLipglossIndex(pos);
-                    break;
-                case TITLE_PUPIL_INDEX:
-                    helper.record(TITLE_PUPIL_INDEX,
-                            "pupil", mAvatarP2A.getPupilIndex(),
-                            "", 0.0);
-                    mAvatarP2A.setPupilIndex(pos);
-                    break;
+
             }
             mAvatarHandle.setAvatar(mAvatarP2A);
             updateSaveBtn();
@@ -895,7 +997,6 @@ public class EditFaceFragment extends BaseFragment
                     @Override
                     public void run() {
                         mLoadingDialogHair.dismiss();
-                        isStartLoading = false;
                         mAvatarHandle.setAvatar(mAvatarP2A);
                         updateSaveBtn();
                     }
@@ -913,8 +1014,8 @@ public class EditFaceFragment extends BaseFragment
                 case TITLE_HAIR_INDEX:
                     iv_model_redo_left.setEnabled(true);
                     helper.record(TITLE_HAIR_INDEX,
-                            "", 0.0,
-                            "hair_color", mAvatarP2A.getHairColorValue());
+                                  "", 0.0,
+                                  "hair_color", mAvatarP2A.getHairColorValue());
                     mAvatarP2A.setHairColorValue(pos);
                     double[] hair_color = ColorConstant.hair_color[pos];
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hair_color, Arrays.copyOf(hair_color, 3));
@@ -927,30 +1028,65 @@ public class EditFaceFragment extends BaseFragment
                 case TITLE_EYE_INDEX:
                     iv_model_redo_left.setEnabled(true);
                     helper.record(TITLE_EYE_INDEX,
-                            "", 0.0,
-                            "eye_color", mAvatarP2A.getIrisColorValue());
+                                  "", 0.0,
+                                  "eye_color", mAvatarP2A.getIrisColorValue());
                     mAvatarP2A.setIrisColorValue(values);
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_iris_color, ColorConstant.getColor(ColorConstant.iris_color, values));
                     break;
-                case TITLE_MOUTH_INDEX:
+
+                //美妆相关
+                case TITLE_EYEBROW_INDEX:
                     iv_model_redo_left.setEnabled(true);
-                    helper.record(TITLE_MOUTH_INDEX,
-                            "", 0.0,
-                            "eye_color", mAvatarP2A.getLipColorValue());
-                    mAvatarP2A.setLipColorValue(values);
-                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_lip_color, ColorConstant.getColor(ColorConstant.lip_color, values));
+                    helper.record(TITLE_EYEBROW_INDEX,
+                                  "", 0.0,
+                                  "eyebrow_color", mAvatarP2A.getEyebrowColorValue());
+                    mAvatarP2A.setEyebrowColorValue(pos);
+
+                    double[] eyebrow_color = ColorConstant.makeup_color[pos];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyebrowItem.handle, Arrays.copyOf(eyebrow_color, 3));
                     break;
+                case TITLE_EYESHADOW_INDEX:
+                    iv_model_redo_left.setEnabled(true);
+                    helper.record(TITLE_EYESHADOW_INDEX,
+                                  "", 0.0,
+                                  "eyeshadow_color", mAvatarP2A.getEyeshadowColorValue());
+                    mAvatarP2A.setEyeshadowColorValue(pos);
+
+                    double[] eyeshadow_color = ColorConstant.makeup_color[pos];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyeshadowItem.handle, Arrays.copyOf(eyeshadow_color, 3));
+                    break;
+                case TITLE_LIPGLOSS_INDEX:
+                    iv_model_redo_left.setEnabled(true);
+                    helper.record(TITLE_LIPGLOSS_INDEX,
+                                  "", 0.0,
+                                  "lipgloss_color", mAvatarP2A.getLipglossColorValue());
+                    mAvatarP2A.setLipglossColorValue(pos);
+
+                    double[] lipgloss_color = ColorConstant.lip_color[pos];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.lipglossItem.handle, Arrays.copyOf(lipgloss_color, 3));
+                    break;
+                case TITLE_EYELASH_INDEX:
+                    iv_model_redo_left.setEnabled(true);
+                    helper.record(TITLE_EYELASH_INDEX,
+                                  "", 0.0,
+                                  "eyelash_color", mAvatarP2A.getEyelashColorValue());
+                    mAvatarP2A.setEyelashColorValue(pos);
+
+                    double[] eyelash_color = ColorConstant.makeup_color[pos];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyelashItem.handle, Arrays.copyOf(eyelash_color, 3));
+                    break;
+                // 换装部分
                 case TITLE_GLASSES_INDEX:
                     if (index == EditFaceGlassesFragment.GLASSES_COLOR) {
                         helper.record(TITLE_GLASSES_INDEX,
-                                "", 0.0,
-                                "glass_color", mAvatarP2A.getGlassesColorValue());
+                                      "", 0.0,
+                                      "glass_color", mAvatarP2A.getGlassesColorValue());
                         mAvatarP2A.setGlassesColorValue(pos);
                         mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_glass_color, ColorConstant.glass_color[pos]);
                     } else {
                         helper.record(TITLE_GLASSES_INDEX,
-                                "", 0.0,
-                                "glass_frame_color", mAvatarP2A.getGlassesFrameColorValue());
+                                      "", 0.0,
+                                      "glass_frame_color", mAvatarP2A.getGlassesFrameColorValue());
 
                         mAvatarP2A.setGlassesFrameColorValue(pos);
                         mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_glass_frame_color, ColorConstant.glass_frame_color[pos]);
@@ -958,11 +1094,12 @@ public class EditFaceFragment extends BaseFragment
                     break;
                 case TITLE_HAT_INDEX:
                     helper.record(TITLE_HAT_INDEX,
-                            "", 0.0,
-                            "hat_color", mAvatarP2A.getHatColorValue());
+                                  "", 0.0,
+                                  "hat_color", mAvatarP2A.getHatColorValue());
                     mAvatarP2A.setHatColorValue(pos);
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hat_color, ColorConstant.hat_color[pos]);
                     break;
+
             }
             updateSaveBtn();
         }
@@ -993,8 +1130,8 @@ public class EditFaceFragment extends BaseFragment
             switch (id) {
                 case TITLE_FACE_INDEX:
                     helper.record(TITLE_FACE_INDEX,
-                            "", 0.0,
-                            "face_color", oldProgressValue);
+                                  "", 0.0,
+                                  "face_color", oldProgressValue);
                     break;
             }
         }
@@ -1007,8 +1144,8 @@ public class EditFaceFragment extends BaseFragment
     private LoadingDialog mLoadingDialog;
 
     private void saveAvatar() {
-        mLoadingDialog = new LoadingDialog();
-        mLoadingDialog.show(getChildFragmentManager(), LoadingDialog.TAG);
+        mLoadingDialog = new LoadingDialog.Builder(mActivity).create();
+        mLoadingDialog.show();
 
         new AvatarEditor(mActivity).saveAvatar(mAvatarP2A, mEditFaceParameter, new AvatarEditor.SaveAvatarListener() {
             @Override
@@ -1030,7 +1167,7 @@ public class EditFaceFragment extends BaseFragment
                         });
                     }
                 };
-                if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
+                if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
                     mActivity.runOnUiThread(task);
                     task = null;
                 }
@@ -1046,7 +1183,7 @@ public class EditFaceFragment extends BaseFragment
                         ToastUtil.showCenterToast(mActivity, "模型保存失败，请重试");
                     }
                 };
-                if (mLoadingDialog != null && !mLoadingDialog.isStateSaved()) {
+                if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
                     mActivity.runOnUiThread(task);
                     task = null;
                 }
@@ -1057,12 +1194,10 @@ public class EditFaceFragment extends BaseFragment
     private void setEditFacePoints(EditFacePoint[] editFacePoints, boolean isStateChange) {
         mEditFacePoints = editFacePoints;
         if (mEditPointLayout == null) return;
-        if (mEditFacePoints == null) {
-            if (isNeedScale) {
-                mAvatarHandle.resetAll();
-            } else {
-                isNeedScale = true;
-            }
+        if (editFacePoints == null) {
+            mP2ACore.loadHalfLengthBodyCamera();
+        } else {
+            mP2ACore.loadBigHalfLengthBodyCamera();
         }
         mActivity.setCanController(mEditFacePoints == null);
         mEditPointLayout.post(new Runnable() {
@@ -1077,6 +1212,7 @@ public class EditFaceFragment extends BaseFragment
                 mIsFrontBox.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
                 ll_redo.setVisibility(mEditFacePoints == null ? View.GONE : View.VISIBLE);
                 mFragmentLayout.setVisibility(mEditFacePoints != null ? View.GONE : View.VISIBLE);
+                mCenterItemGroup.setVisibility(mEditFacePoints != null ? View.INVISIBLE : View.VISIBLE);
                 ll_model_redo.setVisibility(mEditFacePoints != null ? View.GONE : View.VISIBLE);
                 mEditFaceTitle.setVisibility(mEditFacePoints != null ? View.GONE : View.VISIBLE);
             }
@@ -1090,7 +1226,7 @@ public class EditFaceFragment extends BaseFragment
      */
     private void updateEditPoint(boolean isStateChange) {
         setEditFacePoints(EditFacePointFactory.getEditPoints(mEditFaceSelectBottomId, mAvatarP2A.getGender(), isFront),
-                isStateChange);
+                          isStateChange);
         if (isFront) {
             mAvatarHandle.resetAllFront();
         } else {
@@ -1124,6 +1260,14 @@ public class EditFaceFragment extends BaseFragment
     @Override
     public void Revoke(RecordEditBean recordEditBean, RecordEditBean goAheadBean) {
         goAheadBean.setType(recordEditBean.getType());
+        if (recordEditBean.getType() == -1) {
+            goAheadBean.setBundleName("0");
+            goAheadBean.setList(mEditFaceParameter.getMap());
+            mEditFaceParameter.reset(recordEditBean.getList());
+            updateSaveBtn();
+            return;
+        }
+
         goAheadBean.setBundleName(recordEditBean.getBundleName());
         goAheadBean.setColorName(recordEditBean.getColorName());
         switch (recordEditBean.getType()) {
@@ -1137,7 +1281,16 @@ public class EditFaceFragment extends BaseFragment
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hair_color, Arrays.copyOf(hair_color, 3));
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hair_color_intensity, (float) hair_color[3]);
                 } else {
-                    goAheadBean.setBundleValue(mAvatarP2A.getHairIndex());
+                    if (mAvatarP2A.getHatIndex() != 0) {
+                        goAheadBean.setType(TITLE_HAT_INDEX);
+                        goAheadBean.setBundleName(BUNDLE_NAME_HAT);
+                        goAheadBean.setBundleValue(mAvatarP2A.getHatIndex());
+                        mAvatarP2A.setHatIndex(0);
+                        EditFaceItemFragment hatFragment = (EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_HAT_INDEX);
+                        hatFragment.setItem(0);
+                    } else {
+                        goAheadBean.setBundleValue(mAvatarP2A.getHairIndex());
+                    }
                     mAvatarP2A.setHairIndex((int) recordEditBean.getBundleValue());
                     ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_HAIR_INDEX)).setItem((int) recordEditBean.getBundleValue());
                     mAvatarHandle.setAvatar(mAvatarP2A);
@@ -1153,9 +1306,10 @@ public class EditFaceFragment extends BaseFragment
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_skin_color, ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_FACE_INDEX)).getSeekBarColorValue(recordEditBean.getColorValus()));
                 } else {
                     goAheadBean.setBundleValue(((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_FACE_INDEX)).getSelectPos());
+                    goAheadBean.setList(mEditFaceParameter.getMap());
                     ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_FACE_INDEX)).setItem((int) recordEditBean.getBundleValue());
                     if ((int) recordEditBean.getBundleValue() == 0) {
-                        mEditFaceParameter.resetParamMap();
+                        mEditFaceParameter.reset(recordEditBean.getList());
                         return;
                     } else {
                         mEditFaceParameter.setParamMap((EditParamFactory.mEditParamFace.get((int) recordEditBean.getBundleValue())).paramMap);
@@ -1172,9 +1326,10 @@ public class EditFaceFragment extends BaseFragment
                     mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_iris_color, ColorConstant.iris_color[(int) recordEditBean.getColorValus()]);
                 } else {
                     goAheadBean.setBundleValue(((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_EYE_INDEX)).getSelectPos());
+                    goAheadBean.setList(mEditFaceParameter.getMap());
                     ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_EYE_INDEX)).setItem((int) recordEditBean.getBundleValue());
                     if ((int) recordEditBean.getBundleValue() == 0) {
-                        mEditFaceParameter.resetParamMap();
+                        mEditFaceParameter.reset(recordEditBean.getList());
                         return;
                     } else {
                         mEditFaceParameter.setParamMap((EditParamFactory.mEditParamEye.get((int) recordEditBean.getBundleValue())).paramMap);
@@ -1182,32 +1337,57 @@ public class EditFaceFragment extends BaseFragment
                 }
                 break;
             case TITLE_MOUTH_INDEX:
-                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
-                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
-                    goAheadBean.setColorValus(mAvatarP2A.getLipColorValue());
-
-                    ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_MOUTH_INDEX)).setColorItem((int) recordEditBean.getColorValus());
-                    mAvatarP2A.setLipColorValue(recordEditBean.getColorValus());
-                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_lip_color, ColorConstant.lip_color[(int) recordEditBean.getColorValus()]);
+                goAheadBean.setBundleValue(((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_MOUTH_INDEX)).getSelectPos());
+                goAheadBean.setList(mEditFaceParameter.getMap());
+                ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_MOUTH_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                if ((int) recordEditBean.getBundleValue() == 0) {
+                    mEditFaceParameter.reset(recordEditBean.getList());
+                    return;
                 } else {
-                    goAheadBean.setBundleValue(((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_MOUTH_INDEX)).getSelectPos());
-                    ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_MOUTH_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                    if ((int) recordEditBean.getBundleValue() == 0) {
-                        mEditFaceParameter.resetParamMap();
-                        return;
-                    } else {
-                        mEditFaceParameter.setParamMap((EditParamFactory.mEditParamMouth.get((int) recordEditBean.getBundleValue())).paramMap);
-                    }
+                    mEditFaceParameter.setParamMap((EditParamFactory.mEditParamMouth.get((int) recordEditBean.getBundleValue())).paramMap);
                 }
                 break;
             case TITLE_NOSE_INDEX:
                 goAheadBean.setBundleValue(((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_NOSE_INDEX)).getSelectPos());
+                goAheadBean.setList(mEditFaceParameter.getMap());
                 ((EditShapeFragment) mEditFaceBaseFragments.get(TITLE_NOSE_INDEX)).setItem((int) recordEditBean.getBundleValue());
                 if ((int) recordEditBean.getBundleValue() == 0) {
-                    mEditFaceParameter.resetParamMap();
+                    mEditFaceParameter.reset(recordEditBean.getList());
                     return;
                 } else {
                     mEditFaceParameter.setParamMap((EditParamFactory.mEditParamNose.get((int) recordEditBean.getBundleValue())).paramMap);
+                }
+                break;
+            case TITLE_EYELASH_INDEX:
+                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
+                    goAheadBean.setColorValus(mAvatarP2A.getEyelashColorValue());
+                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYELASH_INDEX)).setColorItem((int) recordEditBean.getColorValus());
+                    mAvatarP2A.setEyelashColorValue(recordEditBean.getColorValus());
+
+                    double[] eyelash_color = ColorConstant.makeup_color[(int) recordEditBean.getColorValus()];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyelashItem.handle, Arrays.copyOf(eyelash_color, 3));
+                } else {
+                    goAheadBean.setBundleValue(mAvatarP2A.getEyelashIndex());
+                    mAvatarP2A.setEyelashIndex((int) recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYELASH_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                    mAvatarHandle.setAvatar(mAvatarP2A);
+                }
+                break;
+            case TITLE_EYEBROW_INDEX:
+                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
+                    goAheadBean.setColorValus(mAvatarP2A.getEyebrowColorValue());
+                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYEBROW_INDEX)).setColorItem((int) recordEditBean.getColorValus());
+                    mAvatarP2A.setEyebrowColorValue(recordEditBean.getColorValus());
+
+                    double[] eyebrow_color = ColorConstant.makeup_color[(int) recordEditBean.getColorValus()];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyebrowItem.handle, Arrays.copyOf(eyebrow_color, 3));
+                } else {
+                    goAheadBean.setBundleValue(mAvatarP2A.getEyebrowIndex());
+                    mAvatarP2A.setEyebrowIndex((int) recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYEBROW_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                    mAvatarHandle.setAvatar(mAvatarP2A);
                 }
                 break;
             case TITLE_BEARD_INDEX:
@@ -1216,6 +1396,59 @@ public class EditFaceFragment extends BaseFragment
                 ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_BEARD_INDEX)).setItem((int) recordEditBean.getBundleValue());
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
+            // 美妆部分
+            case TITLE_EYELINER_INDEX:
+                goAheadBean.setBundleValue(mAvatarP2A.getEyelinerIndex());
+                mAvatarP2A.setEyelinerIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_EYELINER_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                mAvatarHandle.setAvatar(mAvatarP2A);
+                break;
+            case TITLE_EYESHADOW_INDEX:
+                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
+                    goAheadBean.setColorValus(mAvatarP2A.getEyeshadowColorValue());
+                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYESHADOW_INDEX)).setColorItem((int) recordEditBean.getColorValus());
+                    mAvatarP2A.setEyeshadowColorValue(recordEditBean.getColorValus());
+
+                    double[] eyeshadow_color = ColorConstant.makeup_color[(int) recordEditBean.getColorValus()];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.eyeshadowItem.handle, Arrays.copyOf(eyeshadow_color, 3));
+                } else {
+                    goAheadBean.setBundleValue(mAvatarP2A.getEyeshadowIndex());
+                    mAvatarP2A.setEyeshadowIndex((int) recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_EYESHADOW_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                    mAvatarHandle.setAvatar(mAvatarP2A);
+                }
+                break;
+
+            case TITLE_FACEMAKEUP_INDEX:
+                goAheadBean.setBundleValue(mAvatarP2A.getFaceMakeupIndex());
+                mAvatarP2A.setFaceMakeupIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_FACEMAKEUP_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                mAvatarHandle.setAvatar(mAvatarP2A);
+                break;
+            case TITLE_LIPGLOSS_INDEX:
+                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
+                    goAheadBean.setColorValus(mAvatarP2A.getLipglossColorValue());
+                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_LIPGLOSS_INDEX)).setColorItem((int) recordEditBean.getColorValus());
+                    mAvatarP2A.setLipglossColorValue(recordEditBean.getColorValus());
+
+                    double[] lipgloss_color = ColorConstant.lip_color[(int) recordEditBean.getColorValus()];
+                    mAvatarHandle.setMakeupColor(mAvatarHandle.lipglossItem.handle, Arrays.copyOf(lipgloss_color, 3));
+                } else {
+                    goAheadBean.setBundleValue(mAvatarP2A.getLipglossIndex());
+                    mAvatarP2A.setLipglossIndex((int) recordEditBean.getBundleValue());
+                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_LIPGLOSS_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                    mAvatarHandle.setAvatar(mAvatarP2A);
+                }
+                break;
+            case TITLE_PUPIL_INDEX:
+                goAheadBean.setBundleValue(mAvatarP2A.getPupilIndex());
+                mAvatarP2A.setPupilIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_PUPIL_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                mAvatarHandle.setAvatar(mAvatarP2A);
+                break;
+            // 换装部分
             case TITLE_GLASSES_INDEX:
                 if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
                     goAheadBean.setBundleValue(recordEditBean.getBundleValue());
@@ -1242,18 +1475,20 @@ public class EditFaceFragment extends BaseFragment
                 }
                 break;
             case TITLE_HAT_INDEX:
-                goAheadBean.setColorValus(mAvatarP2A.getHatColorValue());
-                if (TextUtils.isEmpty(recordEditBean.getBundleName())) {
-                    goAheadBean.setBundleValue(recordEditBean.getBundleValue());
-                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_HAT_INDEX)).setColorItem((int) recordEditBean.getColorValus());
-                    mAvatarP2A.setHatColorValue(recordEditBean.getColorValus());
-                    mAvatarHandle.fuItemSetParamFuItemHandler(AvatarHandle.PARAM_KEY_hat_color, ColorConstant.hat_color[(int) recordEditBean.getColorValus()]);
+                if (mAvatarP2A.getHairIndex() != 0) {
+                    goAheadBean.setType(TITLE_HAIR_INDEX);
+                    goAheadBean.setBundleName(BUNDLE_NAME_HAIR);
+                    goAheadBean.setBundleValue(mAvatarP2A.getHairIndex());
+                    mAvatarP2A.setHairIndex(0);
+                    EditFaceColorItemFragment hatFragment = (EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_HAIR_INDEX);
+                    hatFragment.setItem(0);
                 } else {
                     goAheadBean.setBundleValue(mAvatarP2A.getHatIndex());
-                    mAvatarP2A.setHatIndex((int) recordEditBean.getBundleValue());
-                    ((EditFaceColorItemFragment) mEditFaceBaseFragments.get(TITLE_HAT_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                    mAvatarHandle.setAvatar(mAvatarP2A);
                 }
+
+                mAvatarP2A.setHatIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_HAT_INDEX)).setItem((int) recordEditBean.getBundleValue());
+                mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
             case TITLE_CLOTHES_INDEX:
                 goAheadBean.setBundleValue(mAvatarP2A.getClothesIndex());
@@ -1294,7 +1529,7 @@ public class EditFaceFragment extends BaseFragment
                         }
                     }
                 }
-                setBodyLevelForClothes(pos_cloth, FilePathFactory.clothUpperBundleRes());
+                setBodyLevelForClothes(pos_cloth, FilePathFactory.clothesBundleRes(mAvatarP2A.getGender()));
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
             case TITLE_CLOTHES_UPPER_INDEX:
@@ -1306,7 +1541,7 @@ public class EditFaceFragment extends BaseFragment
                 if (pos_cloth_upper == 0) {
                     if (mAvatarP2A.getClothesIndex() == 0) {
                         ToastUtil.showCenterToast(mActivity,
-                                "必须有一件上衣");
+                                                  "必须有一件上衣");
                         return;
                     }
                 } else {
@@ -1338,7 +1573,7 @@ public class EditFaceFragment extends BaseFragment
                 if (pos_cloth_lower == 0) {
                     if (mAvatarP2A.getClothesIndex() == 0) {
                         ToastUtil.showCenterToast(mActivity,
-                                "必须有一件裤子");
+                                                  "必须有一件裤子");
                         return;
                     }
                 } else {
@@ -1364,46 +1599,22 @@ public class EditFaceFragment extends BaseFragment
                 ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_DECORATIONS_INDEX)).setItem((int) recordEditBean.getBundleValue());
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
-            case TITLE_EYELINER_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getEyelinerIndex());
-                mAvatarP2A.setEyelinerIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_EYELINER_INDEX)).setItem((int) recordEditBean.getBundleValue());
+            case TITLE_SCENES_2D:
+                goAheadBean.setBundleValue(mAvatarP2A.getBackground2DIndex());
+                mAvatarP2A.setBackground2DIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_SCENES_2D)).setItem((int) recordEditBean.getBundleValue());
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
-            case TITLE_EYESHADOW_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getEyeshadowIndex());
-                mAvatarP2A.setEyeshadowIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_EYESHADOW_INDEX)).setItem((int) recordEditBean.getBundleValue());
+            case TITLE_SCENES_3D:
+                goAheadBean.setBundleValue(mAvatarP2A.getBackground3DIndex());
+                mAvatarP2A.setBackground3DIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_SCENES_3D)).setItem((int) recordEditBean.getBundleValue());
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
-            case TITLE_FACEMAKEUP_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getFaceMakeupIndex());
-                mAvatarP2A.setFaceMakeupIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_FACEMAKEUP_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                mAvatarHandle.setAvatar(mAvatarP2A);
-                break;
-            case TITLE_LIPGLOSS_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getLipglossIndex());
-                mAvatarP2A.setLipglossIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_LIPGLOSS_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                mAvatarHandle.setAvatar(mAvatarP2A);
-                break;
-            case TITLE_PUPIL_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getPupilIndex());
-                mAvatarP2A.setPupilIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_PUPIL_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                mAvatarHandle.setAvatar(mAvatarP2A);
-                break;
-            case TITLE_EYELASH_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getEyelashIndex());
-                mAvatarP2A.setEyelashIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_EYELASH_INDEX)).setItem((int) recordEditBean.getBundleValue());
-                mAvatarHandle.setAvatar(mAvatarP2A);
-                break;
-            case TITLE_EYEBROW_INDEX:
-                goAheadBean.setBundleValue(mAvatarP2A.getEyebrowIndex());
-                mAvatarP2A.setEyebrowIndex((int) recordEditBean.getBundleValue());
-                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_EYEBROW_INDEX)).setItem((int) recordEditBean.getBundleValue());
+            case TITLE_SCENES_ANIMATION:
+                goAheadBean.setBundleValue(mAvatarP2A.getBackgroundAniIndex());
+                mAvatarP2A.setBackgroundAniIndex((int) recordEditBean.getBundleValue());
+                ((EditFaceItemFragment) mEditFaceBaseFragments.get(TITLE_SCENES_ANIMATION)).setItem((int) recordEditBean.getBundleValue());
                 mAvatarHandle.setAvatar(mAvatarP2A);
                 break;
         }

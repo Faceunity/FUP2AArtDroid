@@ -17,8 +17,8 @@ import com.faceunity.pta_art.utils.ToastUtil;
 
 import java.util.List;
 
-import static com.faceunity.pta_art.fragment.EditFaceFragment.TITLE_CLOTHES_LOWER_INDEX;
-import static com.faceunity.pta_art.fragment.EditFaceFragment.TITLE_CLOTHES_UPPER_INDEX;
+import static com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager.*;
+
 
 /**
  * Created by tujh on 2018/8/22.

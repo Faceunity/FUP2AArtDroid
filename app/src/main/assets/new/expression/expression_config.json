@@ -31,6 +31,7 @@
     {
       "icon": "new_expression_single_1",
       "camera": "new/expression/ani_dance_cam.bundle",
+      "bg_2d": 1,
       "BundleRes": [
         {
           "gender": 1,
@@ -41,6 +42,7 @@
     {
       "icon": "new_expression_single_2",
       "camera": "new/expression/ani_LRPP_cam.bundle",
+      "bg_2d": 4,
       "BundleRes": [
         {
           "gender": 1,
@@ -55,6 +57,7 @@
     {
       "icon": "new_expression_single_4",
       "camera": "new/expression/ani_SJG_cam.bundle",
+      "bg_2d": 3,
       "BundleRes": [
         {
           "gender": 1,

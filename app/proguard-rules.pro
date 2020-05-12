@@ -193,3 +193,14 @@
 -keep class com.faceunity.util.LogUtils {
     public *;
 }
+
+#
+# ----------------------------- FuEventBus -----------------------------
+#
+
+-keep class com.faceunity.pta_art.utils.eventbus.** { *; }
+-keepclassmembers class ** {
+    @com.faceunity.pta_art.utils.eventbus.Subscribe <methods>;
+}
+-keep enum com.faceunity.pta_art.utils.eventbus.ThreadMode { *; }
+

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorWhite">
@@ -13,7 +14,9 @@
         android:layout_marginLeft="@dimen/x16"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        android:src="@drawable/group_photo_scenes_back" />
+        android:src="@drawable/group_photo_scenes_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,90 +26,35 @@
         android:gravity="center"
         android:text="合影"
         android:textColor="@android:color/black"
-        android:textSize="@dimen/text_size_34" />
+        android:textSize="@dimen/text_size_34"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/group_photo_scenes_tablayout"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_scenes_back"
+        app:tabIndicatorColor="@color/translate"
+        app:tabTextColor="@color/group_photo_tablayout_text_color" />
+
 
     <View
+        android:id="@+id/group_photo_scenes_line"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x2"
-        android:layout_below="@+id/group_photo_scenes_back"
-        android:background="#E5E5E5" />
+        android:background="#E5E5E5"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_scenes_tablayout" />
 
-    <android.support.v4.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/group_photo_scenes_back">
+    <android.support.v4.view.ViewPager
+        android:id="@+id/group_photo_scenes_viewpager"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="left"
-            android:orientation="vertical">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/group_photo_scenes_line" />
 
-            <TextView
-                android:id="@+id/group_photo_scenes_single_text"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/x44"
-                android:layout_marginLeft="@dimen/x28"
-                android:layout_marginTop="@dimen/x30"
-                android:gravity="center"
-                android:text="单人场景"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32"
-                android:visibility="gone" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/group_photo_scenes_single_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/x320"
-                android:layout_marginTop="@dimen/x20"
-                android:layout_marginBottom="@dimen/x40"
-                android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/group_photo_scenes_multiple_text"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/x44"
-                android:layout_marginLeft="@dimen/x28"
-                android:layout_marginTop="@dimen/x30"
-                android:gravity="center"
-                android:text="多人场景"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32"
-                android:visibility="gone" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/group_photo_scenes_multiple_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/x320"
-                android:layout_marginTop="@dimen/x20"
-                android:layout_marginBottom="@dimen/x40"
-                android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/group_photo_animation_text"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/x44"
-                android:layout_marginLeft="@dimen/x28"
-                android:layout_marginTop="@dimen/x40"
-                android:gravity="center"
-                android:text="动画场景"
-                android:textColor="@android:color/black"
-                android:textSize="@dimen/text_size_32"
-                android:visibility="gone" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/group_photo_animation_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/x320"
-                android:layout_marginTop="@dimen/x20"
-                android:layout_marginBottom="@dimen/x40"
-                android:paddingLeft="@dimen/x20"
-                android:paddingRight="@dimen/x20"
-                android:visibility="gone" />
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>

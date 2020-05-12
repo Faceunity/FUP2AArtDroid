@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <View
+        android:id="@+id/vl_titl_bg_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x108"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/vl_title_back"
+        android:layout_width="@dimen/x76"
+        android:layout_height="@dimen/x76"
+        android:layout_marginLeft="@dimen/x18"
+        android:background="@color/translate"
+        android:src="@drawable/delete_avatar_p2a_back_normal"
+        app:layout_constraintBottom_toBottomOf="@id/vl_titl_bg_view"
+        app:layout_constraintLeft_toLeftOf="@id/vl_titl_bg_view"
+        app:layout_constraintTop_toTopOf="@id/vl_titl_bg_view" />
+
+
+    <TextView
+        android:id="@+id/vl_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:drawableRight="@drawable/icon_triangle_down"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:text="所有视频"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/text_size_34"
+        app:layout_constraintBottom_toBottomOf="@id/vl_titl_bg_view"
+        app:layout_constraintLeft_toLeftOf="@id/vl_titl_bg_view"
+        app:layout_constraintRight_toRightOf="@id/vl_titl_bg_view"
+        app:layout_constraintTop_toTopOf="@id/vl_titl_bg_view" />
+
+    <com.faceunity.pta_art.ui.RecyclerViewWithLoadMore
+        android:id="@+id/rv_media"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vl_titl_bg_view" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_bucket"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/x12"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vl_titl_bg_view" />
+
+    <ImageView
+        android:id="@+id/vl_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icon_media_empty"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vl_titl_bg_view"
+        app:layout_constraintVertical_bias="0.44" />
+
+    <TextView
+        android:id="@+id/vl_empty_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x64"
+        android:alpha="0.45"
+        android:text="相册没有视频，先去拍一段吧"
+        android:textColor="#000000"
+        android:textSize="@dimen/x28"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/vl_empty_view" />
+
+</android.support.constraint.ConstraintLayout>

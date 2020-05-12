@@ -5,6 +5,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.faceunity.p2a_client.fuPTAClient;
 import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.base.BaseCore;
 import com.faceunity.pta_art.core.base.FUItemHandler;
@@ -56,16 +57,6 @@ public class FUPTARenderer {
             v3.read(v3Data);
             v3.close();
             faceunity.fuSetup(v3Data, authpack.A());
-
-            /**
-             * fuLoadTongueModel 识别舌头动作数据包加载
-             * 其中 tongue.bundle：头动作驱动数据包；
-             */
-            InputStream tongue = context.getAssets().open(FilePathFactory.BUNDLE_tongue);
-            byte[] tongueDate = new byte[tongue.available()];
-            tongue.read(tongueDate);
-            tongue.close();
-            faceunity.fuLoadTongueModel(tongueDate);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,6 +94,21 @@ public class FUPTARenderer {
         this.mFUCore = core;
     }
 
+
+    public long createHuman3d() {
+        InputStream human3d = null;
+        try {
+            human3d = mContext.getAssets().open(FilePathFactory.BUNDLE_human3d);
+            byte[] human3dDate = new byte[human3d.available()];
+            human3d.read(human3dDate);
+            human3d.close();
+            return faceunity.fu3DBodyTrackerCreate(human3dDate);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /**
      * 创建面部追踪模型
      *
@@ -111,7 +117,7 @@ public class FUPTARenderer {
     public long createFaceCapture() {
         InputStream face_capture = null;
         try {
-            face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_capture);
+            face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_processor_capture);
             byte[] face_capture_Date = new byte[face_capture.available()];
             face_capture.read(face_capture_Date);
             face_capture.close();
@@ -158,9 +164,13 @@ public class FUPTARenderer {
      * 销毁faceunity相关的资源
      */
     public void onSurfaceDestroyed() {
+        mFUCore.unBind();
         mFUCore.release();
+        fuPTAClient.fuPTAReleaseData();
         faceunity.fuDestroyAllItems();
         faceunity.fuOnDeviceLost();
+        faceunity.fuDone();
+        release();
     }
 
     /**
@@ -197,25 +207,28 @@ public class FUPTARenderer {
         //计算FPS等数据
         benchmarkFPS();
 
-        //获取人脸是否识别，并调用回调接口
-        int isTracking = mFUCore.isTracking();
-        if (mOnTrackingStatusChangedListener != null && mTrackingStatus != isTracking) {
-            mOnTrackingStatusChangedListener.onTrackingStatusChanged(mTrackingStatus = isTracking);
-        }
+        if (mFUCore.face_capture > 0) {
 
-        //获取faceunity错误信息，并调用回调接口
-        int error = faceunity.fuGetSystemError();
-        if (error != 0)
-            Log.e(TAG, "fuGetSystemErrorString " + faceunity.fuGetSystemErrorString(error));
-        if (mOnSystemErrorListener != null && error != 0) {
-            mOnSystemErrorListener.onSystemError(error == 0 ? "" : faceunity.fuGetSystemErrorString(error));
-        }
+            //获取人脸是否识别，并调用回调接口
+            int isTracking = mFUCore.isTracking();
+            if (mOnTrackingStatusChangedListener != null && mTrackingStatus != isTracking) {
+                mOnTrackingStatusChangedListener.onTrackingStatusChanged(mTrackingStatus = isTracking);
+            }
 
-        //获取是否正在表情校准，并调用回调接口
-        final float[] isCalibratingTmp = new float[1];
-        faceunity.fuGetFaceInfo(0, "is_calibrating", isCalibratingTmp);
-        if (mOnCalibratingListener != null && isCalibratingTmp[0] != mIsCalibrating) {
-            mOnCalibratingListener.OnCalibrating(mIsCalibrating = isCalibratingTmp[0]);
+            //获取faceunity错误信息，并调用回调接口
+            int error = faceunity.fuGetSystemError();
+            if (error != 0)
+                Log.e(TAG, "fuGetSystemErrorString " + faceunity.fuGetSystemErrorString(error));
+            if (mOnSystemErrorListener != null && error != 0) {
+                mOnSystemErrorListener.onSystemError(error == 0 ? "" : faceunity.fuGetSystemErrorString(error));
+            }
+
+            //获取是否正在表情校准，并调用回调接口
+            final float[] isCalibratingTmp = new float[1];
+            faceunity.fuGetFaceInfo(0, "is_calibrating", isCalibratingTmp);
+            if (mOnCalibratingListener != null && isCalibratingTmp[0] != mIsCalibrating) {
+                mOnCalibratingListener.OnCalibrating(mIsCalibrating = isCalibratingTmp[0]);
+            }
         }
 
         //queueEvent的Runnable在此处被调用

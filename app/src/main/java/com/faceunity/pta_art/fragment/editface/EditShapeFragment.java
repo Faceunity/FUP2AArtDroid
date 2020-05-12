@@ -7,11 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.faceunity.pta_art.R;
-import com.faceunity.pta_art.fragment.EditFaceFragment;
 import com.faceunity.pta_art.fragment.editface.core.ColorValuesChangeListener;
 import com.faceunity.pta_art.fragment.editface.core.EditFaceBaseFragment;
+import com.faceunity.pta_art.fragment.editface.core.EditFaceItemManager;
 import com.faceunity.pta_art.fragment.editface.core.color.ColorAdapter;
 import com.faceunity.pta_art.fragment.editface.core.color.ColorSelectView;
 import com.faceunity.pta_art.fragment.editface.core.item.ItemAdapter;
@@ -75,12 +76,13 @@ public class EditShapeFragment extends EditFaceBaseFragment {
             }
         });
 
-        if (mEditFaceBaseFragmentId == EditFaceFragment.TITLE_NOSE_INDEX) {
+        if (mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_NOSE_INDEX || mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_MOUTH_INDEX) {
             mColorSeekBarLayout.setVisibility(View.GONE);
             mColorRecycler.setVisibility(View.GONE);
-        } else if (mEditFaceBaseFragmentId == EditFaceFragment.TITLE_FACE_INDEX) {
+        } else if (mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_FACE_INDEX) {
             mColorRecycler.setVisibility(View.GONE);
-            mColorSeekBar.setTrackColor(ColorPickGradient.getColor(0), ColorPickGradient.getColor(1));
+            mColorSeekBar.setTrackColor(ColorPickGradient.getmColorArr());
+//            mColorSeekBar.setTrackColor(ColorPickGradient.getColor(0), ColorPickGradient.getColor(1));
             mColorSeekBar.setOnProgressChangeListener(new DiscreteSeekBar.OnSimpleProgressChangeListener() {
 
                 @Override
@@ -135,6 +137,13 @@ public class EditShapeFragment extends EditFaceBaseFragment {
 //            });
 //            mColorSeekBar.setProgress((int) (progress * 100));
         }
+
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mItemRecycler.getLayoutParams();
+        layoutParams.height = mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_NOSE_INDEX ||
+                mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_MOUTH_INDEX ?
+                getResources().getDimensionPixelOffset(R.dimen.x450) :
+                getResources().getDimensionPixelOffset(R.dimen.x350);
+        mItemRecycler.setLayoutParams(layoutParams);
         return view;
     }
 
@@ -144,7 +153,7 @@ public class EditShapeFragment extends EditFaceBaseFragment {
         mColorList = new double[colorList.length][colorList[0].length];
         for (int i = 0; i < colorList.length; i++) {
             System.arraycopy(colorList[i], 0, mColorList[i],
-                    0, colorList[i].length);
+                             0, colorList[i].length);
         }
 //        mColorList = colorList;
         mDefaultValues = values;

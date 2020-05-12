@@ -92,7 +92,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                 //因为已经对双输入的cpu buffer进行旋转、镜像，使其与texture对齐
                 //所以这边不需要其他处理
                 int fu = super.onDrawFrame(img, tex, w,
-                        h, rotation);
+                                           h, rotation);
                 checkPic(w, h);
                 return fu;
             }
@@ -543,7 +543,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         } else if (FaceCheckUtil.checkFaceRect(mFaceRect, w, h)) {
             showCheckPic("识别失败，请再试一次~");
         } else if (FaceCheckUtil.checkExpression(mNamaCore.getExpressionData())) {
-            showCheckPic("识别失败，需要人物正脸完整出镜哦~");
+            showCheckPic("请保持面部无夸张表情");
         } else if (mLight < 5) {
             showCheckPic("光线不充足");
         } else {

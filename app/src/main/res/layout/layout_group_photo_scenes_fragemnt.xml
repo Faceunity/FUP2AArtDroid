@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite">
+
+    <FrameLayout
+        android:id="@+id/group_photo_avatar_fragment_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/group_photo_avatar_fragment_BottomTitleGroup"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.faceunity.pta_art.ui.BottomTitleGroup
+        android:id="@+id/group_photo_avatar_fragment_BottomTitleGroup"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x96"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

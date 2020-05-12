@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/x218"
+    android:layout_height="@dimen/x268"
+    android:layout_marginLeft="@dimen/x8"
+    android:layout_marginRight="@dimen/x8"
+    android:layout_marginBottom="@dimen/x16">
+
+    <ImageView
+        android:id="@+id/igpi_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+
+    <ImageView
+        android:id="@+id/igpi_gif_tag"
+        android:layout_width="@dimen/x56"
+        android:layout_height="@dimen/x36"
+        android:background="@drawable/icon_gif_tag"
+        app:layout_constraintBottom_toBottomOf="@id/igpi_icon"
+        app:layout_constraintRight_toRightOf="@id/igpi_icon" />
+
+</android.support.constraint.ConstraintLayout>

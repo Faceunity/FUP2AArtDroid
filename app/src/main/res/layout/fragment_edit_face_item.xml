@@ -5,14 +5,13 @@
     android:layout_gravity="bottom"
     android:animateLayoutChanges="true"
     android:background="@color/colorWhite"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/x2">
+    android:orientation="vertical">
 
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/item_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x362"
+        android:layout_height="@dimen/x450"
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
-        android:scrollbars="none"/>
+        android:scrollbars="none" />
 </LinearLayout>

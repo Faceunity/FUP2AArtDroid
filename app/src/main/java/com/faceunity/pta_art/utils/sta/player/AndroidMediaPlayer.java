@@ -155,6 +155,9 @@ public class AndroidMediaPlayer extends BaseMediaPlayer {
 
     @Override
     public void release() {
+        mMediaPlayer.setOnCompletionListener(null);
+        mMediaPlayer.setOnPreparedListener(null);
+        mMediaPlayer.setOnErrorListener(null);
         if (state >= STATE_INITIALIZED) {
             mMediaPlayer.release();
             mMediaPlayer = null;

@@ -26,6 +26,7 @@ public class BaseFragment extends Fragment {
     protected CameraRenderer mCameraRenderer;
     protected List<AvatarPTA> mAvatarP2AS;
 
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -51,5 +52,9 @@ public class BaseFragment extends Fragment {
 
     public CameraRenderer getCameraRenderer() {
         return mCameraRenderer;
+    }
+
+    public void setmP2ACore(PTACore mP2ACore) {
+        this.mP2ACore = mP2ACore;
     }
 }

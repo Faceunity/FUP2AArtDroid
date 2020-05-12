@@ -1,7 +1,6 @@
 package com.faceunity.pta_art.core;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.faceunity.pta_art.constant.FilePathFactory;
@@ -29,32 +28,28 @@ public class PTAMultipleCore extends BaseCore {
     private final int[] mItemsArray = new int[ITEM_ARRAYS_COUNT];
 
     private BackgroundUtil mBackgroundUtil;
-    public int fxaaItem, bgItem;
+    public int fxaaItem, defaultBgItem, currentBgItem;
     private int[] bgItems = new int[1];
     public int cameraItem;//相机轨迹
     private int controllerItem;
 
-    public PTAMultipleCore(Context context, FUPTARenderer fuP2ARenderer, String bg) {
+    public PTAMultipleCore(Context context, FUPTARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
-        bgItem = mFUItemHandler.loadFUItem(TextUtils.isEmpty(bg) ? FilePathFactory.BUNDLE_default_bg : bg);
-        if (TextUtils.isEmpty(bg)) {
-            bgItems[0] = bgItem;
-        }
+        defaultBgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        bgItems[0] = currentBgItem = defaultBgItem;
         mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
     }
 
-    public void updateBg(String bg) {
-        bgItem = mFUItemHandler.loadFUItem(TextUtils.isEmpty(bg) ? FilePathFactory.BUNDLE_default_bg : bg);
-        if (TextUtils.isEmpty(bg)) {
-            bgItems[0] = bgItem;
-        }
-        mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
+    public void updateBg() {
+        defaultBgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        bgItems[0] = currentBgItem = defaultBgItem;
     }
 
     public SparseArray<AvatarHandle> createAvatarMultiple(Scenes scenes, int controller) {
         for (int i = 0; i < scenes.bundles.length; i++) {
             AvatarHandle avatarHandle = new AvatarHandle(this, mFUItemHandler, controller);
             avatarHandle.setPose(false);
+            avatarHandle.setGroupPhoto(true);
             mAvatarHandles.put(i, avatarHandle);
         }
         cameraItem = mFUItemHandler.loadFUItem(scenes.camera);
@@ -92,7 +87,7 @@ public class PTAMultipleCore extends BaseCore {
         avatarInfo.mIsValid = false;
 
         int fuTex = faceunity.fuRenderBundles(avatarInfo,
-                faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray());
+                                              faceunity.FU_ADM_FLAG_RGBA_BUFFER, w, h, mFrameId++, itemsArray());
         return mBackgroundUtil.drawBackground(fuTex);
     }
 
@@ -132,13 +127,12 @@ public class PTAMultipleCore extends BaseCore {
                     mBackgroundUtil.release();
                     mBackgroundUtil = null;
                 }
-                faceunity.fuUnBindItems(controllerItem, bgItems);
                 unBindCamera();
             }
         });
         mAvatarHandles.clear();
         queueEvent(destroyItem(fxaaItem));
-        queueEvent(destroyItem(bgItem));
+        queueEvent(destroyItem(currentBgItem));
         queueEvent(destroyItem(cameraItem));
         setCurrentInstancceId(0);
     }
@@ -154,7 +148,7 @@ public class PTAMultipleCore extends BaseCore {
                 @Override
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem,
-                            "current_instance_id", id);
+                                             "current_instance_id", id);
                     faceunity.fuItemSetParam(controllerItem, "target_position", new double[]{0, 0, 0});//必须重新设置初始值
                     faceunity.fuItemSetParam(controllerItem, "reset_all", 1.0f);//必须设置后生效
                 }
@@ -173,7 +167,8 @@ public class PTAMultipleCore extends BaseCore {
                 @Override
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem,
-                            "current_instance_id", id);
+                                             "current_instance_id", id);
+                    faceunity.fuUnBindItems(controllerItem, bgItems);
                 }
             });
             mAvatarHandles.get(id).releaseNoController();
@@ -191,7 +186,7 @@ public class PTAMultipleCore extends BaseCore {
                 @Override
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem,
-                            "current_instance_id", id);
+                                             "current_instance_id", id);
                 }
             });
             mAvatarHandles.get(id).bindAll();
@@ -204,6 +199,20 @@ public class PTAMultipleCore extends BaseCore {
             public void run() {
                 faceunity.fuUnBindItems(controllerItem, bgItems);
                 mBackgroundUtil.loadBackground(path);
+            }
+        });
+    }
+
+    public void loadBundleBg(String bgPath) {
+        int fuItem = mFUItemHandler.loadFUItem(bgPath);
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuUnBindItems(controllerItem, bgItems);
+                faceunity.fuDestroyItem(currentBgItem);
+                bgItems[0] = currentBgItem = fuItem;
+                faceunity.fuBindItems(controllerItem, bgItems);
+                mBackgroundUtil.setUseBitmapBackground(false);
             }
         });
     }
