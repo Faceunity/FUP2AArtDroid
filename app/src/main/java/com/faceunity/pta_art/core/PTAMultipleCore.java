@@ -117,8 +117,9 @@ public class PTAMultipleCore extends BaseCore {
 
     @Override
     public void release() {
-        for (int i = 0; i < mAvatarHandles.size(); i++) {
+        for (int i = mAvatarHandles.size() - 1; i >= 0; i--) {
             unBindInstancceId(i);
+
         }
         queueEvent(new Runnable() {
             @Override
@@ -128,6 +129,7 @@ public class PTAMultipleCore extends BaseCore {
                     mBackgroundUtil = null;
                 }
                 unBindCamera();
+                faceunity.fuUnBindItems(controllerItem, bgItems);
             }
         });
         mAvatarHandles.clear();
@@ -168,7 +170,6 @@ public class PTAMultipleCore extends BaseCore {
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem,
                                              "current_instance_id", id);
-                    faceunity.fuUnBindItems(controllerItem, bgItems);
                 }
             });
             mAvatarHandles.get(id).releaseNoController();
@@ -204,6 +205,7 @@ public class PTAMultipleCore extends BaseCore {
     }
 
     public void loadBundleBg(String bgPath) {
+        setCurrentInstancceId(0);
         int fuItem = mFUItemHandler.loadFUItem(bgPath);
         queueEvent(new Runnable() {
             @Override

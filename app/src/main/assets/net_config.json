@@ -4,6 +4,6 @@
   "web_url_create_download": "https://api-ptoa.faceunity.com/api/p2a/download",
   "pta_client_version_new": "1.7.1",
   "pta_client_version_art": "1.0.2",
-  "web_url_check": "http://p2a-code.faceunity.com:3410/code/check",
+  "web_url_check": "",
   "type": "QStyle"
 }
