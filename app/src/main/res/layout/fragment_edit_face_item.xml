@@ -10,7 +10,7 @@
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/item_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x450"
+        android:layout_height="@dimen/x400"
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
         android:scrollbars="none" />

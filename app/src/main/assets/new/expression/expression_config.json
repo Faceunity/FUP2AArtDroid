@@ -30,7 +30,7 @@
   "animationScenes": [
     {
       "icon": "new_expression_single_1",
-      "camera": "new/expression/ani_dance_cam.bundle",
+      "camera": "new/expression/ani_cam.bundle",
       "bg_2d": 1,
       "BundleRes": [
         {
@@ -41,8 +41,7 @@
     },
     {
       "icon": "new_expression_single_2",
-      "camera": "new/expression/ani_LRPP_cam.bundle",
-      "bg_2d": 4,
+      "camera": "new/expression/ani_cam.bundle",
       "BundleRes": [
         {
           "gender": 1,
@@ -56,7 +55,7 @@
     },
     {
       "icon": "new_expression_single_4",
-      "camera": "new/expression/ani_SJG_cam.bundle",
+      "camera": "new/expression/ani_cam.bundle",
       "bg_2d": 3,
       "BundleRes": [
         {
@@ -71,7 +70,7 @@
     },
     {
       "icon": "new_expression_single_3",
-      "camera": "new/expression/ani_SZW_cam.bundle",
+      "camera": "new/expression/ani_cam.bundle",
       "BundleRes": [
         {
           "gender": 1,

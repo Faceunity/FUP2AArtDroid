@@ -40,11 +40,6 @@
             android:theme="@style/FullScreenTheme"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name="com.faceunity.pta_art.SelectStyleActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/ActivityBaseTheme" />
-        <activity
             android:name="com.faceunity.pta_art.AvatarPTADeleteActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ActivityBaseTheme" />

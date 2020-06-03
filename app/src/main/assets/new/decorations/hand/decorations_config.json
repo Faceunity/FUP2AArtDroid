@@ -1,0 +1,24 @@
+{
+  "decorationsList": [
+    {
+      "gender": 2,
+      "bundle": "new/decorations/hand/peishi_shou_1.bundle",
+      "icon": "peishi_shou_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/hand/peishi_shou_2.bundle",
+      "icon": "peishi_shou_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/hand/peishi_shou_3.bundle",
+      "icon": "peishi_shou_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/hand/peishi_shou_6.bundle",
+      "icon": "peishi_shou_6"
+    }
+  ]
+}

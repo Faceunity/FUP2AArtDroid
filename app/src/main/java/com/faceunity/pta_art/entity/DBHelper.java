@@ -20,7 +20,7 @@ import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 31;
+    public static final int DATABASE_VERSION = 32;
 
     static final String DATABASE_NAME = Constant.APP_NAME + "_avatar.db";
     static final String HISTORY_TABLE_NAME = "avatar_history";
@@ -32,6 +32,7 @@ public class DBHelper extends SQLiteOpenHelper {
     static final String HISTORY_IMAGE_THUMB_NAIL = "img_thumb_nail";
     static final String HISTORY_Q_FINAL_URI = "head";
     static final String HISTORY_GENDER = "gender";
+    static final String HISTORY_GENDER_CLOTHES = "gender_clothes";
     static final String HISTORY_HAIR_INDEX = "hair_index";
     static final String HISTORY_GLASSES_INDEX = "glasses_index";
     static final String HISTORY_CLOTHES_INDEX = "clothes_index";
@@ -42,7 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
     static final String HISTORY_EYEBROW_INDEX = "eyebrow_index";
     static final String HISTORY_HAT_INDEX = "hat_index";
     static final String HISTORY_SHOES_INDEX = "shoes_index";
-    static final String HISTORY_DECORATIONS_INDEX = "decorations_index";
+
     static final String HISTORY_BODY_LEVEL = "body_level";
     static final String HISTORY_EYELINER_INDEX = "eyeliner_index";
     static final String HISTORY_EYESHADOW_INDEX = "eyeshadow_index";
@@ -53,6 +54,11 @@ public class DBHelper extends SQLiteOpenHelper {
     static final String HISTORY_BACKGROUND_3D_INDEX = "background_3d_index";
     static final String HISTORY_BACKGROUND_ANI_INDEX = "background_ani_index";
 
+    static final String HISTORY_DECORATION_HAND_INDEX = "decoration_hand_index";
+    static final String HISTORY_DECORATION_FOOT_INDEX = "decoration_foot_index";
+    static final String HISTORY_DECORATION_NECK_INDEX = "decoration_neck_index";
+    static final String HISTORY_DECORATION_EAR_INDEX = "decoration_ear_index";
+    static final String HISTORY_DECORATION_HEAD_INDEX = "decoration_head_index";
 
     static final String HISTORY_SKIN_COLOR = "skin_color_values";
     static final String HISTORY_LIP_COLOR = "lip_color_values";
@@ -83,6 +89,7 @@ public class DBHelper extends SQLiteOpenHelper {
                         " img_thumb_nail text," +
                         " head text," +
                         " gender integer," +
+                        " gender_clothes integer," +
                         " hair_index integer," +
                         " glasses_index integer," +
                         " clothes_index integer," +
@@ -116,7 +123,13 @@ public class DBHelper extends SQLiteOpenHelper {
                         " pupil_index integer," +
                         " background_2d_index integer," +
                         " background_3d_index integer," +
-                        " background_ani_index integer" +
+                        " background_ani_index integer," +
+
+                        HISTORY_DECORATION_HAND_INDEX + " integer," +
+                        HISTORY_DECORATION_FOOT_INDEX + " integer," +
+                        HISTORY_DECORATION_NECK_INDEX + " integer," +
+                        HISTORY_DECORATION_EAR_INDEX + " integer," +
+                        HISTORY_DECORATION_HEAD_INDEX + " integer" +
                         ")"
         );
     }
@@ -146,7 +159,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_EYEBROW_INDEX, avatarP2A.getEyebrowIndex());
         contentValues.put(HISTORY_HAT_INDEX, avatarP2A.getHatIndex());
         contentValues.put(HISTORY_SHOES_INDEX, avatarP2A.getShoeIndex());
-        contentValues.put(HISTORY_DECORATIONS_INDEX, avatarP2A.getDecorationsIndex());
+
         contentValues.put(HISTORY_BACKGROUND_2D_INDEX, avatarP2A.getBackground2DIndex());
         contentValues.put(HISTORY_BACKGROUND_3D_INDEX, avatarP2A.getBackground3DIndex());
         contentValues.put(HISTORY_BACKGROUND_ANI_INDEX, avatarP2A.getBackgroundAniIndex());
@@ -171,7 +184,14 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_EYEBROW_COLOR, avatarP2A.getEyebrowColorValue());
         contentValues.put(HISTORY_EYESHADOW_COLOR, avatarP2A.getEyeshadowColorValue());
 
+        contentValues.put(HISTORY_DECORATION_HAND_INDEX, avatarP2A.getDecorationsHandIndex());
+        contentValues.put(HISTORY_DECORATION_FOOT_INDEX, avatarP2A.getDecorationsFootIndex());
+        contentValues.put(HISTORY_DECORATION_NECK_INDEX, avatarP2A.getDecorationsNeckIndex());
+        contentValues.put(HISTORY_DECORATION_EAR_INDEX, avatarP2A.getDecorationsEarIndex());
+        contentValues.put(HISTORY_DECORATION_HEAD_INDEX, avatarP2A.getDecorationsHeadIndex());
+
         contentValues.put(HISTORY_GENDER, avatarP2A.getGender());
+        contentValues.put(HISTORY_GENDER_CLOTHES, avatarP2A.getClothesGender());
         contentValues.put(HISTORY_BODY_LEVEL, avatarP2A.getBodyLevel());
         db.insert(HISTORY_TABLE_NAME, null, contentValues);
         db.close();
@@ -196,7 +216,7 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_EYEBROW_INDEX, avatarP2A.getEyebrowIndex());
         contentValues.put(HISTORY_HAT_INDEX, avatarP2A.getHatIndex());
         contentValues.put(HISTORY_SHOES_INDEX, avatarP2A.getShoeIndex());
-        contentValues.put(HISTORY_DECORATIONS_INDEX, avatarP2A.getDecorationsIndex());
+
         contentValues.put(HISTORY_BACKGROUND_2D_INDEX, avatarP2A.getBackground2DIndex());
         contentValues.put(HISTORY_BACKGROUND_3D_INDEX, avatarP2A.getBackground3DIndex());
         contentValues.put(HISTORY_BACKGROUND_ANI_INDEX, avatarP2A.getBackgroundAniIndex());
@@ -221,7 +241,15 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HISTORY_EYEBROW_COLOR, avatarP2A.getEyebrowColorValue());
         contentValues.put(HISTORY_EYESHADOW_COLOR, avatarP2A.getEyeshadowColorValue());
 
+        contentValues.put(HISTORY_DECORATION_HAND_INDEX, avatarP2A.getDecorationsHandIndex());
+        contentValues.put(HISTORY_DECORATION_FOOT_INDEX, avatarP2A.getDecorationsFootIndex());
+        contentValues.put(HISTORY_DECORATION_NECK_INDEX, avatarP2A.getDecorationsNeckIndex());
+        contentValues.put(HISTORY_DECORATION_EAR_INDEX, avatarP2A.getDecorationsEarIndex());
+        contentValues.put(HISTORY_DECORATION_HEAD_INDEX, avatarP2A.getDecorationsHeadIndex());
+
+
         contentValues.put(HISTORY_GENDER, avatarP2A.getGender());
+        contentValues.put(HISTORY_GENDER_CLOTHES, avatarP2A.getClothesGender());
         contentValues.put(HISTORY_BODY_LEVEL, avatarP2A.getBodyLevel());
         db.update(HISTORY_TABLE_NAME, contentValues, HISTORY_DIR + "=?", new String[]{avatarP2A.getBundleDir()});
         db.close();
@@ -251,6 +279,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int bundleDirIndex = res.getColumnIndex(HISTORY_DIR);
         int qBundleIndex = res.getColumnIndex(HISTORY_Q_FINAL_URI);
         int genderIndex = res.getColumnIndex(HISTORY_GENDER);
+        int genderClothesIndex = res.getColumnIndex(HISTORY_GENDER_CLOTHES);
         int imageOriginIndex = res.getColumnIndex(HISTORY_IMAGE_ORIGIN);
         int imageThumbNailIndex = res.getColumnIndex(HISTORY_IMAGE_THUMB_NAIL);
         int hairIndex = res.getColumnIndex(HISTORY_HAIR_INDEX);
@@ -263,7 +292,7 @@ public class DBHelper extends SQLiteOpenHelper {
         int eyebrowIndex = res.getColumnIndex(HISTORY_EYEBROW_INDEX);
         int hatIndex = res.getColumnIndex(HISTORY_HAT_INDEX);
         int shoeIndex = res.getColumnIndex(HISTORY_SHOES_INDEX);
-        int decorationsIndex = res.getColumnIndex(HISTORY_DECORATIONS_INDEX);
+
         int background2DIndex = res.getColumnIndex(HISTORY_BACKGROUND_2D_INDEX);
         int background3DIndex = res.getColumnIndex(HISTORY_BACKGROUND_3D_INDEX);
         int backgroundAniIndex = res.getColumnIndex(HISTORY_BACKGROUND_ANI_INDEX);
@@ -288,9 +317,15 @@ public class DBHelper extends SQLiteOpenHelper {
         int eyebrowColorIndex = res.getColumnIndex(HISTORY_EYEBROW_COLOR);
         int eyeshadowColorIndex = res.getColumnIndex(HISTORY_EYESHADOW_COLOR);
 
+        int decorationHandIndex = res.getColumnIndex(HISTORY_DECORATION_HAND_INDEX);
+        int decorationFootIndex = res.getColumnIndex(HISTORY_DECORATION_FOOT_INDEX);
+        int decorationNeckIndex = res.getColumnIndex(HISTORY_DECORATION_NECK_INDEX);
+        int decorationEarIndex = res.getColumnIndex(HISTORY_DECORATION_EAR_INDEX);
+        int decorationHeadIndex = res.getColumnIndex(HISTORY_DECORATION_HEAD_INDEX);
+
         int bodyLevel = res.getColumnIndex(HISTORY_BODY_LEVEL);
         while (!res.isAfterLast()) {
-            AvatarPTA historyItem = new AvatarPTA(res.getString(bundleDirIndex), res.getInt(genderIndex), res.getString(qBundleIndex));
+            AvatarPTA historyItem = new AvatarPTA(res.getString(bundleDirIndex), res.getInt(genderIndex), res.getInt(genderClothesIndex), res.getString(qBundleIndex));
             historyItem.setOriginPhotoThumbNail(res.getString(imageThumbNailIndex));
             historyItem.setOriginPhoto(res.getString(imageOriginIndex));
             historyItem.setHairIndex(res.getInt(hairIndex));
@@ -303,7 +338,7 @@ public class DBHelper extends SQLiteOpenHelper {
             historyItem.setEyebrowIndex(res.getInt(eyebrowIndex));
             historyItem.setHatIndex(res.getInt(hatIndex));
             historyItem.setShoeIndex(res.getInt(shoeIndex));
-            historyItem.setDecorationsIndex(res.getInt(decorationsIndex));
+
             historyItem.setBackground2DIndex(res.getInt(background2DIndex));
             historyItem.setBackground3DIndex(res.getInt(background3DIndex));
             historyItem.setBackgroundAniIndex(res.getInt(backgroundAniIndex));
@@ -327,6 +362,12 @@ public class DBHelper extends SQLiteOpenHelper {
             historyItem.setEyelashColorValue(res.getDouble(eyelashColorIndex));
             historyItem.setEyebrowColorValue(res.getDouble(eyebrowColorIndex));
             historyItem.setEyeshadowColorValue(res.getDouble(eyeshadowColorIndex));
+
+            historyItem.setDecorationsHandIndex(res.getInt(decorationHandIndex));
+            historyItem.setDecorationsFootIndex(res.getInt(decorationFootIndex));
+            historyItem.setDecorationsNeckIndex(res.getInt(decorationNeckIndex));
+            historyItem.setDecorationsEarIndex(res.getInt(decorationEarIndex));
+            historyItem.setDecorationsHeadIndex(res.getInt(decorationHeadIndex));
 
             historyItem.setBodyLevel(res.getInt(bodyLevel));
             allHistoryItemList.add(historyItem);

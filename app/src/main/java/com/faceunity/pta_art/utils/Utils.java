@@ -56,4 +56,30 @@ public class Utils {
             Toast.makeText(context, "生成完毕", Toast.LENGTH_SHORT).show();
         }
     }
+
+    public static void generateAllHat(Context context, AvatarPTA avatarPTA) {
+        if (generateAllHair && BuildConfig.DEBUG) {
+
+            final List<BundleRes> bundleRes = FilePathFactory.hatBundleRes(avatarPTA.getGender());
+            for (int i = 0; i < bundleRes.size(); i++) {
+                ExecutorService executorService = Executors.newFixedThreadPool(1);
+                int finalI = i;
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        byte[] objData = FileUtil.readBytes(avatarPTA.getHeadFile());
+                        if (objData == null)
+                            return;
+                        BundleRes hat = bundleRes.get(finalI);
+                        try {
+                            PTAClientWrapper.deformHairByServer(context, objData, hat.path, avatarPTA.getBundleDir() + hat.name);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+            Toast.makeText(context, "生成完毕", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

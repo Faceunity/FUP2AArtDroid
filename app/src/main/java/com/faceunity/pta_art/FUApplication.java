@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.faceunity.pta_art.constant.ColorConstant;
 import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.pta_art.core.authpack;
 import com.faceunity.pta_art.core.client.PTAClientWrapper;
@@ -49,6 +50,7 @@ public class FUApplication extends Application {
         //初始化 core data 数据---捏脸
         if (!needRestartMainActivity) {
             PTAClientWrapper.setupData(this);
+            PTAClientWrapper.setupStyleData(this);
         }
         long endInitCoreDataTime = System.currentTimeMillis();
 
@@ -59,6 +61,9 @@ public class FUApplication extends Application {
 
         TtsEngineUtils.getInstance().init(this);
         initResolution();
+
+        //风格选择后初始化 P2A client
+        ColorConstant.init(this);
     }
 
     //

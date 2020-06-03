@@ -32,6 +32,8 @@ public class PTAMultipleCore extends BaseCore {
     private int[] bgItems = new int[1];
     public int cameraItem;//相机轨迹
     private int controllerItem;
+    // 平地阴影道具
+    public int planeItemLeft, planeItemRight;
 
     public PTAMultipleCore(Context context, FUPTARenderer fuP2ARenderer) {
         super(context, fuP2ARenderer);
@@ -43,6 +45,11 @@ public class PTAMultipleCore extends BaseCore {
     public void updateBg() {
         defaultBgItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
         bgItems[0] = currentBgItem = defaultBgItem;
+    }
+
+    public void receiveShadowItem(int leftShadowItem, int rightShadowItem) {
+        this.planeItemLeft = leftShadowItem;
+        this.planeItemRight = rightShadowItem;
     }
 
     public SparseArray<AvatarHandle> createAvatarMultiple(Scenes scenes, int controller) {
@@ -215,6 +222,24 @@ public class PTAMultipleCore extends BaseCore {
                 bgItems[0] = currentBgItem = fuItem;
                 faceunity.fuBindItems(controllerItem, bgItems);
                 mBackgroundUtil.setUseBitmapBackground(false);
+            }
+        });
+    }
+
+    public void bindPlane() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuBindItems(controllerItem, new int[]{planeItemLeft, planeItemRight});
+            }
+        });
+    }
+
+    public void unBindPlane() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuUnBindItems(controllerItem, new int[]{planeItemLeft, planeItemRight});
             }
         });
     }

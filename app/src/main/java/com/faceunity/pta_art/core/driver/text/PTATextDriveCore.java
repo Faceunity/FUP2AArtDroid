@@ -31,7 +31,7 @@ public class PTATextDriveCore extends BaseCore {
     //语音相关
     private boolean isPlaying;
     private int currentFrameId;
-    private double changeRate;
+    public static double changeRate;
     private List<float[]> mExpressions;
     private double[] expressions = new double[57];
 
@@ -61,8 +61,8 @@ public class PTATextDriveCore extends BaseCore {
         }
         mExpressions.clear();
         mExpressions.addAll(Expression);
-        //绘制图像1/30帧，而口型系数是15ms一帧，这里需要按照图像转换，进行同步
-        changeRate = 1.0f / (30 * 0.015);
+        //绘制图像1/60帧，而口型系数是15ms一帧，这里需要按照图像转换，进行同步
+        changeRate = 1.0f / (60 * 0.015);
     }
 
     /**

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.faceunity.pta_art.entity.AvatarPTA;
@@ -48,10 +49,17 @@ public class AvatarPTADeleteActivity extends AppCompatActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_avatar_p2a_delete);
         FullScreenUtils.fullScreen(this);
+        int statusBarHeight = FullScreenUtils.getStatusBarHeight(this);
         mDBHelper = new DBHelper(this);
         mAvatarP2As = mDBHelper.getAllHistoryItems();
         isDeleteList = new boolean[mAvatarP2As.size()];
         Arrays.fill(isDeleteList, false);
+
+        View tvTitle = findViewById(R.id.avatar_p2a_delete_title);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) tvTitle.getLayoutParams();
+        layoutParams.topMargin = statusBarHeight;
+        tvTitle.setLayoutParams(layoutParams);
+
 
         mRecyclerView = findViewById(R.id.avatar_p2a_delete_recycler);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false));

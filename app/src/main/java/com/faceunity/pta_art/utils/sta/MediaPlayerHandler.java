@@ -1,12 +1,14 @@
 package com.faceunity.pta_art.utils.sta;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
 import com.faceunity.pta_art.utils.sta.player.BaseMediaPlayer;
 
+import java.io.FileDescriptor;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -67,6 +69,17 @@ public class MediaPlayerHandler {
             public void run() {
                 if (mBasePlayer != null) {
                     mBasePlayer.setDataSource(pathOrUrl);
+                }
+            }
+        });
+    }
+
+    public void setDataSource(AssetFileDescriptor afd) {
+        mPlayerHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mBasePlayer != null) {
+                    mBasePlayer.setDataSource(afd);
                 }
             }
         });

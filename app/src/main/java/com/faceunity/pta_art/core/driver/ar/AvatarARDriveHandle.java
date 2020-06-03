@@ -32,6 +32,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
     public final FUItem eyelashItem = new FUItem();
     public final FUItem hatItem = new FUItem();
     public final FUItem shoeItem = new FUItem();
+    public final FUItem decorationsEarItem = new FUItem();
+    public final FUItem decorationsHeadItem = new FUItem();
 
     public final FUItem eyelinerItem = new FUItem();
     public final FUItem eyeshadowItem = new FUItem();
@@ -64,7 +66,7 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 // 当前的帽子都是帽子头发道具，所以就不需要原先的头发道具了
                 if (TextUtils.isEmpty(avatar.getHatFile())) {
                     loadItem(hairItem, avatar.getHairFile(), needDestory);
-                    loadItem(hatItem, avatar.getHatFile(),needDestory);
+                    loadItem(hatItem, avatar.getHatFile(), needDestory);
                 } else {
                     loadItem(hairItem, "", needDestory);
                     loadItem(hatItem, avatar.getHatFile(), needDestory);
@@ -73,6 +75,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 loadItemNew(beardItem, avatar.getBeardFile(), needDestory);
                 loadItemNew(eyebrowItem, avatar.getEyebrowFile(), needDestory);
                 loadItemNew(eyelashItem, avatar.getEyelashFile(), needDestory);
+                loadItem(decorationsEarItem, avatar.getEarDecorationsFile());
+                loadItem(decorationsHeadItem, avatar.getHeadDecorationsFile());
 
                 loadItem(eyelinerItem, avatar.getEyelinerFile());
                 loadItem(eyeshadowItem, avatar.getEyeshadowFile());
@@ -112,7 +116,7 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 public void run() {
                     int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle,
                             beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle,
-                            shoeItem.handle,  expressionItem.handle,
+                            shoeItem.handle, expressionItem.handle, decorationsEarItem.handle, decorationsHeadItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
                             lipglossItem.handle, pupilItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
@@ -134,7 +138,7 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 public void run() {
                     int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle,
                             eyebrowItem.handle, eyelashItem.handle, hatItem.handle,
-                            shoeItem.handle, expressionItem.handle, hairMask,
+                            shoeItem.handle, expressionItem.handle, hairMask, decorationsEarItem.handle, decorationsHeadItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
                             lipglossItem.handle, pupilItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
@@ -193,6 +197,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(hatItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsEarItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsHeadItem.handle));
 
         mBaseCore.queueEvent(mBaseCore.destroyItem(eyelinerItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(eyeshadowItem.handle));
@@ -218,6 +224,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 hatItem.clear();
                 shoeItem.clear();
                 expressionItem.clear();
+                decorationsEarItem.clear();
+                decorationsHeadItem.clear();
 
                 eyelinerItem.clear();
                 eyeshadowItem.clear();

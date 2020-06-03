@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:animateLayoutChanges="true"
+    android:background="@color/colorWhite"
+    android:orientation="vertical">
+
+    <com.faceunity.pta_art.fragment.editface.core.item.SingleSelectView
+        android:id="@+id/item_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x450"
+        android:paddingLeft="@dimen/x8"
+        android:paddingRight="@dimen/x8"
+        android:scrollbars="none" />
+</LinearLayout>

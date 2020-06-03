@@ -31,6 +31,7 @@ import com.faceunity.pta_art.constant.FilePathFactory;
 import com.faceunity.pta_art.core.AvatarHandle;
 import com.faceunity.pta_art.core.FUPTARenderer;
 import com.faceunity.pta_art.core.PTACore;
+import com.faceunity.pta_art.core.driver.text.PTATextDriveCore;
 import com.faceunity.pta_art.entity.AvatarPTA;
 import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.entity.DBHelper;
@@ -47,6 +48,10 @@ import com.faceunity.pta_art.fragment.drive.TextDriveFragment;
 import com.faceunity.pta_art.renderer.CameraRenderer;
 import com.faceunity.pta_art.utils.SurfaceViewOutlineProvider;
 import com.faceunity.pta_art.utils.ToastUtil;
+import com.faceunity.pta_art.utils.eventbus.FuEventBus;
+import com.faceunity.pta_art.utils.eventbus.Subscribe;
+import com.faceunity.pta_art.utils.eventbus.ThreadMode;
+import com.faceunity.pta_art.utils.eventbus.event.UpdateHomeAvatarEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -92,13 +97,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     private View v_is_canClick;
     private boolean isCanClick = true;
+    private boolean cameraIsOpen = false;
+    private AvatarPTA currentDrivenAvatar;
+    /**
+     * 驱动界面显示的模型index
+     */
+    private int drivenAvatarShowIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        FuEventBus.getDefault().register(this);
         mMainLayout = findViewById(R.id.main_layout);
         v_is_canClick = findViewById(R.id.v_is_canClick);
         v_is_canClick.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +216,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onResume() {
         super.onResume();
-        mCameraRenderer.openCamera();
+        if (!cameraIsOpen) {
+            mCameraRenderer.openCamera();
+        }
+        cameraIsOpen = false;
         mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -218,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     protected void onDestroy() {
+        FuEventBus.getDefault().unRegister(this);
         mCameraRenderer.onDestroy();
         Glide.get(FUApplication.getInstance()).clearMemory();
         super.onDestroy();
@@ -294,24 +309,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        boolean isToHome = false;
         boolean isNeedLoad = true;
         if (intent != null && intent.getExtras() != null) {
-            isToHome = intent.getBooleanExtra("isToHome", false);
             isNeedLoad = false;
         }
         if (isNeedLoad) {
             updateAvatarP2As();
             mAvatarHandle.setAvatar(getShowAvatarP2A());
-        }
-        if (isToHome) {
-            if (mBaseFragment instanceof GroupPhotoFragment) {
-                ((GroupPhotoFragment) mBaseFragment).backToHome();
-                mP2ACore.setCurrentInstancceId(0);
-                mP2ACore.bind();
-                mFUP2ARenderer.setFUCore(mP2ACore);
-                mP2ACore.loadWholeBodyCamera();
-            }
         }
     }
 
@@ -337,6 +341,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mFUP2ARenderer.onSurfaceCreated();
+        mFUP2ARenderer.setOnFUDebugListener(new FUPTARenderer.OnFUDebugListener() {
+            @Override
+            public void onFpsChange(double fps, double renderTime) {
+                PTATextDriveCore.changeRate = 1.0f / (fps * 0.015);
+            }
+        });
     }
 
     @Override
@@ -431,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             transaction.show(mHomeFragment);
         }
         mShowFragmentFlag = HomeFragment.TAG;
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
         mP2ACore.loadWholeBodyCamera();
     }
 
@@ -601,5 +611,34 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    @Subscribe(threadMode = ThreadMode.MainThread)
+    public void onMediaBack(UpdateHomeAvatarEvent mediaEvent) {
+        boolean toHome = mediaEvent.isToHome();
+        if (toHome && mBaseFragment instanceof GroupPhotoFragment) {
+            mCameraRenderer.openCamera();
+            cameraIsOpen = true;
+            ((GroupPhotoFragment) mBaseFragment).backToHome();
+            mP2ACore.setCurrentInstancceId(0);
+            mP2ACore.bind();
+            mFUP2ARenderer.setFUCore(mP2ACore);
+            mP2ACore.loadWholeBodyCamera();
+        }
+    }
+
+    public AvatarPTA getCurrentDrivenAvatar() {
+        return currentDrivenAvatar;
+    }
+
+    public void setCurrentDrivenAvatar(AvatarPTA currentDrivenAvatar) {
+        drivenAvatarShowIndex = mAvatarP2As.indexOf(currentDrivenAvatar);
+
+
+        this.currentDrivenAvatar = currentDrivenAvatar;
+    }
+
+    public int getDrivenAvatarShowIndex() {
+        return drivenAvatarShowIndex == -1 ? drivenAvatarShowIndex = mShowIndex : drivenAvatarShowIndex;
     }
 }

@@ -141,8 +141,8 @@ public class EditShapeFragment extends EditFaceBaseFragment {
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mItemRecycler.getLayoutParams();
         layoutParams.height = mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_NOSE_INDEX ||
                 mEditFaceBaseFragmentId == EditFaceItemManager.TITLE_MOUTH_INDEX ?
-                getResources().getDimensionPixelOffset(R.dimen.x450) :
-                getResources().getDimensionPixelOffset(R.dimen.x350);
+                getResources().getDimensionPixelOffset(R.dimen.x400) :
+                getResources().getDimensionPixelOffset(R.dimen.x300);
         mItemRecycler.setLayoutParams(layoutParams);
         return view;
     }

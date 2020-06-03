@@ -193,10 +193,11 @@ public class GroupPhotoScenesFragment extends BaseFragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && needReset) {
-            mEditFaceSelectBottomId = TITLE_SCENES_2D;
             mGroupPhotoBaseFragments.clear();
-            bottomTitleGroup.setCheckedById(mEditFaceSelectBottomId);
-            showFragment(mEditFaceSelectBottomId);
+            bottomTitleGroup.setCheckedById(TITLE_SCENES_2D);
+            showFragment(TITLE_SCENES_2D);
+            mEditFaceSelectBottomId = TITLE_SCENES_2D;
+            needReset = false;
         }
     }
 

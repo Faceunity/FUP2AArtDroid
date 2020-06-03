@@ -6,6 +6,7 @@ import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -22,6 +23,8 @@ import com.faceunity.pta_art.utils.DateUtil;
 import com.faceunity.pta_art.utils.FileUtil;
 import com.faceunity.pta_art.utils.SurfaceViewOutlineProvider;
 import com.faceunity.pta_art.utils.ToastUtil;
+import com.faceunity.pta_art.utils.eventbus.FuEventBus;
+import com.faceunity.pta_art.utils.eventbus.event.UpdateHomeAvatarEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,11 +122,17 @@ public class VideoAndImageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(VideoAndImageActivity.this, MainActivity.class);
-        intent.putExtra("isToHome", isToHome);
-        startActivity(intent);
-        super.onBackPressed();
-        overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_bottom);
+        FuEventBus.getDefault().post(new UpdateHomeAvatarEvent(isToHome));
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(VideoAndImageActivity.this, MainActivity.class);
+                startActivity(intent);
+                VideoAndImageActivity.super.onBackPressed();
+                overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_bottom);
+            }
+        }, isToHome ? 500 : 0);
+
     }
 
     private class MyCallBack implements SurfaceHolder.Callback {

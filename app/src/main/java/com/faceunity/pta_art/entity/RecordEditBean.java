@@ -1,8 +1,10 @@
 package com.faceunity.pta_art.entity;
 
+import com.faceunity.pta_art.fragment.editface.core.bean.PairBean;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,8 +16,39 @@ public class RecordEditBean {
     private double bundleValue;
     private String colorName;
     private double colorValus;
+    /**
+     * 美妆相关
+     */
+    private boolean isSel;//美妆是否选择
+    private Map<Integer, PairBean> pairBeanMap;//存储当前美妆选中的列表
     //捏脸数据
     private LinkedHashMap<String, Float> mList;
+    /**
+     * 是否需要立即执行下一步操作
+     */
+    private boolean takeTheNextStep;
+
+    /**
+     * 绑定操作，当前撤销的项目可能不止一种
+     */
+    private RecordEditBean bindOperation;
+
+
+    public RecordEditBean getBindOperation() {
+        return bindOperation;
+    }
+
+    public void setBindOperation(RecordEditBean bindOperation) {
+        this.bindOperation = bindOperation;
+    }
+
+    public boolean isTakeTheNextStep() {
+        return takeTheNextStep;
+    }
+
+    public void setTakeTheNextStep(boolean takeTheNextStep) {
+        this.takeTheNextStep = takeTheNextStep;
+    }
 
     public int getType() {
         return type;
@@ -55,6 +88,27 @@ public class RecordEditBean {
 
     public void setColorValus(double colorValus) {
         this.colorValus = colorValus;
+    }
+
+    public boolean isSel() {
+        return isSel;
+    }
+
+    public void setSel(boolean sel) {
+        isSel = sel;
+    }
+
+    public void setPairBeanMap(Map<Integer, PairBean> pairBeanMap) {
+        this.pairBeanMap = new HashMap<>();
+        for (Integer key : pairBeanMap.keySet()) {
+            PairBean pairBean = new PairBean(pairBeanMap.get(key).getFrontLength(),
+                                             pairBeanMap.get(key).getSelectItemPos(), pairBeanMap.get(key).getSelectColorPos());
+            this.pairBeanMap.put(key, pairBean);
+        }
+    }
+
+    public Map<Integer, PairBean> getPairBeanMap() {
+        return pairBeanMap;
     }
 
     public LinkedHashMap<String, Float> getList() {

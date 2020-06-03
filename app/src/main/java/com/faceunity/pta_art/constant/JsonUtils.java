@@ -6,6 +6,7 @@ import android.util.Log;
 import com.faceunity.pta_art.FUApplication;
 import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.entity.Scenes;
+import com.faceunity.pta_art.entity.SpecialBundleRes;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,9 +19,17 @@ import java.util.Iterator;
 import java.util.List;
 
 public class JsonUtils {
+    /**
+     * 解析的是普通类型的配置文件
+     */
+    public static final int TYPE_NORMAL = 1;
+    /**
+     * 解析的是配饰类型的配置文件
+     */
+    public static final int TYPE_DECORATION = 2;
 
-
-    private List<BundleRes> jsonList;
+    private List<BundleRes> jsonList = new ArrayList<>();
+    private List<SpecialBundleRes> jsonDecorationList = new ArrayList<>();
     private List<Scenes> scenesList;
     private Context context;
 
@@ -28,10 +37,24 @@ public class JsonUtils {
         this.context = FUApplication.getInstance();
     }
 
+
     public void readJson(String path) {
-        if (jsonList == null)
-            jsonList = new ArrayList<>();
-        jsonList.clear();
+        readJson(path, TYPE_NORMAL, 0);
+    }
+
+    /**
+     * 解析传递进来的json文件
+     *
+     * @param path       json文件路径
+     * @param type       解析的类型（1：正常类型 2：配饰类型）
+     * @param bundleType 配饰类型中的类型（配饰-手、配饰-脚、配饰-脖子、配饰-头、配饰-耳朵）
+     */
+    public void readJson(String path, int type, int bundleType) {
+        if (type == TYPE_NORMAL) {
+            jsonList.clear();
+        } else {
+            jsonDecorationList.clear();
+        }
         try {
             InputStream inputStream = context.getAssets().open(path);
             byte[] data = new byte[inputStream.available()];
@@ -42,7 +65,7 @@ public class JsonUtils {
             JSONArray jsonArray = (JSONArray) (jsonObject.opt(jsonObject.keys().next()));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                resolveConfigJson(jsonObject1);
+                resolveConfigJson(jsonObject1, type, bundleType);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,7 +76,7 @@ public class JsonUtils {
         }
     }
 
-    private void resolveConfigJson(JSONObject jsonObject) {
+    private void resolveConfigJson(JSONObject jsonObject, int type, int bundleType) {
         int gender = 0;
         String bundle = "";
         int resId = 0;
@@ -93,11 +116,24 @@ public class JsonUtils {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        jsonList.add(new BundleRes(gender, bundle, resId, label, isSupport, bodyLevel));
+        if (type == TYPE_NORMAL) {
+            jsonList.add(new BundleRes(gender, bundle, resId, label, isSupport, bodyLevel));
+        } else {
+            jsonDecorationList.add(new SpecialBundleRes(resId, bundleType, bundle));
+        }
     }
 
     public List<BundleRes> getBundleResList() {
         return jsonList;
+    }
+
+    /**
+     * 获取配饰配置文件解析出来的数据
+     *
+     * @return
+     */
+    public List<SpecialBundleRes> getDecorationBundleResList() {
+        return jsonDecorationList;
     }
 
     //读取动画数据
@@ -243,5 +279,74 @@ public class JsonUtils {
         String[] facePup = new String[facePupList.size()];
         facePupList.toArray(facePup);
         return facePup;
+    }
+
+    /**
+     * 读取本地预置的口型
+     *
+     * @param path
+     * @return
+     */
+    public List<String[]> readSta(String path) {
+        List<String[]> result = new ArrayList<>();
+        try {
+            InputStream inputStream = context.getAssets().open(path);
+            byte[] data = new byte[inputStream.available()];
+            inputStream.read(data);
+            inputStream.close();
+            String jsonStr = new String(data);
+            JSONArray jsonArray = new JSONArray(jsonStr);
+            String[] speakers = new String[jsonArray.length()];
+            String[] speakers_id = new String[jsonArray.length()];
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                speakers_id[i] = jsonObject.optString("name");
+                speakers[i] = jsonObject.optString("chineseName");
+            }
+            result.add(speakers);
+            result.add(speakers_id);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("IOException", e.getMessage());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("JSONException", e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * 读取本地预置的口型
+     *
+     * @param path
+     * @return
+     */
+    public List<float[]> readStaExpression(String path) {
+        List<float[]> result = new ArrayList<>();
+        try {
+            InputStream inputStream = context.getAssets().open(path);
+            byte[] data = new byte[inputStream.available()];
+            inputStream.read(data);
+            inputStream.close();
+            String jsonStr = new String(data);
+            JSONArray jsonArray = new JSONArray(jsonStr);
+
+            float[] values = new float[57];
+            for (int i = 0; i < jsonArray.length(); i++) {
+                if ((i + 1) % 57 == 0) {
+                    result.add(values);
+                    values = new float[57];
+                }
+                values[i % 57] = (float) jsonArray.getDouble(i);
+            }
+            result.add(values);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("IOException", e.getMessage());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("JSONException", e.getMessage());
+        }
+        return result;
     }
 }

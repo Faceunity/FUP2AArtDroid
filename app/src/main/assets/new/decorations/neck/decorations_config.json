@@ -1,0 +1,34 @@
+{
+  "decorationsList": [
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/peishi_xianglian_1.bundle",
+      "icon": "peishi_xianglian_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/peishi_xianglian_2.bundle",
+      "icon": "peishi_xianglian_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/peishi_xianglian_3.bundle",
+      "icon": "peishi_xianglian_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/peishi_xianglian_4.bundle",
+      "icon": "peishi_xianglian_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/toushi_14.bundle",
+      "icon": "toushi_14"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/neck/peishi_erji.bundle",
+      "icon": "peishi_erji"
+    }
+  ]
+}

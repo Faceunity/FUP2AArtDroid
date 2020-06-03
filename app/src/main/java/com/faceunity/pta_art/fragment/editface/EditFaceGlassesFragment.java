@@ -111,8 +111,8 @@ public class EditFaceGlassesFragment extends EditFaceBaseFragment {
         customSwitchView.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) mGlassesRecycler.getLayoutParams();
         layoutParams.height = mColorRecycler.getVisibility() == View.GONE ?
-                getResources().getDimensionPixelOffset(R.dimen.x450) :
-                getResources().getDimensionPixelOffset(R.dimen.x350);
+                getResources().getDimensionPixelOffset(R.dimen.x400) :
+                getResources().getDimensionPixelOffset(R.dimen.x300);
         mGlassesRecycler.setLayoutParams(layoutParams);
     }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -14,25 +14,39 @@
         android:id="@+id/edit_shape_position"
         android:layout_width="@dimen/x96"
         android:layout_height="@dimen/x96"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginRight="@dimen/x32"
         android:layout_marginBottom="@dimen/x30"
         android:background="@drawable/edit_face_shape_position"
         android:button="@null"
         android:checked="true"
-        android:visibility="gone" />
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_reset"
+        android:layout_width="@dimen/x76"
+        android:layout_height="@dimen/x76"
+        android:layout_marginLeft="@dimen/x15"
+        android:layout_marginBottom="@dimen/x20"
+        android:background="@drawable/white_bg"
+        android:scaleType="centerInside"
+        android:src="@drawable/edit_face_all_reset"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/edit_shape_position"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <LinearLayout
         android:id="@+id/ll_redo"
         android:layout_width="@dimen/x200"
         android:layout_height="@dimen/x76"
-        android:layout_alignBottom="@id/edit_shape_position"
         android:layout_marginLeft="@dimen/x20"
         android:background="@drawable/white_bg"
         android:gravity="center"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/iv_reset"
+        app:layout_constraintLeft_toRightOf="@id/iv_reset">
 
         <ImageView
             android:id="@+id/iv_redo_left"
@@ -58,24 +72,44 @@
             android:src="@drawable/sl_redo_right" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/edit_face_fragment_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/x498"
+        android:background="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <FrameLayout
         android:id="@+id/edit_face_bottom_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/edit_face_bottom_title"
-        android:background="@color/colorWhite" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_face_bottom_title" />
+
+    <ImageView
+        android:id="@+id/iv_model_reset"
+        android:layout_width="@dimen/x76"
+        android:layout_height="@dimen/x76"
+        android:layout_marginLeft="@dimen/x15"
+        android:layout_marginBottom="@dimen/x20"
+        android:background="@drawable/white_bg"
+        android:scaleType="centerInside"
+        android:src="@drawable/edit_face_all_reset"
+        app:layout_constraintBottom_toTopOf="@id/edit_face_fragment_bg"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_goneMarginBottom="@dimen/x20" />
 
     <LinearLayout
         android:id="@+id/ll_model_redo"
         android:layout_width="@dimen/x200"
         android:layout_height="@dimen/x76"
-        android:layout_above="@id/edit_face_center_type"
-        android:layout_alignBottom="@id/edit_shape_position"
         android:layout_marginLeft="@dimen/x20"
-        android:layout_marginBottom="@dimen/x20"
+        android:layout_toRightOf="@id/iv_model_reset"
         android:background="@drawable/white_bg"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@id/iv_model_reset"
+        app:layout_constraintLeft_toRightOf="@id/iv_model_reset">
 
         <ImageView
             android:id="@+id/iv_model_redo_left"
@@ -101,49 +135,91 @@
             android:src="@drawable/sl_redo_right" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/ll_slide_title"
+        android:layout_width="@dimen/x80"
+        android:layout_height="@dimen/x264"
+        android:layout_marginRight="@dimen/x22"
+        android:background="@drawable/white_bg"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/iv_model_reset"
+        app:layout_constraintRight_toRightOf="parent">
 
-    <com.faceunity.pta_art.ui.BottomTitleGroup
-        android:id="@+id/edit_face_center_type"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/x80"
-        android:layout_above="@id/edit_face_bottom_layout"
-        android:background="#F5F7FA"
-        app:padding="@dimen/x52"
-        app:text_color="@color/bottom_title_text_color"
-        app:text_size="@dimen/text_size_28" />
+        <TextView
+            android:id="@+id/tv_slide_edit_face"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="捏脸"
+            android:textColor="@color/slide_title_text_color"
+            android:textSize="@dimen/x24" />
 
+        <View
+            android:layout_width="@dimen/x44"
+            android:layout_height="@dimen/x2"
+            android:layout_gravity="center_horizontal"
+            android:background="#0D000000" />
 
-    <ImageButton
-        android:id="@+id/edit_face_back"
-        android:layout_width="@dimen/x108"
-        android:layout_height="@dimen/x108"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="@dimen/x2"
-        android:background="@android:color/transparent"
-        android:padding="@dimen/x12"
-        android:scaleType="centerInside"
-        android:src="@drawable/edit_face_back" />
+        <TextView
+            android:id="@+id/tv_slide_makeup"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="美妆"
+            android:textColor="@color/slide_title_text_color"
+            android:textSize="@dimen/x24" />
 
-    <ImageButton
-        android:id="@+id/edit_face_save"
-        android:layout_width="@dimen/x108"
-        android:layout_height="@dimen/x108"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/x2"
-        android:background="@android:color/transparent"
-        android:padding="@dimen/x12"
-        android:scaleType="centerInside"
-        android:src="@drawable/edit_face_save" />
+        <View
+            android:layout_width="@dimen/x44"
+            android:layout_height="@dimen/x2"
+            android:layout_gravity="center_horizontal"
+            android:background="#0D000000" />
+
+        <TextView
+            android:id="@+id/tv_slide_apparel"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="服饰"
+            android:textColor="@color/slide_title_text_color"
+            android:textSize="@dimen/x24" />
+    </LinearLayout>
 
     <com.faceunity.pta_art.ui.BottomTitleGroup
         android:id="@+id/edit_face_bottom_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x98"
-        android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@id/edit_face_bottom_layout"
+        app:layout_constraintTop_toTopOf="@id/edit_face_fragment_bg"
         app:padding="@dimen/x32"
         app:text_color="@color/bottom_title_text_color"
         app:text_size="@dimen/text_size_28" />
-</RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/edit_face_back"
+        android:layout_width="@dimen/x108"
+        android:layout_height="@dimen/x108"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/x2"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/x12"
+        android:scaleType="centerInside"
+        android:src="@drawable/edit_face_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageButton
+        android:id="@+id/edit_face_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/x14"
+        android:layout_marginRight="@dimen/x12"
+        android:background="@android:color/transparent"
+        android:src="@drawable/edit_face_save_selector"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>

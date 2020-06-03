@@ -43,11 +43,13 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
 
         mP2AARCore = new PTAARDriveCore(mActivity, mFUP2ARenderer);
         mP2AARCore.setFace_capture(mP2ACore.face_capture);
+        mP2ACore.unBindPlane();
         mFUP2ARenderer.setFUCore(mP2AARCore);
         mAvatarARHandle = mP2AARCore.createAvatarARHandle(mAvatarHandle.controllerItem);
 
         mActivity.setCanClick(false, true);
-        mAvatarARHandle.setARAvatar(mActivity.getShowAvatarP2A(), new Runnable() {
+        AvatarPTA avatarPTA = mActivity.getCurrentDrivenAvatar() == null ? mActivity.getShowAvatarP2A() : mActivity.getCurrentDrivenAvatar();
+        mAvatarARHandle.setARAvatar(avatarPTA, new Runnable() {
             @Override
             public void run() {
                 mActivity.setCanClick(true, false);
@@ -80,7 +82,7 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
             }
         });
         mBottomTitleGroup.setResStrings(new String[]{"模型", "滤镜"}, new int[]{0, 1}, 0);
-        adapter.setDefaultIndex(DriveAdapter.STATUS_AR_DRIVE_HEAD, mActivity.getShowIndex());
+        adapter.setDefaultIndex(DriveAdapter.STATUS_AR_DRIVE_HEAD, mActivity.getDrivenAvatarShowIndex());
     }
 
     @Override
@@ -97,6 +99,7 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
                     mP2AARCore.release();
                     mP2AARCore = null;
                 }
+                mP2ACore.bindPlane();
                 mP2ACore.bindDefault();
                 mActivity.showBaseFragment(BodyDriveFragment.TAG);
                 break;
@@ -106,6 +109,7 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
                     mP2AARCore = null;
                 }
                 mActivity.setIsAR(true);
+                mP2ACore.bindPlane();
                 mP2ACore.bindDefault();
                 mActivity.showBaseFragment(TextDriveFragment.TAG);
                 break;
@@ -132,13 +136,16 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
             mP2AARCore.release();
             mP2AARCore = null;
         }
+        mP2ACore.bindPlane();
         mP2ACore.bind();
         mFUP2ARenderer.setFUCore(mP2ACore);
+        mActivity.setCurrentDrivenAvatar(null);
     }
 
     @Override
     public void onClickHead(int pos, AvatarPTA avatarPTA) {
         mActivity.setCanClick(false, true);
+        mActivity.setCurrentDrivenAvatar(avatarPTA);
         mAvatarARHandle.setARAvatar(avatarPTA, new Runnable() {
             @Override
             public void run() {
@@ -154,5 +161,10 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
         mAvatarARHandle.setFilter(path);
         adapter.notifySelectItemChanged(pos);
         scrollToPosition(pos);
+    }
+
+    @Override
+    public void onClickTone(String toneId) {
+
     }
 }

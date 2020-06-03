@@ -1,6 +1,8 @@
 package com.faceunity.pta_art.fragment.drive;
 
 import android.app.Activity;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.faceunity.pta_art.R;
+import com.faceunity.pta_art.constant.JsonUtils;
 import com.faceunity.pta_art.core.driver.text.AvatarTextDriveHandle;
 import com.faceunity.pta_art.core.driver.text.PTATextDriveCore;
 import com.faceunity.pta_art.entity.AvatarPTA;
@@ -28,6 +31,7 @@ import com.faceunity.pta_art.utils.sta.MediaPlayerHandler;
 import com.faceunity.pta_art.utils.sta.player.BaseMediaPlayer;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +55,7 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
     private TTSCompletionListener ttsCompletionListener = new TTSCompletionListener();
     private TTSErrorListener ttsErrorListener = new TTSErrorListener();
     private TTSPreparedListener ttsPreparedListener = new TTSPreparedListener(this);
-
+    private List<String[]> mSpeaks;
 
     @Override
     public int getResource() {
@@ -83,7 +87,8 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
         mAvatarTextHandle = mPTATextDriveCore.createAvatarHandle(mAvatarHandle.controllerItem);
 
         mActivity.setCanClick(false, true);
-        mAvatarTextHandle.setAvatarForVoice(mActivity.getShowAvatarP2A(), new Runnable() {
+        AvatarPTA avatarPTA = mActivity.getCurrentDrivenAvatar() == null ? mActivity.getShowAvatarP2A() : mActivity.getCurrentDrivenAvatar();
+        mAvatarTextHandle.setAvatarForVoice(avatarPTA, new Runnable() {
             @Override
             public void run() {
                 mActivity.setCanClick(true, false);
@@ -93,7 +98,7 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
 
     @Override
     public DriveAdapter initAdapter() {
-        return new DriveAdapter(mActivity, mAvatarP2AS, this);
+        return new DriveAdapter(mActivity, mAvatarP2AS, mSpeaks.get(0), mSpeaks.get(1), this);
     }
 
     @Override
@@ -116,7 +121,7 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
             }
         });
         mBottomTitleGroup.setResStrings(new String[]{"模型", "音色"}, new int[]{0, 1}, 0);
-        adapter.setDefaultIndex(DriveAdapter.STATUS_TEXT_DRIVE_HEAD, mActivity.getShowIndex());
+        adapter.setDefaultIndex(DriveAdapter.STATUS_TEXT_DRIVE_HEAD, mActivity.getDrivenAvatarShowIndex());
     }
 
     @Override
@@ -131,6 +136,7 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
         mP2ACore.bind();
         mP2ACore.unBindDefault();
         mFUP2ARenderer.setFUCore(mP2ACore);
+        mActivity.setCurrentDrivenAvatar(null);
     }
 
     @Override
@@ -168,6 +174,10 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
         mMediaPlayerHandler = new MediaPlayerHandler(mActivity);
         mExpressionList = new ArrayList<>();
         mMediaPlayerHandler.initPlayer(TYPE_PLATFORM, ttsPreparedListener, ttsCompletionListener, ttsErrorListener);
+
+        JsonUtils jsonUtils = new JsonUtils();
+        mSpeaks = jsonUtils.readSta("sta/config.json");
+
     }
 
     private void sendText() {
@@ -280,6 +290,7 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
     @Override
     public void onClickHead(int pos, AvatarPTA avatarPTA) {
         mActivity.setCanClick(false, true);
+        mActivity.setCurrentDrivenAvatar(avatarPTA);
         mAvatarTextHandle.setAvatarForVoice(avatarPTA, new Runnable() {
             @Override
             public void run() {
@@ -294,6 +305,27 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
     public void onClickARFilter(int pos, String path) {
 
     }
+
+    @Override
+    public void onClickTone(String toneId) {
+        JsonUtils jsonUtils = new JsonUtils();
+
+        mExpressionList.clear();
+        mExpressionList.addAll(jsonUtils.readStaExpression("sta/" + toneId + ".json"));
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AssetManager am = mActivity.getAssets();
+                try {
+                    AssetFileDescriptor afd = am.openFd("sta/" + toneId + ".mp3");
+                    mMediaPlayerHandler.setDataSource(afd);
+                } catch (IOException e) {
+                    Log.i(TAG, e.getMessage());
+                }
+            }
+        });
+    }
+
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {

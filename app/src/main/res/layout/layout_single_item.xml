@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/x156"
+             android:layout_gravity="center">
+
+    <com.faceunity.pta_art.ui.RoundImageView
+        android:id="@+id/bottom_item_img"
+        android:layout_width="@dimen/x140"
+        android:layout_height="@dimen/x140"
+        android:layout_gravity="center"
+        android:background="@drawable/main_item_background"
+        android:cropToPadding="true"
+        android:scaleType="centerCrop"
+        app:round_radius="@dimen/x12"/>
+
+    <View
+        android:id="@+id/bottom_item_img_select"
+        android:layout_width="@dimen/x156"
+        android:layout_height="@dimen/x156"
+        android:layout_gravity="center"
+        android:background="@drawable/main_item_select"/>
+</FrameLayout>

@@ -100,6 +100,10 @@ public class EditFaceParameter {
         return mMap.get(key);
     }
 
+    public Float getDefaultParamByKey(String key) {
+        return mDefaultMap.get(key);
+    }
+
     private void setParamFaceShape(String positiveKey, String negativeKey, float distance) {
         if (mMap.get(positiveKey) == null || mMap.get(negativeKey) == null) {
             Log.e(TAG, "setParamFaceShape error " + positiveKey + ":" + mMap.get(positiveKey) + " " + negativeKey + ":" + mMap.get(negativeKey));

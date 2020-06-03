@@ -1,9 +1,12 @@
 package com.faceunity.pta_art.utils.sta.player;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.util.Log;
+
+import java.io.FileDescriptor;
 
 /**
  * 封装 Android 原生 MediaPlayer
@@ -58,6 +61,18 @@ public class AndroidMediaPlayer extends BaseMediaPlayer {
         reset();
         try {
             mMediaPlayer.setDataSource(pathOrUrl);
+            prepareAsync();
+        } catch (Exception e) {
+            Log.e(TAG, "setDataSource: ", e);
+        }
+    }
+
+    @Override
+    public void setDataSource(AssetFileDescriptor afd) {
+        reset();
+        try {
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(),
+                    afd.getLength());
             prepareAsync();
         } catch (Exception e) {
             Log.e(TAG, "setDataSource: ", e);

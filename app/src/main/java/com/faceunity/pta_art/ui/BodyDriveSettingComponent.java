@@ -19,7 +19,6 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
     private SwitchButton faceDriveSb;
     private TextView bodyDriveTv;
     private SwitchButton bodyDriveSb;
-    //private SwitchButton followingSb;
 
     public BodyDriveSettingComponent(Context context) {
         super(context);
@@ -42,8 +41,6 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
         faceDriveSb = findViewById(R.id.body_drive_setting_face_drive_sb);
         bodyDriveTv = findViewById(R.id.body_drive_setting_body_drive_tv);
         bodyDriveSb = findViewById(R.id.body_drive_setting_body_drive_sb);
-        //TextView followingTv = findViewById(R.id.body_drive_setting_following_tv);
-        //followingSb = findViewById(R.id.body_drive_setting_following_sb);
 
         showSettingView.setOnClickListener(new OnClickListener() {
             @Override
@@ -54,16 +51,12 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
                     faceDriveSb.setVisibility(INVISIBLE);
                     bodyDriveTv.setVisibility(INVISIBLE);
                     bodyDriveSb.setVisibility(INVISIBLE);
-                    //followingTv.setVisibility(INVISIBLE);
-                    //followingSb.setVisibility(INVISIBLE);
                 } else {
                     settingViewBg.setVisibility(VISIBLE);
                     faceDriveTv.setVisibility(VISIBLE);
                     faceDriveSb.setVisibility(VISIBLE);
                     bodyDriveTv.setVisibility(VISIBLE);
                     bodyDriveSb.setVisibility(VISIBLE);
-                    //followingTv.setVisibility(VISIBLE);
-                    //followingSb.setVisibility(VISIBLE);
                 }
             }
         });
@@ -77,7 +70,6 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
 
         faceDriveSb.setOnCheckedChangeListener(faceDriveListener);
         bodyDriveSb.setOnCheckedChangeListener(bodyDriveListener);
-        //followingSb.setOnCheckedChangeListener(followingListener);
     }
 
 
@@ -89,9 +81,6 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
         return bodyDriveSb.isChecked();
     }
 
-//    public boolean followingIsChecked() {
-//        return followingSb.isChecked();
-//    }
 
     public void setFaceDriveChecked(boolean checked, boolean needAni) {
         faceDriveSb.setCheck(checked, needAni);
@@ -109,13 +98,6 @@ public class BodyDriveSettingComponent extends ConstraintLayout {
         bodyDriveSb.setChecked(checked);
     }
 
-//    public void setFollowingChecked(boolean checked, boolean needAni) {
-//        followingSb.setCheck(checked, needAni);
-//    }
-//
-//    public void setFollowingChecked(boolean checked) {
-//        followingSb.setChecked(checked);
-//    }
 
     public void setBodyDriveTextViewChanged(boolean isChecked) {
         if (isChecked) {

@@ -1,0 +1,29 @@
+{
+  "decorationsList": [
+    {
+      "gender": 2,
+      "bundle": "new/decorations/ear/peishi_erding_1.bundle",
+      "icon": "peishi_erding_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/ear/peishi_erding_2.bundle",
+      "icon": "peishi_erding_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/ear/peishi_erding_3.bundle",
+      "icon": "peishi_erding_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/ear/peishi_erding_4.bundle",
+      "icon": "peishi_erding_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/ear/peishi_erding_5.bundle",
+      "icon": "peishi_erding_5"
+    }
+  ]
+}

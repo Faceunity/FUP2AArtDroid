@@ -1,0 +1,24 @@
+{
+  "decorationsList": [
+    {
+      "gender": 2,
+      "bundle": "new/decorations/foot/peishi_jiao_1.bundle",
+      "icon": "peishi_jiao_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/foot/peishi_jiao_2.bundle",
+      "icon": "peishi_jiao_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/foot/peishi_jiao_3.bundle",
+      "icon": "peishi_jiao_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/foot/peishi_jiao_4.bundle",
+      "icon": "peishi_jiao_4"
+    }
+  ]
+}
