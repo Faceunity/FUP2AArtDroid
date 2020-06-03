@@ -103,12 +103,6 @@
       "body_match_level": 4
     },
     {
-      "bundle": "new/clothes/suit/taozhuang_lifu_4.bundle",
-      "icon": "taozhuang_lifu_4",
-      "gender": 1,
-      "body_match_level": 2
-    },
-    {
       "bundle": "new/clothes/suit/yiqun_2.bundle",
       "icon": "yiqun_2",
       "gender": 1,

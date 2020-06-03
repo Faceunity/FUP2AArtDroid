@@ -31,7 +31,8 @@ public class PTACore extends BaseCore {
     private boolean canResetHomeAnimationPosition = true;
     // 默认背景
     public int defaultItem;
-
+    // 平地阴影道具
+    public int planeItemLeft, planeItemRight;
     private int lastLoadCompletedFrameId = 0;
 
     public PTACore(PTACore core) {
@@ -51,6 +52,8 @@ public class PTACore extends BaseCore {
         face_capture = mFUP2ARenderer.createFaceCapture();
         currentCameraItem = mFUItemHandler.loadFUItem(FilePathFactory.CAMERA_WHOLE_BODY);
         defaultItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_default_bg);
+        planeItemLeft = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_plane_left);
+        planeItemRight = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_plane_right);
     }
 
 
@@ -70,6 +73,8 @@ public class PTACore extends BaseCore {
                 faceunity.fuItemSetParam(avatarHandle.controllerItem, "target_angle", 0);
                 faceunity.fuItemSetParam(avatarHandle.controllerItem, "reset_all", 3);
                 faceunity.fuBindItems(avatarHandle.controllerItem, new int[]{currentCameraItem});
+
+                bindPlane();
             }
         });
     }
@@ -151,7 +156,7 @@ public class PTACore extends BaseCore {
             }
         }
         return faceunity.fuRenderBundles(avatarInfo,
-                0, w, h, mFrameId++, itemsArray());
+                                         0, w, h, mFrameId++, itemsArray());
     }
 
     public void setCurrentInstancceId(int id) {
@@ -167,6 +172,9 @@ public class PTACore extends BaseCore {
         avatarHandle.setFaceCapture(false);
     }
 
+    /**
+     * 解绑之前的2D背景，并绑定上默认背景
+     */
     public void unBindAndBindDefault() {
         unBind();
         bindDefault();
@@ -186,6 +194,24 @@ public class PTACore extends BaseCore {
             @Override
             public void run() {
                 faceunity.fuBindItems(avatarHandle.controllerItem, new int[]{defaultItem});
+            }
+        });
+    }
+
+    public void bindPlane() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuBindItems(avatarHandle.controllerItem, new int[]{planeItemLeft, planeItemRight});
+            }
+        });
+    }
+
+    public void unBindPlane() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                faceunity.fuUnBindItems(avatarHandle.controllerItem, new int[]{planeItemLeft, planeItemRight});
             }
         });
     }
@@ -228,7 +254,8 @@ public class PTACore extends BaseCore {
         currentCameraItem = 0;
         canResetHomeAnimationPosition = true;
         currentHomeAnimationPosition = -1;
-        avatarHandle.release();
+
+        unBindPlane();
         faceunity.fuUnBindItems(avatarHandle.controllerItem, new int[]{controller_config});
         queueEvent(destroyItem(controller_config));
 
@@ -239,6 +266,10 @@ public class PTACore extends BaseCore {
         queueEvent(destroyItem(halfLengthBodyCameraItem));
         queueEvent(destroyItem(bigHalfLengthBodyCameraItem));
         queueEvent(destroyFaceCaptureItem(face_capture));
+        queueEvent(destroyItem(planeItemLeft));
+        queueEvent(destroyItem(planeItemRight));
+
+        avatarHandle.release();
     }
 
     public void setNeedTrackFace(boolean needTrackFace) {

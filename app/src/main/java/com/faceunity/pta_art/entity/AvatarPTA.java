@@ -32,6 +32,12 @@ public class AvatarPTA implements Serializable {
     private String headFile = "";
     private String bodyFile = "";
     private int gender = gender_boy;//识别性别, gender 0 is man 1 is woman
+    /**
+     * 识别性别
+     * gender 0 is man 1 is woman
+     * 主要是用来跟衣服进行匹配的，有些衣服需要的是男性身体、有些衣服需要的是女性身体
+     */
+    private int clothesGender = gender_boy;
     private int bodyLevel = 0;// 身体的级别
     private int hairIndex = 0;
     private int glassesIndex = 0;
@@ -43,7 +49,11 @@ public class AvatarPTA implements Serializable {
     private int eyebrowIndex = 0;
     private int hatIndex = 0;
     private int shoeIndex = 1;
-    private int decorationsIndex = 0;
+    private int decorationsEarIndex = 0;
+    private int decorationsFootIndex = 0;
+    private int decorationsHandIndex = 0;
+    private int decorationsHeadIndex = 0;
+    private int decorationsNeckIndex = 0;
     private int eyelinerIndex = 0;
     private int eyeshadowIndex = 0;
     private int faceMakeupIndex = 0;
@@ -83,7 +93,11 @@ public class AvatarPTA implements Serializable {
         eyebrowIndex = -1;
         hatIndex = -1;
         shoeIndex = -1;
-        decorationsIndex = -1;
+        decorationsEarIndex = 0;
+        decorationsFootIndex = 0;
+        decorationsHandIndex = 0;
+        decorationsHeadIndex = 0;
+        decorationsNeckIndex = 0;
         bodyLevel = -1;
         eyelinerIndex = -1;
         eyeshadowIndex = -1;
@@ -101,15 +115,20 @@ public class AvatarPTA implements Serializable {
         this.bundleDir = bundleDir;
         this.originPhotoRes = originPhotoRes;
         this.gender = gender;
+        this.clothesGender = gender;
         this.headFile = headFile;
-        this.bodyFile = FilePathFactory.bodyBundle(gender);
+        this.bodyFile = FilePathFactory.bodyBundle(clothesGender);
         this.hairIndex = hairIndex;
         this.beardIndex = beardIndex;
         this.clothesIndex = clothesIndex;
         this.clothesUpperIndex = clothesUpperIndex;
         this.clothesLowerIndex = clothesLowerIndex;
         this.shoeIndex = shoeIndex;
-        this.decorationsIndex = decorationsIndex;
+        this.decorationsEarIndex = 0;
+        this.decorationsFootIndex = 0;
+        this.decorationsHandIndex = 0;
+        this.decorationsHeadIndex = 0;
+        this.decorationsNeckIndex = 0;
         this.bodyLevel = 3;
         this.isCreateAvatar = false;
         this.background2DIndex = background2DIndex;
@@ -121,18 +140,19 @@ public class AvatarPTA implements Serializable {
         }
     }
 
-    public AvatarPTA(String bundleDir, int gender, String headFile) {
+    public AvatarPTA(String bundleDir, int gender, int clothesGender, String headFile) {
         setBundleDir(bundleDir);
         this.headFile = headFile;
-        this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.gender = gender;
+        this.clothesGender = clothesGender;
+        this.bodyFile = FilePathFactory.bodyBundle(clothesGender);
     }
 
     public AvatarPTA(String bundleDir, int gender) {
         setBundleDir(bundleDir);
-
-        this.bodyFile = FilePathFactory.bodyBundle(gender);
         this.gender = gender;
+        this.clothesGender = gender;
+        this.bodyFile = FilePathFactory.bodyBundle(clothesGender);
 
         if (gender == gender_girl) {
             this.lipglossColorValue = 1;
@@ -202,6 +222,14 @@ public class AvatarPTA implements Serializable {
 
     public void setGender(int gender) {
         this.gender = gender;
+    }
+
+    public int getClothesGender() {
+        return clothesGender;
+    }
+
+    public void setClothesGender(int clothesGender) {
+        this.clothesGender = clothesGender;
     }
 
     public int getHairIndex() {
@@ -285,12 +313,45 @@ public class AvatarPTA implements Serializable {
         this.shoeIndex = shoeIndex;
     }
 
-    public int getDecorationsIndex() {
-        return decorationsIndex;
+
+    public int getDecorationsEarIndex() {
+        return decorationsEarIndex;
     }
 
-    public void setDecorationsIndex(int decorationsIndex) {
-        this.decorationsIndex = decorationsIndex;
+    public void setDecorationsEarIndex(int decorationsEarIndex) {
+        this.decorationsEarIndex = decorationsEarIndex;
+    }
+
+    public int getDecorationsFootIndex() {
+        return decorationsFootIndex;
+    }
+
+    public void setDecorationsFootIndex(int decorationsFootIndex) {
+        this.decorationsFootIndex = decorationsFootIndex;
+    }
+
+    public int getDecorationsHandIndex() {
+        return decorationsHandIndex;
+    }
+
+    public void setDecorationsHandIndex(int decorationsHandIndex) {
+        this.decorationsHandIndex = decorationsHandIndex;
+    }
+
+    public int getDecorationsHeadIndex() {
+        return decorationsHeadIndex;
+    }
+
+    public void setDecorationsHeadIndex(int decorationsHeadIndex) {
+        this.decorationsHeadIndex = decorationsHeadIndex;
+    }
+
+    public int getDecorationsNeckIndex() {
+        return decorationsNeckIndex;
+    }
+
+    public void setDecorationsNeckIndex(int decorationsNeckIndex) {
+        this.decorationsNeckIndex = decorationsNeckIndex;
     }
 
     public int getEyelinerIndex() {
@@ -413,7 +474,7 @@ public class AvatarPTA implements Serializable {
     }
 
     public String getClothesFile() {
-        return getStringByIndex(FilePathFactory.clothesBundleRes(gender), clothesIndex);
+        return getStringByIndex(FilePathFactory.clothesBundleRes(clothesGender), clothesIndex);
     }
 
     public String getClothesUpperFile() {
@@ -425,11 +486,11 @@ public class AvatarPTA implements Serializable {
     }
 
     public String getEyelashFile() {
-        return getStringByIndex(FilePathFactory.eyelashBundleRes(gender), eyelashIndex);
+        return getSpecialStringByIndex(FilePathFactory.eyelashBundleRes(), eyelashIndex);
     }
 
     public String getEyebrowFile() {
-        return getStringByIndex(FilePathFactory.eyebrowBundleRes(gender), eyebrowIndex);
+        return getSpecialStringByIndex(FilePathFactory.eyebrowBundleRes(), eyebrowIndex);
     }
 
     public String getBeardFile() {
@@ -437,35 +498,57 @@ public class AvatarPTA implements Serializable {
     }
 
     public String getHatFile() {
-        return getStringByIndex(FilePathFactory.hatBundleRes(gender), hatIndex);
+        List<BundleRes> lists = FilePathFactory.hatBundleRes(gender);
+        String name = lists == null || lists.isEmpty() || hatIndex < 0 || hatIndex >= lists.size() ? "" : lists.get(hatIndex).name;
+        if (TextUtils.isEmpty(name)) {
+            return "";
+        }
+        return bundleDir + name;
     }
 
     public String getShoeFile() {
         return getStringByIndex(FilePathFactory.shoeBundleRes(gender), shoeIndex);
     }
 
-    public String getDecorationsFile() {
-        return getStringByIndex(FilePathFactory.decorationsBundleRes(), decorationsIndex);
+    public String getEarDecorationsFile() {
+        return getSpecialStringByIndex(FilePathFactory.decorationsEarBundleRes(), decorationsEarIndex);
     }
 
+    public String getFootDecorationsFile() {
+        return getSpecialStringByIndex(FilePathFactory.decorationsFootBundleRes(), decorationsFootIndex);
+    }
+
+    public String getHandDecorationsFile() {
+        return getSpecialStringByIndex(FilePathFactory.decorationsHandBundleRes(), decorationsHandIndex);
+    }
+
+    public String getHeadDecorationsFile() {
+        return getSpecialStringByIndex(FilePathFactory.decorationsHeadBundleRes(), decorationsHeadIndex);
+    }
+
+    public String getNeckDecorationsFile() {
+        return getSpecialStringByIndex(FilePathFactory.decorationsNeckBundleRes(), decorationsNeckIndex);
+    }
+
+
     public String getEyelinerFile() {
-        return getStringByIndex(FilePathFactory.eyelinerBundleRes(gender), eyelinerIndex);
+        return getSpecialStringByIndex(FilePathFactory.eyelinerBundleRes(), eyelinerIndex);
     }
 
     public String getEyeshadowFile() {
-        return getStringByIndex(FilePathFactory.eyeshadowBundleRes(gender), eyeshadowIndex);
+        return getSpecialStringByIndex(FilePathFactory.eyeshadowBundleRes(), eyeshadowIndex);
     }
 
     public String getFacemakeupFile() {
-        return getStringByIndex(FilePathFactory.facemakeupBundleRes(gender), faceMakeupIndex);
+        return getSpecialStringByIndex(FilePathFactory.facemakeupBundleRes(), faceMakeupIndex);
     }
 
     public String getLipglossFile() {
-        return getStringByIndex(FilePathFactory.lipglossBundleRes(gender), lipglossIndex);
+        return getSpecialStringByIndex(FilePathFactory.lipglossBundleRes(), lipglossIndex);
     }
 
     public String getPupilFile() {
-        return getStringByIndex(FilePathFactory.pupilBundleRes(gender), pupilIndex);
+        return getSpecialStringByIndex(FilePathFactory.pupilBundleRes(), pupilIndex);
     }
 
     public String getBackgroundFile() {
@@ -483,6 +566,10 @@ public class AvatarPTA implements Serializable {
 
     private String getStringByIndex(List<BundleRes> lists, int index) {
         return lists == null || lists.isEmpty() || index < 0 || index >= lists.size() ? "" : lists.get(index).path;
+    }
+
+    private String getSpecialStringByIndex(List<SpecialBundleRes> lists, int index) {
+        return lists == null || lists.isEmpty() || index <= 0 || index > lists.size() ? "" : lists.get(index - 1).path;
     }
 
     public double getSkinColorValue() {
@@ -584,6 +671,7 @@ public class AvatarPTA implements Serializable {
         avatarP2A.headFile = this.headFile;
         avatarP2A.bodyFile = this.bodyFile;
         avatarP2A.gender = this.gender;
+        avatarP2A.clothesGender = this.clothesGender;
         avatarP2A.hairIndex = this.hairIndex;
         avatarP2A.glassesIndex = this.glassesIndex;
         avatarP2A.clothesIndex = this.clothesIndex;
@@ -595,7 +683,11 @@ public class AvatarPTA implements Serializable {
         avatarP2A.eyebrowIndex = this.eyebrowIndex;
         avatarP2A.hatIndex = this.hatIndex;
         avatarP2A.shoeIndex = this.shoeIndex;
-        avatarP2A.decorationsIndex = this.decorationsIndex;
+        avatarP2A.decorationsEarIndex = this.decorationsEarIndex;
+        avatarP2A.decorationsFootIndex = this.decorationsFootIndex;
+        avatarP2A.decorationsHandIndex = this.decorationsHandIndex;
+        avatarP2A.decorationsHeadIndex = this.decorationsHeadIndex;
+        avatarP2A.decorationsNeckIndex = this.decorationsNeckIndex;
         avatarP2A.bodyLevel = this.bodyLevel;
         avatarP2A.background2DIndex = this.background2DIndex;
         avatarP2A.background3DIndex = this.background3DIndex;
@@ -637,7 +729,13 @@ public class AvatarPTA implements Serializable {
                 avatarP2A.eyebrowIndex != this.eyebrowIndex ||
                 avatarP2A.hatIndex != this.hatIndex ||
                 avatarP2A.shoeIndex != this.shoeIndex ||
-                avatarP2A.decorationsIndex != this.decorationsIndex ||
+
+                avatarP2A.decorationsEarIndex != this.decorationsEarIndex ||
+                avatarP2A.decorationsFootIndex != this.decorationsFootIndex ||
+                avatarP2A.decorationsHandIndex != this.decorationsHandIndex ||
+                avatarP2A.decorationsHeadIndex != this.decorationsHeadIndex ||
+                avatarP2A.decorationsNeckIndex != this.decorationsNeckIndex ||
+
                 avatarP2A.bodyLevel != this.bodyLevel ||
                 avatarP2A.skinColorValue != this.skinColorValue ||
                 avatarP2A.lipColorValue != this.lipColorValue ||

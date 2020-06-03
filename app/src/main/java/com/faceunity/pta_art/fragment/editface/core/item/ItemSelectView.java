@@ -21,7 +21,7 @@ import java.util.List;
 public class ItemSelectView extends RecyclerView {
     public static final String TAG = ItemSelectView.class.getSimpleName();
 
-    private static final int spanCount = 4;
+    private static final int spanCount = 5;
 
     private ItemAdapter mItemAdapter;
     private GridLayoutManager mGridLayoutManager;
@@ -64,20 +64,19 @@ public class ItemSelectView extends RecyclerView {
         setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), spanCount, GridLayoutManager.VERTICAL, false));
         setAdapter(mItemAdapter);
         final int wL = getResources().getDimensionPixelSize(R.dimen.x8);
-        final int hL = getResources().getDimensionPixelSize(R.dimen.x17);
-        final int topNormalL = getResources().getDimensionPixelSize(R.dimen.x14);
+        final int hL = getResources().getDimensionPixelSize(R.dimen.x16);
+        final int topNormalL = getResources().getDimensionPixelSize(R.dimen.x8);
         addItemDecoration(new ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state) {
                 int index = parent.getChildAdapterPosition(view);
-                int left = index % spanCount == 0 ? wL : 0;
-                int right = index % spanCount == spanCount - 1 ? wL : 0;
+                int left = wL;
+                int right = wL;
                 int top = index < spanCount ? hL : topNormalL;
-                int bottom = index < size / spanCount * spanCount ? 0 : hL;
+                int bottom = index < spanCount ? 0 : topNormalL;
                 outRect.set(left, top, right, bottom);
             }
         });
-
         ((SimpleItemAnimator) getItemAnimator()).setSupportsChangeAnimations(false);
         mItemAdapter.setItemSelectListener(new ItemAdapter.ItemSelectListener() {
             @Override
@@ -95,7 +94,7 @@ public class ItemSelectView extends RecyclerView {
             @Override
             public void run() {
                 final int topNormalL = getResources().getDimensionPixelSize(R.dimen.x14);
-                final int itemW = getResources().getDimensionPixelOffset(R.dimen.x156);
+                final int itemW = getResources().getDimensionPixelOffset(R.dimen.x126);
                 final int first = mGridLayoutManager.findFirstVisibleItemPosition();
                 if (first < 0) return;
                 int dy = (int) ((0.5 + pos / spanCount) * (itemW + topNormalL) - getHeight() / 2

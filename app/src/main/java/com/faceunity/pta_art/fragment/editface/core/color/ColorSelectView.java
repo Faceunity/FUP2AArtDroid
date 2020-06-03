@@ -98,6 +98,7 @@ public class ColorSelectView extends RecyclerView {
         mColorAdapter.notifyItemChanged(position);
         mColorAdapter.notifyItemChanged(this.mDefaultSelectColor);
         this.mDefaultSelectColor = position;
+        scrollToPosition(position);
     }
 
     public void setColorSelectListener(ColorAdapter.ColorSelectListener colorSelectListener) {

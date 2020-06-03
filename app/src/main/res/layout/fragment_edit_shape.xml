@@ -10,8 +10,7 @@
     <FrameLayout
         android:id="@+id/color_seek_bar_layout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x100"
-        android:background="@color/colorWhite">
+        android:layout_height="@dimen/x100">
 
         <com.faceunity.pta_art.ui.seekbar.DiscreteSeekBar
             android:id="@+id/color_seek_bar"
@@ -40,7 +39,7 @@
         android:id="@+id/color_recycler"
         android:layout_width="match_parent"
         android:layout_height="@dimen/x100"
-        android:background="@color/colorWhite"
+
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
         android:scrollbars="none" />
@@ -48,7 +47,6 @@
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/shape_item_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x350"
-        android:background="@color/colorWhite"
+        android:layout_height="@dimen/x300"
         android:scrollbars="none" />
 </LinearLayout>

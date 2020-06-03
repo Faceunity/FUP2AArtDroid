@@ -1,0 +1,94 @@
+{
+  "decorationsList": [
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_1.bundle",
+      "icon": "toushi_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_2.bundle",
+      "icon": "toushi_2"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_3.bundle",
+      "icon": "toushi_3"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_4.bundle",
+      "icon": "toushi_4"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_5.bundle",
+      "icon": "toushi_5"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_6.bundle",
+      "icon": "toushi_6"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_7.bundle",
+      "icon": "toushi_7"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_8.bundle",
+      "icon": "toushi_8"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_9.bundle",
+      "icon": "toushi_9"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_10.bundle",
+      "icon": "toushi_10"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_11.bundle",
+      "icon": "toushi_11"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_12.bundle",
+      "icon": "toushi_12"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_13.bundle",
+      "icon": "toushi_13"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_15.bundle",
+      "icon": "toushi_15"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_16.bundle",
+      "icon": "toushi_16"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_17.bundle",
+      "icon": "toushi_17"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_maozi_1.bundle",
+      "icon": "toushi_maozi_1"
+    },
+    {
+      "gender": 2,
+      "bundle": "new/decorations/head/toushi_maozi_2.bundle",
+      "icon": "toushi_maozi_2"
+    }
+  ]
+}

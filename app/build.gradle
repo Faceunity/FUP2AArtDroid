@@ -1,4 +1,13 @@
 apply plugin: 'com.android.application'
+import groovy.json.JsonSlurper
+
+def getApkName() {
+    File apkDir = new File("${rootDir}/app/src/main/assets/net_config.json");
+    def jsonSlurper = new JsonSlurper();
+    def netConfig = jsonSlurper.parse(apkDir)
+    new String(netConfig.web_url_check).isEmpty() ? "no_check" : ""
+}
+
 
 android {
     compileSdkVersion 28
@@ -6,8 +15,8 @@ android {
         applicationId "com.faceunity.p2aart"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 32
-        versionName "1.8.0"
+        versionCode 33
+        versionName "1.8.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters 'arm64-v8a'
@@ -50,6 +59,24 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            def fileName
+            def versionName = new String(defaultConfig.versionName).replace(".","")
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                if (variant.buildType.name == 'release') {
+                    defaultConfig.versionName
+                    fileName = "PTA_${versionName}_" + getApkName()  + '.apk'
+                } else {
+                    fileName = "PTA_${versionName}_" + getApkName()  +'.apk'
+                }
+                outputFileName = fileName
+            }
+        }
     }
 }
 

@@ -74,6 +74,16 @@ public class AvatarEditor {
                         }
                     }
 
+                    List<BundleRes> hatBundles = FilePathFactory.hatBundleRes(newAvatarP2A.getGender());
+                    BundleRes hatRes = hatBundles.get(avatarP2A.getHatIndex());
+                    if (!TextUtils.isEmpty(hatRes.path)) {
+                        String hat = avatarP2A.getBundleDir() + hatRes.name;
+                        String hatNew = newAvatarP2A.getBundleDir() + hatRes.name;
+                        if (!isCreateAvatar) {
+                            FileUtil.copyFileTo(mContext.getAssets().open(hat), new File(hatNew));
+                        }
+                    }
+
                     if (isCreateAvatar) {
                         dbHelper.updateHistory(newAvatarP2A);
                     } else {

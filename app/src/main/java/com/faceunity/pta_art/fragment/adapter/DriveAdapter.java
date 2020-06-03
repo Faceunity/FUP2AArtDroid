@@ -93,11 +93,11 @@ public class DriveAdapter extends RecyclerView.Adapter<DriveAdapter.DriveHolder>
      * @param avatarList
      * @param listener
      */
-    public DriveAdapter(Context context, List<AvatarPTA> avatarList, OnListener listener) {
+    public DriveAdapter(Context context, List<AvatarPTA> avatarList, String[] toneList, String[] toneListId, OnListener listener) {
         this(context, avatarList);
         this.listener = listener;
-        toneList = context.getResources().getStringArray(R.array.speakers);
-        toneListId = context.getResources().getStringArray(R.array.speakers_id);
+        this.toneList = toneList;
+        this.toneListId = toneListId;
     }
 
     public void selectStatus(int selectStatus) {
@@ -209,10 +209,8 @@ public class DriveAdapter extends RecyclerView.Adapter<DriveAdapter.DriveHolder>
                 holder.tv_text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (currentIndex == position) {
-                            return;
-                        }
                         if (listener != null) {
+                            listener.onClickTone(toneListId[position]);
                             notifySelectItemChanged(position);
                         }
                     }
@@ -282,5 +280,7 @@ public class DriveAdapter extends RecyclerView.Adapter<DriveAdapter.DriveHolder>
         void onClickHead(int pos, AvatarPTA avatarPTA);
 
         void onClickARFilter(int pos, String path);
+
+        void onClickTone(String toneId);
     }
 }

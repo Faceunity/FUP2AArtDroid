@@ -52,7 +52,8 @@ public class FPSUtil {
         mStartTime = 0;
     }
 
-    private long mLimitMinTime = 33333333;
+    private long mLimitMinTime = 10000000;
+//    private long mLimitMinTime = 33333333;
     private long mLimitStartTime;
     private int mLimitFrameRate;
 

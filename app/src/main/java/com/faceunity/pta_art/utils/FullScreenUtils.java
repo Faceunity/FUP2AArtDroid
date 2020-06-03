@@ -1,6 +1,8 @@
 package com.faceunity.pta_art.utils;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.view.View;
@@ -29,5 +31,12 @@ public abstract class FullScreenUtils {
 //                attributes.flags |= WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
             window.setAttributes(attributes);
         }
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        int height = resources.getDimensionPixelSize(resourceId);
+        return height;
     }
 }

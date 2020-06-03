@@ -130,6 +130,8 @@ public class PTABodyCore extends BaseCore {
         avatarBodyHandle.setCNNTrackFace(needTrackFace);
     }
 
+
+
     @Override
     public void release() {
         long tempHunman3d = human3d;

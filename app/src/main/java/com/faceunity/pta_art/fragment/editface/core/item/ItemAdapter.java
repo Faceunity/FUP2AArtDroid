@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -44,6 +45,16 @@ public abstract class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemH
         final int position = holder.getLayoutPosition();
         Glide.with(holder.itemView.getContext()).load(getRes(position)).into(holder.mItemImg);
         holder.mSelect.setVisibility(mSelectPosition == position ? View.VISIBLE : View.GONE);
+
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) holder.mItemImg.getLayoutParams();
+        layoutParams.width = mSelectPosition == position ?
+                mContext.getResources().getDimensionPixelOffset(R.dimen.x110) :
+                mContext.getResources().getDimensionPixelOffset(R.dimen.x126);
+        layoutParams.height = mSelectPosition == position ?
+                mContext.getResources().getDimensionPixelOffset(R.dimen.x110) :
+                mContext.getResources().getDimensionPixelOffset(R.dimen.x126);
+        holder.mItemImg.setLayoutParams(layoutParams);
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

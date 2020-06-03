@@ -30,16 +30,6 @@
     },
     {
       "gender": 2,
-      "bundle": "new/glasses/glass_4.bundle",
-      "icon": "glass_4"
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_5.bundle",
-      "icon": "glass_5"
-    },
-    {
-      "gender": 2,
       "bundle": "new/glasses/glass_6.bundle",
       "icon": "glass_6"
     },
@@ -61,16 +51,6 @@
       "gender": 2,
       "bundle": "new/glasses/glass_9.bundle",
       "icon": "glass_9"
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_10.bundle",
-      "icon": "glass_10"
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_11.bundle",
-      "icon": "glass_11"
     },
     {
       "gender": 2,
@@ -99,21 +79,6 @@
         1,
         2
       ]
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_16.bundle",
-      "icon": "glass_16"
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_17.bundle",
-      "icon": "glass_17"
-    },
-    {
-      "gender": 2,
-      "bundle": "new/glasses/glass_18.bundle",
-      "icon": "glass_18"
     },
     {
       "gender": 2,

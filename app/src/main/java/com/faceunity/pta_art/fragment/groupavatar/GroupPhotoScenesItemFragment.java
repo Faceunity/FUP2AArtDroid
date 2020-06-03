@@ -14,8 +14,8 @@ import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.entity.BundleRes;
 import com.faceunity.pta_art.fragment.editface.EditFaceColorItemFragment;
 import com.faceunity.pta_art.fragment.editface.core.ItemChangeListener;
-import com.faceunity.pta_art.fragment.editface.core.item.ItemAdapter;
-import com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView;
+import com.faceunity.pta_art.fragment.editface.core.item.SingleAdapter;
+import com.faceunity.pta_art.fragment.editface.core.item.SingleSelectView;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class GroupPhotoScenesItemFragment extends GroupPhotoBaseFragment {
 
     public static final String TAG = EditFaceColorItemFragment.class.getSimpleName();
 
-    private ItemSelectView mItemRecycler;
+    private SingleSelectView mItemRecycler;
 
     private List<BundleRes> itemList;
     private int mDefaultSelectItem;
@@ -37,7 +37,7 @@ public class GroupPhotoScenesItemFragment extends GroupPhotoBaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_edit_face_item, container, false);
+        View view = inflater.inflate(R.layout.fragment_group_photo_scenes_item, container, false);
         // 动态设置layoutParams主要是为了适配高度比较小的手机
         FrameLayout.LayoutParams rootViewLayoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
         rootViewLayoutParams.gravity = Gravity.TOP;
@@ -50,7 +50,7 @@ public class GroupPhotoScenesItemFragment extends GroupPhotoBaseFragment {
         mItemRecycler.setLayoutParams(layoutParams);
 
         mItemRecycler.init(itemList, mDefaultSelectItem);
-        mItemRecycler.setItemControllerListener(new ItemAdapter.ItemSelectListener() {
+        mItemRecycler.setItemControllerListener(new SingleAdapter.ItemSelectListener() {
             @Override
             public boolean itemSelectListener(int lastPos, int position) {
                 if (lastPos == position) {

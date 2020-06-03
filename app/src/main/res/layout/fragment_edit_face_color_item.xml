@@ -14,12 +14,11 @@
         android:paddingLeft="@dimen/x8"
         android:paddingRight="@dimen/x8"
         android:scrollbars="none"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/color_item_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x350"
-        android:background="@color/colorWhite"
-        android:scrollbars="none"/>
+        android:layout_height="@dimen/x300"
+        android:scrollbars="none" />
 </LinearLayout>

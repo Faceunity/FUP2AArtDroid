@@ -1,5 +1,9 @@
 package com.faceunity.pta_art.utils.sta.player;
 
+import android.content.res.AssetFileDescriptor;
+
+import java.io.FileDescriptor;
+
 /**
  * 播放器接口
  *
@@ -60,6 +64,8 @@ public abstract class BaseMediaPlayer {
     public abstract long getCurrentPosition();
 
     public abstract void setDataSource(String pathOrUrl);
+
+    public abstract void setDataSource(AssetFileDescriptor afd);
 
     public abstract boolean isPlaying();
 

@@ -55,8 +55,7 @@
     <com.faceunity.pta_art.fragment.editface.core.item.ItemSelectView
         android:id="@+id/glasses_recycler"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/x350"
-        android:background="@color/colorWhite"
+        android:layout_height="@dimen/x300"
         android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent" />
 </android.support.constraint.ConstraintLayout>

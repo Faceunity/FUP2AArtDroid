@@ -181,7 +181,7 @@ public class GuideActivity extends AppCompatActivity implements View.OnClickList
             }
         }
 
-        startActivity(new Intent(GuideActivity.this, SelectStyleActivity.class));
+        startActivity(new Intent(GuideActivity.this, MainActivity.class));
         finish();
         overridePendingTransition(0, 0);
     }

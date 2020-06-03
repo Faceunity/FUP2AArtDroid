@@ -48,7 +48,15 @@ public class EditFaceItemFragment extends EditFaceBaseFragment {
                     //衣服必须选择一件
                     if (mAvatarP2A.getClothesIndex() == 0 && position == 0) {
                         ToastUtil.showCenterToast(mActivity,
-                                "必须有一套衣服");
+                                                  "必须有一套衣服");
+                        return false;
+                    }
+                }
+                if (mEditFaceBaseFragmentId == TITLE_CLOTHES_INDEX) {
+                    // 套装必须选择一件
+                    if (mAvatarP2A.getClothesIndex() > 0 && position == 0) {
+                        ToastUtil.showCenterToast(mActivity,
+                                                  "必须有一套衣服");
                         return false;
                     }
                 }

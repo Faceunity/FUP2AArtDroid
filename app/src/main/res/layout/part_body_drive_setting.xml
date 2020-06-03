@@ -86,7 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/x40"
         android:includeFontPadding="false"
-        android:text="跟随模式"
+        android:text="距离追踪"
         android:textColor="@color/color666666"
         android:textSize="@dimen/text_size_24"
         app:layout_constraintLeft_toLeftOf="@id/body_drive_setting_face_drive_tv"

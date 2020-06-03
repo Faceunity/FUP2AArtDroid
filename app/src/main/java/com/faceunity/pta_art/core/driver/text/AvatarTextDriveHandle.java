@@ -1,6 +1,5 @@
 package com.faceunity.pta_art.core.driver.text;
 
-import android.hardware.Camera;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,7 +34,11 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
     public final FUItem clothesUpperItem = new FUItem();
     public final FUItem clothesLowerItem = new FUItem();
     public final FUItem shoeItem = new FUItem();
-    public final FUItem decorationsItem = new FUItem();
+    public final FUItem decorationsEarItem = new FUItem();
+    public final FUItem decorationsFootItem = new FUItem();
+    public final FUItem decorationsHandItem = new FUItem();
+    public final FUItem decorationsHeadItem = new FUItem();
+    public final FUItem decorationsNeckItem = new FUItem();
 
     public final FUItem eyelinerItem = new FUItem();
     public final FUItem eyeshadowItem = new FUItem();
@@ -73,12 +76,16 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
                 loadItem(beardItem, avatar.getBeardFile());
                 loadItem(eyebrowItem, avatar.getEyebrowFile());
                 loadItem(eyelashItem, avatar.getEyelashFile());
-                loadItem(bodyItem, FilePathFactory.bodyBundle(avatar.getGender(), avatar.getBodyLevel()));
+                loadItem(bodyItem, FilePathFactory.bodyBundle(avatar.getClothesGender(), avatar.getBodyLevel()));
                 loadItem(clothesItem, avatar.getClothesFile());
                 loadItem(clothesUpperItem, avatar.getClothesUpperFile());
                 loadItem(clothesLowerItem, avatar.getClothesLowerFile());
                 loadItem(shoeItem, avatar.getShoeFile());
-                loadItem(decorationsItem, avatar.getDecorationsFile());
+                loadItem(decorationsEarItem, avatar.getEarDecorationsFile());
+                loadItem(decorationsFootItem, avatar.getFootDecorationsFile());
+                loadItem(decorationsHandItem, avatar.getHandDecorationsFile());
+                loadItem(decorationsHeadItem, avatar.getHeadDecorationsFile());
+                loadItem(decorationsNeckItem, avatar.getNeckDecorationsFile());
                 loadItem(expressionItem, FilePathFactory.bundleIdle(avatar.getGender()));
                 loadItem(backgroundItem, "");
 
@@ -122,7 +129,10 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
                     int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle,
                             beardItem.handle, eyebrowItem.handle, eyelashItem.handle, hatItem.handle,
                             bodyItem.handle, clothesItem.handle, clothesUpperItem.handle, clothesLowerItem.handle,
-                            shoeItem.handle, decorationsItem.handle, expressionItem.handle, backgroundItem.handle,
+                            shoeItem.handle,   decorationsEarItem.handle,
+                            decorationsFootItem.handle, decorationsHandItem.handle, decorationsHeadItem.handle, decorationsNeckItem.handle,
+                            eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle, lipglossItem.handle, pupilItem.handle,
+                            expressionItem.handle, backgroundItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
                             lipglossItem.handle, pupilItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
@@ -145,7 +155,10 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
                     int[] items = new int[]{headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle,
                             eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle,
                             clothesItem.handle, clothesUpperItem.handle, clothesLowerItem.handle,
-                            shoeItem.handle, decorationsItem.handle, expressionItem.handle, backgroundItem.handle,
+                            shoeItem.handle,  decorationsEarItem.handle,
+                            decorationsFootItem.handle, decorationsHandItem.handle, decorationsHeadItem.handle, decorationsNeckItem.handle,
+                            eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle, lipglossItem.handle, pupilItem.handle,
+                            expressionItem.handle, backgroundItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle,
                             lipglossItem.handle, pupilItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle,
@@ -208,7 +221,11 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesUpperItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesLowerItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
-        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsEarItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsFootItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsHandItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsHeadItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsNeckItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(backgroundItem.handle));
 
@@ -238,7 +255,13 @@ public class AvatarTextDriveHandle extends BasePTAHandle {
                 clothesUpperItem.clear();
                 clothesLowerItem.clear();
                 shoeItem.clear();
-                decorationsItem.clear();
+
+                decorationsEarItem.clear();
+                decorationsFootItem.clear();
+                decorationsHandItem.clear();
+                decorationsHeadItem.clear();
+                decorationsNeckItem.clear();
+
                 expressionItem.clear();
                 backgroundItem.clear();
 

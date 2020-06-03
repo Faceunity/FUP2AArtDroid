@@ -48,7 +48,11 @@ public class AvatarHandle extends BasePTAHandle {
     public final FUItem clothesUpperItem = new FUItem();
     public final FUItem clothesLowerItem = new FUItem();
     public final FUItem shoeItem = new FUItem();
-    public final FUItem decorationsItem = new FUItem();
+    public final FUItem decorationsEarItem = new FUItem();
+    public final FUItem decorationsFootItem = new FUItem();
+    public final FUItem decorationsHandItem = new FUItem();
+    public final FUItem decorationsHeadItem = new FUItem();
+    public final FUItem decorationsNeckItem = new FUItem();
 
     public final FUItem eyelinerItem = new FUItem();
     public final FUItem eyeshadowItem = new FUItem();
@@ -121,13 +125,17 @@ public class AvatarHandle extends BasePTAHandle {
                 loadItem(eyebrowItem, avatar.getEyebrowFile());
                 loadItem(eyelashItem, avatar.getEyelashFile());
 
-                loadItem(bodyItem, FilePathFactory.bodyBundle(avatar.getGender(), avatar.getBodyLevel()));
+                loadItem(bodyItem, FilePathFactory.bodyBundle(avatar.getClothesGender(), avatar.getBodyLevel()));
                 loadItem(clothesItem, avatar.getClothesFile());
 
                 loadItem(clothesUpperItem, avatar.getClothesUpperFile());
                 loadItem(clothesLowerItem, avatar.getClothesLowerFile());
                 loadItem(shoeItem, avatar.getShoeFile());
-                loadItem(decorationsItem, avatar.getDecorationsFile());
+                loadItem(decorationsEarItem, avatar.getEarDecorationsFile());
+                loadItem(decorationsFootItem, avatar.getFootDecorationsFile());
+                loadItem(decorationsHandItem, avatar.getHandDecorationsFile());
+                loadItem(decorationsHeadItem, avatar.getHeadDecorationsFile());
+                loadItem(decorationsNeckItem, avatar.getNeckDecorationsFile());
 
                 loadItem(eyelinerItem, avatar.getEyelinerFile());
                 loadItem(eyeshadowItem, avatar.getEyeshadowFile());
@@ -212,7 +220,8 @@ public class AvatarHandle extends BasePTAHandle {
                             backgroundItem.handle,
                             headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle,
                             eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle,
-                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsItem.handle,
+                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsEarItem.handle,
+                            decorationsFootItem.handle, decorationsHandItem.handle, decorationsHeadItem.handle, decorationsNeckItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle, lipglossItem.handle, pupilItem.handle,
                             expressionItem.handle, otherItem[0] == null ? 0 : otherItem[0].handle, otherItem[1] == null ? 0 : otherItem[1].handle, otherItem[2] == null ? 0 : otherItem[2].handle, otherItem[3] == null ? 0 : otherItem[3].handle, otherItem[4] == null ? 0 : otherItem[4].handle};
                     Log.i(TAG, "bundle avatarBindItem controlItem " + controllerItem + " bindAll " + Arrays.toString(items));
@@ -230,7 +239,8 @@ public class AvatarHandle extends BasePTAHandle {
                 public void run() {
                     int[] items = new int[]{backgroundItem.handle, headItem.handle, hairItem.handle, glassItem.handle, beardItem.handle,
                             eyebrowItem.handle, eyelashItem.handle, hatItem.handle, bodyItem.handle, clothesItem.handle,
-                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsItem.handle,
+                            clothesUpperItem.handle, clothesLowerItem.handle, shoeItem.handle, decorationsEarItem.handle,
+                            decorationsFootItem.handle, decorationsHandItem.handle, decorationsHeadItem.handle, decorationsNeckItem.handle,
                             eyelinerItem.handle, eyeshadowItem.handle, facemakeupItem.handle, lipglossItem.handle,
                             pupilItem.handle, expressionItem.handle,
                             otherItem[0] == null ? 0 : otherItem[0].handle,
@@ -279,7 +289,11 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(mBaseCore.destroyItem(clothesUpperItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(shoeItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(expressionItem.handle));
-        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsEarItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsFootItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsHandItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsHeadItem.handle));
+        mBaseCore.queueEvent(mBaseCore.destroyItem(decorationsNeckItem.handle));
         mBaseCore.queueEvent(mBaseCore.destroyItem(backgroundItem.handle));
 
         mBaseCore.queueEvent(mBaseCore.destroyItem(eyelinerItem.handle));
@@ -309,7 +323,11 @@ public class AvatarHandle extends BasePTAHandle {
                 clothesUpperItem.clear();
                 clothesLowerItem.clear();
                 shoeItem.clear();
-                decorationsItem.clear();
+                decorationsEarItem.clear();
+                decorationsFootItem.clear();
+                decorationsHandItem.clear();
+                decorationsHeadItem.clear();
+                decorationsNeckItem.clear();
                 expressionItem.clear();
                 backgroundItem.clear();
 

@@ -2,7 +2,7 @@
 
 本文主要介绍了如何快速跑通我们的FUPTA工程 、如何创建和编辑风格化形象、如何绘制风格化形象、SDK的分类及相关资源说明等。工程中会使用到三个库文件:p2a\_client SDK、Nama SDK、FUTtsEngine SDK，其中p2a\_client SDK 用来做风格化形象的生成，Nama SDK 用来做风格化形象的绘制，FUTtsEngine SDK用来做语音驱动。
 
-如果您之前已经接入过我们的V1.7.1版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.8.0更新说明文档.md)。
+如果您之前已经接入过我们的V1.8.0版本，这边建议您看我们的升级文档，这样能够快速的进行版本升级，点此[跳转升级文档](./update_README/1.8.1更新说明文档.md)。
 
 ## 快速开始
 
@@ -826,6 +826,68 @@ public void setMakeupColor(int makeupHandleId, double[] color) {
 + `color` 表示 需要更换的颜色值
 
 关于更多美妆换色的使用方法，请查看[controller说明文档](Controller%20%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.md)。
+
+## 增加脚底阴影
+
+增加了脚底阴影，使得人偶的效果更加的逼真，人偶和环境也更加的契合。
+
+```java
+// 平地阴影道具  定义道具句柄
+public int planeItemLeft, planeItemRight;
+// 加载道具句柄
+planeItemLeft = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_plane_left);
+planeItemRight = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_plane_right);
+// 绑定道具
+public void bindPlane() {
+    queueEvent(new Runnable() {
+        @Override
+        public void run() {
+            faceunity.fuBindItems(avatarHandle.controllerItem, new int[]{planeItemLeft, planeItemRight});
+        }
+    });
+}
+// 解绑道具
+public void unBindPlane() {
+    queueEvent(new Runnable() {
+        @Override
+        public void run() {
+            faceunity.fuUnBindItems(avatarHandle.controllerItem, new int[]{planeItemLeft, planeItemRight});
+        }
+    });
+}
+```
+
+更多使用方式请看Demo 中的 `PTACore.java` 。
+
+## TTS语音音色试听
+
+增加TTS音色试听功能，只需要选择对应的音色按钮就能够听到对应音色的 `你好` 语音，方便了用户操作，同时也优化了用户体验。
+
+### 配置对应的表情文件跟音色语音包
+
+对应 `Demo ` 中的 `assets/sta/` 文件夹
+
+### 对应的音色选择时候，获取对应的表情文件跟音色语音包进行播放
+
+```java
+// 填充对应的表情系数
+mExpressionList.addAll(jsonUtils.readStaExpression("sta/" + toneId + ".json"));
+mActivity.runOnUiThread(new Runnable() {
+    @Override
+    public void run() {
+        AssetManager am = mActivity.getAssets();
+        try {
+          	// 获取并播放对应音色的音频文件
+            AssetFileDescriptor afd = am.openFd("sta/" + toneId + ".mp3");
+            mMediaPlayerHandler.setDataSource(afd);
+        } catch (IOException e) {
+            Log.i(TAG, e.getMessage());
+        }
+    }
+});
+```
+
+更多使用方式请看Demo 中的 `TextDriveFragment.java` 。
 
 ## 注意
 

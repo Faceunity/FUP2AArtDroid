@@ -84,8 +84,8 @@ public class EditFaceColorItemFragment extends EditFaceBaseFragment {
         mColorRecycler.setVisibility(position > 0 ? View.VISIBLE : View.GONE);
         LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mItemRecycler.getLayoutParams();
         layoutParams.height = mColorRecycler.getVisibility() == View.GONE ?
-                getResources().getDimensionPixelOffset(R.dimen.x450) :
-                getResources().getDimensionPixelOffset(R.dimen.x350);
+                getResources().getDimensionPixelOffset(R.dimen.x400) :
+                getResources().getDimensionPixelOffset(R.dimen.x300);
         mItemRecycler.setLayoutParams(layoutParams);
     }
 

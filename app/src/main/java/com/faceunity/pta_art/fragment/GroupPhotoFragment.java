@@ -101,6 +101,7 @@ public class GroupPhotoFragment extends BaseFragment {
                 mAvatarLayout.setScenes(mScenes);
                 mP2AMultipleCore = createPTAMultipleCore();
                 mP2ACore.unBind();
+                mP2ACore.unBindPlane();
                 mFUP2ARenderer.setFUCore(mP2AMultipleCore);
                 mAvatarHandleSparse = mP2AMultipleCore.createAvatarMultiple(mScenes, mAvatarHandle.controllerItem);
                 mAvatarP2As = new AvatarPTA[mScenes.bundles.length];
@@ -136,10 +137,6 @@ public class GroupPhotoFragment extends BaseFragment {
                     currentRoleId = roleId;
                     syncPlayAnim(avatar, roleId);
                 } else {
-                    // 停止相机动画
-                    if (mCurrentAvatarHandler != null) {
-                        mCurrentAvatarHandler.setCameraAnim(3);
-                    }
                     mCurrentAvatar = null;
                     currentRoleId = -1;
                     mCurrentAvatarHandler = null;
@@ -152,7 +149,19 @@ public class GroupPhotoFragment extends BaseFragment {
                             break;
                         }
                     }
+                    // 解绑阴影
+                    boolean haveAvatarInScenes = false;
+                    for (boolean isSelected : mAvatarLayout.getIsSelectList()) {
+                        if (isSelected) {
+                            haveAvatarInScenes = true;
+                            break;
+                        }
+                    }
+                    if (!haveAvatarInScenes) {
+                        mP2AMultipleCore.unBindPlane();
+                    }
                 }
+
             }
         });
         mAvatarLayout.setNextRunnable(new Runnable() {
@@ -241,6 +250,7 @@ public class GroupPhotoFragment extends BaseFragment {
         } else {
             mP2AMultipleCore.updateBg();
         }
+        mP2AMultipleCore.receiveShadowItem(mP2ACore.planeItemLeft, mP2ACore.planeItemRight);
         return mP2AMultipleCore;
     }
 
@@ -287,8 +297,6 @@ public class GroupPhotoFragment extends BaseFragment {
         mScenesLayout.setVisibility(View.VISIBLE);
         mAvatarLayout.setVisibility(View.GONE);
         mActivity.setCanClick(false, true);
-        // 必须重新设置相机动画为开启状态，要不然就首页设置的相机缩放可能就没有效果了
-        mAvatarHandleSparse.get(0).setCameraAnim(1);
         mAvatarLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -298,6 +306,7 @@ public class GroupPhotoFragment extends BaseFragment {
                 }
                 mP2ACore.setCurrentInstancceId(0);
                 mP2ACore.bind();
+                mP2ACore.bindPlane();
                 mFUP2ARenderer.setFUCore(mP2ACore);
                 mActivity.setCanClick(true, true);
             }
@@ -314,12 +323,9 @@ public class GroupPhotoFragment extends BaseFragment {
                 break;
             }
         }
-        if (mCurrentAvatar == null) {
-            // 借助AvatarHandle对象停止当前的相机动画
-            mAvatarHandleSparse.get(0).setCameraAnim(3);
-            return;
+        if (mCurrentAvatar != null) {
+            syncPlayAnim(mCurrentAvatar, currentRoleId);
         }
-        syncPlayAnim(mCurrentAvatar, currentRoleId);
     }
 
     /**
@@ -330,7 +336,7 @@ public class GroupPhotoFragment extends BaseFragment {
      */
     private void syncPlayAnim(AvatarPTA avatar, int roleId) {
         for (int i = 0; i < mAvatarP2As.length; i++) {
-            if (mAvatarP2As[i] == null && (Constant.style == Constant.style_new || (Constant.style == Constant.style_art && avatar.getGender() == mScenes.bundles[i].gender))) {
+            if (mAvatarP2As[i] == null) {
                 avatar.setExpression(mScenes.bundles[i]);
                 final AvatarHandle avatarHandle = mAvatarHandleSparse.get(roleId);
                 avatarHandle.setNeedNextEventCallback(false);
@@ -339,6 +345,9 @@ public class GroupPhotoFragment extends BaseFragment {
                 avatarHandle.setAvatar(mAvatarP2As[i] = avatar, new Runnable() {
                     @Override
                     public void run() {
+                        if (isAnimationScenes) {
+                            mP2AMultipleCore.bindPlane();
+                        }
                         mActivity.setCanClick(true, false);
                         mAvatarLayout.updateAvatarPoint();
                         if (++isLoadComplete == mAvatarHandleSparse.size()) {
@@ -373,7 +382,6 @@ public class GroupPhotoFragment extends BaseFragment {
                             }
                             mAvatarHandleSparse.get(roleId).setAnimState(3, roleId);
                             mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).expressionItem.handle);
-                            mAvatarHandleSparse.get(roleId).setCameraAnim(4);
 
                             if (mAvatarHandleSparse.get(roleId).otherItem[1] != null) {
                                 /**

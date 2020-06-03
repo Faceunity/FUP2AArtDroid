@@ -85,7 +85,8 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
         smallCameraPositionManager.setBottomMargin(getResources().getDimensionPixelSize(R.dimen.x342));
 
         mActivity.setCanClick(false, true);
-        mAvatarBodyHandle.setAvatar(mActivity.getShowAvatarP2A(), new Runnable() {
+        AvatarPTA avatarPTA = mActivity.getCurrentDrivenAvatar() == null ? mActivity.getShowAvatarP2A() : mActivity.getCurrentDrivenAvatar();
+        mAvatarBodyHandle.setAvatar(avatarPTA, new Runnable() {
             @Override
             public void run() {
                 smallCameraPositionManager.setBodyDrivenScene(true);
@@ -123,7 +124,7 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
             }
         });
         mBottomTitleGroup.setResStrings(new String[]{"模型", "输入"}, new int[]{0, 1}, 0);
-        adapter.setDefaultIndex(DriveAdapter.STATUS_BODY_DRIVE_HEAD, mActivity.getShowIndex());
+        adapter.setDefaultIndex(DriveAdapter.STATUS_BODY_DRIVE_HEAD, mActivity.getDrivenAvatarShowIndex());
     }
 
     @Override
@@ -132,6 +133,7 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
         mP2ACore.bind();
         mP2ACore.unBindDefault();
         mFUP2ARenderer.setFUCore(mP2ACore);
+        mActivity.setCurrentDrivenAvatar(null);
     }
 
     @Override
@@ -172,6 +174,7 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
     @Override
     public void onClickHead(int pos, AvatarPTA avatarPTA) {
         mActivity.setCanClick(false, true);
+        mActivity.setCurrentDrivenAvatar(avatarPTA);
         mAvatarBodyHandle.setAvatar(avatarPTA, new Runnable() {
             @Override
             public void run() {
@@ -199,6 +202,11 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
                 mCameraRenderer.setVideoPath(path);
                 break;
         }
+    }
+
+    @Override
+    public void onClickTone(String toneId) {
+
     }
 
     @Subscribe(threadMode = ThreadMode.MainThread)

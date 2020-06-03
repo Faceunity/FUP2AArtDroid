@@ -1,5 +1,6 @@
 package com.faceunity.pta_art.utils.sta.player;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -7,6 +8,7 @@ import android.media.AudioTrack;
 import android.os.Build;
 import android.util.Log;
 
+import java.io.FileDescriptor;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -261,6 +263,11 @@ public class PcmPlayer extends BaseMediaPlayer {
 
     @Override
     public void setDataSource(String path) {
+        throw new UnsupportedOperationException("Not support setDataSource");
+    }
+
+    @Override
+    public void setDataSource(AssetFileDescriptor afd) {
         throw new UnsupportedOperationException("Not support setDataSource");
     }
 
