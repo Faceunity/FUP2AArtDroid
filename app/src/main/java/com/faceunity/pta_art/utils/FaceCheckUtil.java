@@ -13,7 +13,7 @@ public abstract class FaceCheckUtil {
         double yaw = Math.atan2(2 * (w * z + y * z), 1 - 2 * (x * x + y * y)) / Math.PI * 180;
         double pitch = Math.asin(2 * (w * y - z * x)) / Math.PI * 180;
         double roll = Math.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z)) / Math.PI * 180;
-        return yaw > 20 || yaw < -20 || pitch > 20 || pitch < -20 || roll > 20 || roll < -20;
+        return yaw > 30 || yaw < -30 || pitch > 15 || pitch < -15;
     }
 
     public static boolean checkFaceRect(float[] faceRect, int width, int height) {
@@ -25,7 +25,7 @@ public abstract class FaceCheckUtil {
 
     public static boolean checkExpression(float[] expressionData) {
         for (float e : expressionData) {
-            if (e > 0.5) {
+            if (e > 0.8) {
                 return true;
             }
         }

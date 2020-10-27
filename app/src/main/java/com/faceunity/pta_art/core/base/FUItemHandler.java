@@ -72,6 +72,7 @@ public class FUItemHandler extends Handler {
      */
     public int loadFUItem(String bundle) {
         int item = 0;
+        long loadItemS = System.currentTimeMillis();
         try {
             if (TextUtils.isEmpty(bundle)) {
                 item = 0;
@@ -89,6 +90,8 @@ public class FUItemHandler extends Handler {
                 is.close();
                 item = faceunity.fuCreateItemFromPackage(itemData);
             }
+            long loadItemE = System.currentTimeMillis();
+            Log.i("time", "load item:" + bundle + "--loadTime:" + (loadItemE - loadItemS) + "ms");
             Log.i(TAG, "bundle loadFUItem " + bundle + " item " + item);
         } catch (IOException e) {
             e.printStackTrace();

@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.faceunity.pta_art.BuildConfig;
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.constant.FUPTAClient;
-import com.faceunity.pta_art.fragment.drive.ARFragment;
 import com.faceunity.pta_art.fragment.drive.BodyDriveFragment;
 
 /**

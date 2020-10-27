@@ -21,15 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -46,7 +42,6 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
     private static final String TAG = OkHttpUtils.class.getSimpleName();
-    public static final String PEM_PATH = "pta_ptoa.pem";
 
     private volatile static OkHttpUtils sOkHttpUtils;
 
@@ -70,33 +65,13 @@ public class OkHttpUtils {
         return Constant.web_url_get_token.startsWith("https");
     }
 
-    public static OkHttpClient initOkHttpClient(Context context, boolean isHttps) {
-        SSLSocketFactory sslSocketFactory = null;
-        try {
-
-            //p2a服务器需要的ca，手动传避免部分机型ca不全
-            InputStream ca = context.getAssets().open(PEM_PATH);
-            byte[] caBytes = new byte[ca.available()];
-            ca.read(caBytes);
-            ca.close();
-
-            TrustManagerFactory tmf = OkHttpUtils.getTrustManagerFactory(caBytes);
-            sslSocketFactory = new CustomSslSocketFactory(null,
-                    tmf == null ? null : tmf.getTrustManagers());
-        } catch (Exception e) {
-        }
-
+    public static OkHttpClient initOkHttpClient() {
+        initNet();
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(60000L, TimeUnit.MILLISECONDS)
                 .writeTimeout(60000L, TimeUnit.MILLISECONDS)
                 .readTimeout(60000L, TimeUnit.MILLISECONDS);
-        OkHttpClient okHttpClient;
-        if (sslSocketFactory != null && isHttps) {
-            okHttpClient = builder.sslSocketFactory(sslSocketFactory).build();
-        } else {
-            okHttpClient = builder.build();
-        }
-        return okHttpClient;
+        return builder.build();
     }
 
     public static OkHttpUtils initOkHttpUtils(OkHttpClient okHttpClient) {
@@ -124,36 +99,6 @@ public class OkHttpUtils {
 
     public OkHttpClient getOkHttpClient() {
         return mOkHttpClient;
-    }
-
-    public static KeyManagerFactory getKeyManagerFactory(byte[] p12) {
-        KeyManagerFactory kmf = null;
-        try {
-            KeyStore p12KeyStore = KeyStore.getInstance("PKCS12");
-            InputStream in = new ByteArrayInputStream(p12);
-            p12KeyStore.load(in, "".toCharArray());
-            kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(p12KeyStore, "".toCharArray());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return kmf;
-    }
-
-    static class TrustAllCerts implements X509TrustManager {
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
-        }
     }
 
     /**

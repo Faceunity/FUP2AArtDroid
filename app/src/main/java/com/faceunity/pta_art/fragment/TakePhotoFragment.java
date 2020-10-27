@@ -38,6 +38,7 @@ import com.faceunity.pta_art.utils.ToastUtil;
 import com.faceunity.pta_art.web.CreateFailureToast;
 import com.faceunity.pta_art.web.OkHttpUtils;
 import com.faceunity.pta_art.web.ProgressRequestBody;
+import com.faceunity.wrapper.faceunity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,6 +70,8 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
     private Handler mHandler;
 
+    private volatile boolean needTrackFace = true;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,18 +89,20 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
 
         LightSensorUtil.registerLightSensor(mSensorManager, mSensorEventListener);
 
-        mNamaCore = new NamaCore(getContext(), mFUP2ARenderer) {
+        mNamaCore = new NamaCore(getContext(), mFUP2ARenderer, mAvatarHandle.controllerItem) {
             @Override
             public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
                 //因为已经对双输入的cpu buffer进行旋转、镜像，使其与texture对齐
                 //所以这边不需要其他处理
                 int fu = super.onDrawFrame(img, tex, w,
                                            h, rotation);
+                if (needTrackFace){
+                    faceunity.fuTrackFace(img, 0, w, h);
+                }
                 checkPic(w, h);
                 return fu;
             }
         };
-        mNamaCore.setFace_capture(mP2ACore.face_capture);
         mFUP2ARenderer.setFUCore(mNamaCore);
         return view;
     }
@@ -227,6 +232,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                needTrackFace = false;
                 mCreateAvatarDialog = new CreateAvatarDialog();
                 mCreateAvatarDialog.setPhotoBitmap(bitmap);
                 mCreateAvatarDialog.show(mActivity.getSupportFragmentManager(), CreateAvatarDialog.TAG);
@@ -260,6 +266,7 @@ public class TakePhotoFragment extends BaseFragment implements View.OnClickListe
                                 if (mDownloadRunnable != null) {
                                     mHandler.removeCallbacks(mDownloadRunnable);
                                 }
+                                needTrackFace = true;
                             }
 
                             @Override

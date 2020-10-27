@@ -11,6 +11,7 @@ import com.faceunity.pta_art.core.client.PTAClientWrapper;
 import com.faceunity.pta_art.utils.sta.TtsEngineUtils;
 import com.faceunity.pta_art.web.OkHttpUtils;
 import com.faceunity.pta_helper.FUAuthCheck;
+import com.faceunity.wrapper.faceunity;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -34,8 +35,14 @@ public class FUApplication extends Application {
         closeAndroidPDialog();
         fuApplication = this;
 
-        boolean isHttps = OkHttpUtils.initNet();
-        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient(this, isHttps));
+        /**
+         * 初始化dsp设备
+         * 如果已经调用过一次了，后面再重新初始化bundle，也不需要重新再调用了。
+         */
+        String path = fuApplication.getApplicationInfo().nativeLibraryDir;
+        faceunity.fuHexagonInitWithPath(path);
+
+        OkHttpUtils.initOkHttpUtils(OkHttpUtils.initOkHttpClient());
 
         //TODO 初始化部分
         long startTime = System.currentTimeMillis();

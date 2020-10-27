@@ -42,12 +42,12 @@ public abstract class FilePathFactory {
     public static final String BUNDLE_v3 = "v3.bundle";
     public static final String BUNDLE_fxaa = "fxaa.bundle";
     public static final String BUNDLE_default_bg = "default_bg.bundle";
-    public static final String BUNDLE_human3d = "human3d.bundle";
     public static final String BUNDLE_plane_left = "plane_shadow_left.bundle";
     public static final String BUNDLE_plane_right = "plane_shadow_right.bundle";
     public static final String BUNDLE_hair_mask = "hair_mask.bundle";
     public static final String BUNDLE_client_core = "pta_client_core.bin";
-    public static final String BUNDLE_face_processor_capture = "face_processor_capture.bundle";
+    public static final String BUNDLE_ai_face_processor = "ai_face_processor.bundle";
+    public static final String BUNDLE_ai_human_processor = "ai_human_processor.bundle";
 
 
     /**
@@ -62,7 +62,7 @@ public abstract class FilePathFactory {
     /**
      * controller.bundle：controller数据文件，用于控制和显示avatar。
      */
-    public static final String BUNDLE_controller_new = "new/controller.bundle";
+    public static final String BUNDLE_controller_new = "new/controller_cpp.bundle";
     public static final String BUNDLE_controller_config_new = "new/controller_config.bundle";
 
     public static String bundleController() {
@@ -199,13 +199,13 @@ public abstract class FilePathFactory {
     public static List<AvatarPTA> getDefaultAvatarP2As() {
         List<AvatarPTA> p2AS = new ArrayList<>();
         p2AS.add(0, new AvatarPTA("new/head/head_1/", R.drawable.head_1_male, AvatarPTA.gender_boy,
-                                  "new/head/head_1/head.bundle", 7, 0,
-                                  0, 4, 6, 9,
-                                  0, 1));
+                "new/head/head_1/head.bundle", 7, 0,
+                0, 4, 6, 9,
+                0, 1));
         p2AS.add(1, new AvatarPTA("new/head/head_2/", R.drawable.head_2_female, AvatarPTA.gender_girl,
-                                  "new/head/head_2/head.bundle", 25, 0,
-                                  10, 0, 0, 9,
-                                  0, 1));
+                "new/head/head_2/head.bundle", 25, 0,
+                10, 0, 0, 9,
+                0, 1));
         return p2AS;
     }
 

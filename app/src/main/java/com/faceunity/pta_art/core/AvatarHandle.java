@@ -494,8 +494,8 @@ public class AvatarHandle extends BasePTAHandle {
         mBaseCore.queueEvent(new Runnable() {
             @Override
             public void run() {
-                //3.设置close_face_capture，说明启用或者关闭CNN面部追踪，value = 0.0表示开启，value = 1.0表示关闭
-                faceunity.fuItemSetParam(controllerItem, "close_face_capture", isOpen ? 0.0 : 1.0);
+                //3.设置enable_face_processor，说明启用或者关闭面部追踪，value = 1.0表示开启，value = 0.0表示关闭
+                faceunity.fuItemSetParam(controllerItem, "enable_face_processor", isOpen ? 1.0 : 0.0);
             }
         });
     }

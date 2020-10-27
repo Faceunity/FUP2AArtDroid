@@ -3,6 +3,7 @@ package com.faceunity.pta_art.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,7 +14,6 @@ import android.view.ViewGroup;
 
 import com.faceunity.pta_art.R;
 import com.faceunity.pta_art.VideoAndImageActivity;
-import com.faceunity.pta_art.constant.Constant;
 import com.faceunity.pta_art.core.AvatarHandle;
 import com.faceunity.pta_art.core.PTAMultipleCore;
 import com.faceunity.pta_art.entity.AvatarPTA;
@@ -29,6 +29,8 @@ import com.faceunity.pta_art.utils.VideoUtil;
 
 import java.io.File;
 import java.util.Map;
+
+import static com.faceunity.pta_art.constant.Constant.TmpPath;
 
 
 /**
@@ -53,6 +55,8 @@ public class GroupPhotoFragment extends BaseFragment {
 
     public static final int IMAGE_REQUEST_CODE = 0x102;
     private VideoUtil videoUtil;
+    private boolean recordingStop = false;
+    private boolean nextEnable = false;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -78,7 +82,7 @@ public class GroupPhotoFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_group_photo, container, false);
-        FileUtil.createFile(Constant.TmpPath);
+        FileUtil.createFile(TmpPath);
 
         mScenesLayout = view.findViewById(R.id.group_photo_scenes);
         mScenesLayout.setBackRunnable(new Runnable() {
@@ -185,7 +189,7 @@ public class GroupPhotoFragment extends BaseFragment {
                             mActivity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    String resultPath = Constant.TmpPath + "tmp.jpg";
+                                    String resultPath = TmpPath + "tmp.jpg";
                                     FileUtil.saveBitmapToFile(resultPath, bmp);
 
                                     Intent intent = new Intent(mActivity, VideoAndImageActivity.class);
@@ -214,7 +218,6 @@ public class GroupPhotoFragment extends BaseFragment {
         return view;
     }
 
-    private int currentFrame = 0;
 
     private PTAMultipleCore createPTAMultipleCore() {
         if (mP2AMultipleCore == null) {
@@ -228,20 +231,15 @@ public class GroupPhotoFragment extends BaseFragment {
                         float nowFrameId = mCurrentAvatarHandler.getAnimateProgress(mCurrentAvatarHandler.expressionItem.handle);
                         if (nowFrameId >= 1.0f) {
                             //录制mp4完成
-                            stopRecording();
-                            currentFrame = 0;
-                            mActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mAvatarLayout.updateNextBtn(true);
-                                }
-                            });
-                        } else {
-                            // 等待3帧再进行录制，防止出现录制到黑屏
-                            if (currentFrame > 3) {
-                                videoUtil.sendRecordingData(fuTex, GlUtil.IDENTITY_MATRIX);
+                            if (!recordingStop) {
+                                stopRecording();
                             }
-                            currentFrame++;
+                            enableNext(true);
+                        } else {
+                            enableNext(false);
+                            recordingStop = false;
+                            videoUtil.sendRecordingData(fuTex, GlUtil.IDENTITY_MATRIX);
+                            GLES20.glFinish();
                         }
                     }
                     return fuTex;
@@ -256,7 +254,26 @@ public class GroupPhotoFragment extends BaseFragment {
 
     private void initVideoUtil() {
         videoUtil = new VideoUtil(mActivity.getmGLSurfaceView());
-        videoUtil.setEndListener(null);
+        videoUtil.setRecordCompletedListener(new VideoUtil.RecordStatusListener() {
+
+            @Override
+            public void recordStart() {
+                resetAnimation(currentRoleId);
+            }
+        });
+    }
+
+    private void enableNext(boolean enable) {
+        if (enable == nextEnable) {
+            return;
+        }
+        nextEnable = enable;
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAvatarLayout.updateNextBtn(nextEnable);
+            }
+        });
     }
 
     @Override
@@ -290,7 +307,7 @@ public class GroupPhotoFragment extends BaseFragment {
         }
         mActivity.showHomeFragment();
         mActivity.setGLSurfaceViewSize(false);
-        FileUtil.deleteDirAndFile(Constant.TmpPath);
+        FileUtil.deleteDirAndFile(TmpPath);
     }
 
     private void backToScenesLayout() {
@@ -356,46 +373,49 @@ public class GroupPhotoFragment extends BaseFragment {
                                 mActivity.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        mAvatarLayout.updateNextBtn(false);
                                         mCurrentAvatarHandler = avatarHandle;
                                         startRecording();
+                                        enableNext(false);
                                     }
                                 });
                             } else {
-                                mAvatarLayout.updateNextBtn(true);
-                            }
-                        }
-                        if (isAnimationScenes) {
-                            Map<Integer, Integer> usedRole = mAvatarLayout.getUsedRoleId();
-                            boolean[] isSels = mAvatarLayout.getIsSelectList();
-                            for (int j = 0; j < isSels.length; j++) {
-                                if (isSels[j]) {
-                                    int f_roleId = usedRole.get(j);
-                                    if (f_roleId != roleId) {
-                                        mAvatarHandleSparse.get(f_roleId).setAnimState(3, f_roleId);
-                                        mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).expressionItem.handle);
-                                        if (mAvatarHandleSparse.get(f_roleId).otherItem[1] != null) {
-                                            mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).otherItem[1].handle);
-                                        }
-                                    }
-                                }
-                            }
-                            mAvatarHandleSparse.get(roleId).setAnimState(3, roleId);
-                            mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).expressionItem.handle);
-
-                            if (mAvatarHandleSparse.get(roleId).otherItem[1] != null) {
-                                /**
-                                 *  道具动画逻辑修改
-                                 *  需要加载道具模型和道具动画（图形自动寻找对应的动画）
-                                 *  需要和人物动画一起开始（保持同步）
-                                 *  注意：配置json信息的时候，需要将道具动画放在第二个位置
-                                 */
-                                mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).otherItem[1].handle);
+                                enableNext(true);
                             }
                         }
                     }
                 });
                 break;
+            }
+        }
+    }
+
+    private void resetAnimation(int roleId) {
+        if (isAnimationScenes) {
+            Map<Integer, Integer> usedRole = mAvatarLayout.getUsedRoleId();
+            boolean[] isSels = mAvatarLayout.getIsSelectList();
+            for (int j = 0; j < isSels.length; j++) {
+                if (isSels[j]) {
+                    int f_roleId = usedRole.get(j);
+                    if (f_roleId != roleId) {
+                        mAvatarHandleSparse.get(f_roleId).setAnimState(3, f_roleId);
+                        mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).expressionItem.handle);
+                        if (mAvatarHandleSparse.get(f_roleId).otherItem[1] != null) {
+                            mAvatarHandleSparse.get(f_roleId).seekToAnimBegin(mAvatarHandleSparse.get(f_roleId).otherItem[1].handle);
+                        }
+                    }
+                }
+            }
+            mAvatarHandleSparse.get(roleId).setAnimState(3, roleId);
+            mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).expressionItem.handle);
+
+            if (mAvatarHandleSparse.get(roleId).otherItem[1] != null) {
+                /**
+                 *  道具动画逻辑修改
+                 *  需要加载道具模型和道具动画（图形自动寻找对应的动画）
+                 *  需要和人物动画一起开始（保持同步）
+                 *  注意：配置json信息的时候，需要将道具动画放在第二个位置
+                 */
+                mAvatarHandleSparse.get(roleId).seekToAnimBegin(mAvatarHandleSparse.get(roleId).otherItem[1].handle);
             }
         }
     }
@@ -430,9 +450,9 @@ public class GroupPhotoFragment extends BaseFragment {
         int cropX = -(textureWidth - videoWidth) / 2;
         int cropY = -(textureHeight - videoHeight) / 2;
         videoUtil.startRecording(videoWidth, videoHeight,
-                                 cropX, cropY,
-                                 textureWidth, textureHeight,
-                                 0, null, null);
+                cropX, cropY,
+                textureWidth, textureHeight,
+                0, null, null);
     }
 
     /**
@@ -440,5 +460,6 @@ public class GroupPhotoFragment extends BaseFragment {
      */
     private void stopRecording() {
         videoUtil.stopRecording();
+        recordingStop = true;
     }
 }
