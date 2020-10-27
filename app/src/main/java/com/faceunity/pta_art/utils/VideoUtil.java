@@ -28,6 +28,11 @@ public class VideoUtil {
     private MediaVideoEncoder mVideoEncoder;
     private GLSurfaceView mGlSurfaceView;
 
+    /**
+     * 录制编码中
+     */
+    private volatile boolean recordingEncoding = false;
+
     public VideoUtil(GLSurfaceView mGlSurfaceView) {
         this.mGlSurfaceView = mGlSurfaceView;
     }
@@ -46,6 +51,7 @@ public class VideoUtil {
         @Override
         public void onPrepared(final MediaEncoder encoder) {
             if (encoder instanceof MediaVideoEncoder) {
+                recordingEncoding = true;
                 mGlSurfaceView.queueEvent(new Runnable() {
                     @Override
                     public void run() {
@@ -67,6 +73,7 @@ public class VideoUtil {
                 endNum++;
                 Log.e(TAG, "stop MediaVideoEncoder success" +
                         "  " + mOutFile.length());
+                recordingEncoding = false;
             }
             if (encoder instanceof MediaAudioEncoder) {
                 Log.e(TAG, "stop MediaAudioEncoder success" + "  " + mOutFile.length());
@@ -85,6 +92,7 @@ public class VideoUtil {
         @Override
         public void onError(String s) {
             Log.e(TAG, "error:" + s);
+            recordingEncoding = false;
             if (endListener != null) {
                 endListener.end();
             }
@@ -134,12 +142,30 @@ public class VideoUtil {
             if (!mOutFile.getParentFile().exists()) {
                 mOutFile.getParentFile().mkdirs();
             }
+
+            // 如果是在录制中的状态，然后调用setNeedRecord(true) 方法，重新录制，需要等到MediaCodec完全释放资源才能
+            // 录制，否则会出现录制失败的问题
+
+            if (recordingEncoding) {
+
+                long l = System.currentTimeMillis();
+                while (recordingEncoding) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                long time = System.currentTimeMillis() - l;
+                Log.e(TAG, "startRecording: " + time);
+            }
+
             mMuxer = new MediaMuxerWrapper(mOutFile.getAbsolutePath());
 
             // for video capturing
             MediaEncoder mediaVideoEncoder;
             mediaVideoEncoder = new MediaVideoEncoder(mMuxer, mMediaEncoderListener, width, height, cropX, cropY,
-                                                      textureWidth, textureHeight);
+                    textureWidth, textureHeight);
             mediaVideoEncoder.setInterval(interval);
 
             MediaEncoder mediaEncoder = null;
@@ -154,18 +180,13 @@ public class VideoUtil {
             if (mediaEncoder != null) {
                 mediaEncoder.setListener(timeListener);
             }
-            //  这边需要sleep 200ms 的问题主要是，我们现在可以任意切换场景，切换场景的时候也需要停止录制再开始录制
-            // 由于在停止录制的时候，需要去清除跟释放之前的无用资源，当我们立即开始录制的话，由于之前的资源没有清理完成，
-            // mediaEncoder中的录制状态还没有改变成stop，再次开启的话就会出错(状态不对)，所以这边采用睡眠200ms的形式等待stop完成
-            // 为什么是200 ms呢？这个是根据多次测试的数据，取得最优值。
-            Thread.sleep(200);
-
+            if (recordCompletedListener != null) {
+                recordCompletedListener.recordStart();
+            }
             mMuxer.prepare();
             mMuxer.startRecording();
         } catch (final IOException e) {
             Log.e(TAG, "startCapture:", e);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 
@@ -337,5 +358,20 @@ public class VideoUtil {
         void end();
 
         void start();
+    }
+
+
+    private RecordStatusListener recordCompletedListener;
+
+    public void setRecordCompletedListener(RecordStatusListener recordCompletedListener) {
+        this.recordCompletedListener = recordCompletedListener;
+    }
+
+    public interface RecordStatusListener {
+
+        /**
+         * 录制开始了
+         */
+        void recordStart();
     }
 }

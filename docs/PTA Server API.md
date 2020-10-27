@@ -41,7 +41,7 @@ WebAPI控制台链接为：https://console.faceunity.com。新用户可以自行
 Key = '12345' //必须携带
 Secrect = '54321'
 ```
-假设获取access_token的请求链接为：https://token.faceunity.com/api/v1/GetAccessToken?params=test&Key=12345 。获取access_token的具体流程如下：
+假设获取access_token的请求链接为：https://token2.faceunity.com/api/v1/GetAccessToken?params=test&Key=12345 。获取access_token的具体流程如下：
 
 **1. 将本次请求参数按照名称进行升序排列 **
 
@@ -117,7 +117,7 @@ def _verfy_ac(private_key, params):
 
  **4. 拼接出请求链接**
 
-将计算出的Signature拼接到尾部(各参数需要url编码,例如Key为lbA2MypNve2PeZpaOiPUGnSt+FHePw==,编码后为lbA2MypNve2PeZpaOiPUGnSt%2BFHePw%3D%3D)例如```https://token.faceunity.com/api/v1/GetAccessToken?params=test&Key=12345&Signature=cac49742c5e52e63b285b6a549c7d362b19aa054```
+将计算出的Signature拼接到尾部(各参数需要url编码,例如Key为lbA2MypNve2PeZpaOiPUGnSt+FHePw==,编码后为lbA2MypNve2PeZpaOiPUGnSt%2BFHePw%3D%3D)例如```https://token2.faceunity.com/api/v1/GetAccessToken?params=test&Key=12345&Signature=cac49742c5e52e63b285b6a549c7d362b19aa054```
 
  **5. 发送请求，获取access_token**
 
@@ -142,7 +142,7 @@ data.expirein:token的过期时间，单位为秒。
 
 ## 访问API
 
- **请求API时需在url地址或body中带上access_token参数，如```https://api-ptoa.faceunity.com/api/p2a/upload?access_token=82f205d0-8a31-11e8-8c11-b74c5a2e235c```。**
+ **请求API时需在url地址或body中带上access_token参数，如```https://api-pta.faceunity.com/api/p2a/upload?access_token=82f205d0-8a31-11e8-8c11-b74c5a2e235c```。**
 
 ## API
 
@@ -184,7 +184,7 @@ const access_token = "xxxx";
 async function submit(access_token, data) {
     return new Promise((reslove, reject) => {
         request.post({
-            url: `https://api-ptoa.faceunity.com/api/p2a/upload?access_token=${access_token}`,
+            url: `https://api-pta.faceunity.com/api/p2a/upload?access_token=${access_token}`,
             formData: data
         }, function optionalCallback(err, res) {
             if (err) {
@@ -273,7 +273,7 @@ var formData = {
 async function submit(access_token, data) {
     return new Promise((reslove, reject) => {
         request.post({
-            url: `https://api-ptoa.faceunity.com/api/p2a/download?access_token=${access_token}`,
+            url: `https://api-pta.faceunity.com/api/p2a/download?access_token=${access_token}`,
             formData: data
         }, function optionalCallback(err, res) {
             if (err) {

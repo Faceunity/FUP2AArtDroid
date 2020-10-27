@@ -1,7 +1,7 @@
 {
-  "web_url_get_token": "https://api2.faceunity.com:7070/token/info?company=faceunity",
-  "web_url_create_upload_image": "https://api-ptoa.faceunity.com/api/p2a/upload",
-  "web_url_create_download": "https://api-ptoa.faceunity.com/api/p2a/download",
+  "web_url_get_token": "https://token-server.faceunity.com/api/token/info?company=faceunity",
+  "web_url_create_upload_image": "https://api-pta.faceunity.com/api/p2a/upload",
+  "web_url_create_download": "https://api-pta.faceunity.com/api/p2a/download",
   "pta_client_version_new": "1.7.1",
   "pta_client_version_art": "1.0.2",
   "web_url_check": "",

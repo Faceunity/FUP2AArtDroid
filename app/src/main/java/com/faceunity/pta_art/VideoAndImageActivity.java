@@ -122,16 +122,20 @@ public class VideoAndImageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        FuEventBus.getDefault().post(new UpdateHomeAvatarEvent(isToHome));
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(VideoAndImageActivity.this, MainActivity.class);
-                startActivity(intent);
-                VideoAndImageActivity.super.onBackPressed();
-                overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_bottom);
-            }
-        }, isToHome ? 500 : 0);
+        if (isToHome) {
+            FuEventBus.getDefault().post(new UpdateHomeAvatarEvent(true));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(VideoAndImageActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    VideoAndImageActivity.super.onBackPressed();
+                    overridePendingTransition(android.R.anim.fade_in, R.anim.slide_out_bottom);
+                }
+            }, 500);
+        } else {
+            VideoAndImageActivity.super.onBackPressed();
+        }
 
     }
 

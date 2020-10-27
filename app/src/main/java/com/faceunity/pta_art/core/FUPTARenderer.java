@@ -3,6 +3,7 @@ package com.faceunity.pta_art.core;
 import android.content.Context;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.faceunity.p2a_client.fuPTAClient;
@@ -11,6 +12,7 @@ import com.faceunity.pta_art.core.base.BaseCore;
 import com.faceunity.pta_art.core.base.FUItemHandler;
 import com.faceunity.wrapper.faceunity;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -44,7 +46,7 @@ public class FUPTARenderer {
         Context context = ct.getApplicationContext();
         try {
             //获取faceunity SDK版本信息
-            Log.i(TAG, "fu sdk version " + faceunity.fuGetVersion());
+//            Log.i(TAG, "fu sdk version " + faceunity.fuGetVersion());
 
             /**
              * fuSetup faceunity初始化
@@ -57,6 +59,10 @@ public class FUPTARenderer {
             v3.read(v3Data);
             v3.close();
             faceunity.fuSetup(v3Data, authpack.A());
+
+            // 提前加载算法数据模型，用于人脸检测
+            loadAiModel(context, FilePathFactory.BUNDLE_ai_face_processor, faceunity.FUAITYPE_FACEPROCESSOR);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,38 +100,69 @@ public class FUPTARenderer {
         this.mFUCore = core;
     }
 
-
-    public long createHuman3d() {
-        InputStream human3d = null;
-        try {
-            human3d = mContext.getAssets().open(FilePathFactory.BUNDLE_human3d);
-            byte[] human3dDate = new byte[human3d.available()];
-            human3d.read(human3dDate);
-            human3d.close();
-            return faceunity.fu3DBodyTrackerCreate(human3dDate);
-        } catch (IOException e) {
-            e.printStackTrace();
+    /**
+     * 加载 AI 模型资源
+     *
+     * @param context
+     * @param bundlePath ai_model.bundle
+     * @param type       faceunity.FUAITYPE_XXX
+     */
+    private static void loadAiModel(Context context, String bundlePath, int type) {
+        byte[] buffer = readFile(context, bundlePath);
+        if (buffer != null) {
+            int isLoaded = faceunity.fuLoadAIModelFromPackage(buffer, type);
+            Log.d(TAG, "loadAiModel. type: " + type + ", isLoaded: " + (isLoaded == 1 ? "yes" : "no"));
         }
-        return 0;
     }
 
     /**
-     * 创建面部追踪模型
+     * 释放 AI 模型资源
      *
+     * @param type
+     */
+    private static void releaseAiModel(int type) {
+        if (faceunity.fuIsAIModelLoaded(type) == 1) {
+            int isReleased = faceunity.fuReleaseAIModel(type);
+            Log.d(TAG, "releaseAiModel. type: " + type + ", isReleased: " + (isReleased == 1 ? "yes" : "no"));
+        }
+    }
+
+    /**
+     * 从 assets 文件夹或者本地磁盘读文件
+     *
+     * @param context
+     * @param path
      * @return
      */
-    public long createFaceCapture() {
-        InputStream face_capture = null;
+    private static byte[] readFile(Context context, String path) {
+        InputStream is = null;
         try {
-            face_capture = mContext.getAssets().open(FilePathFactory.BUNDLE_face_processor_capture);
-            byte[] face_capture_Date = new byte[face_capture.available()];
-            face_capture.read(face_capture_Date);
-            face_capture.close();
-            return faceunity.fuFaceCaptureCreate(face_capture_Date);
-        } catch (IOException e) {
-            e.printStackTrace();
+            is = context.getAssets().open(path);
+        } catch (IOException e1) {
+            Log.w(TAG, "readFile: e1", e1);
+            // open assets failed, then try sdcard
+            try {
+                is = new FileInputStream(path);
+            } catch (IOException e2) {
+                Log.w(TAG, "readFile: e2", e2);
+            }
         }
-        return 0;
+        if (is != null) {
+            try {
+                byte[] buffer = new byte[is.available()];
+                int length = is.read(buffer);
+                Log.v(TAG, "readFile. path: " + path + ", length: " + length + " Byte");
+                is.close();
+                return buffer;
+            } catch (IOException e3) {
+                Log.e(TAG, "readFile: e3", e3);
+            }
+        }
+        return null;
+    }
+
+    public void createHuman3d(Context context) {
+        loadAiModel(context, FilePathFactory.BUNDLE_ai_human_processor, faceunity.FUAITYPE_HUMAN_PROCESSOR);
     }
 
 
@@ -133,9 +170,9 @@ public class FUPTARenderer {
      * 创建及初始化faceunity相应的资源
      */
     public void onSurfaceCreated() {
-        faceunity.fuSetExpressionCalibration(2);
-        faceunity.fuSetMaxFaces(1);//设置多脸，目前最多支持8人。
-        faceunity.fuSetAsyncTrackFace(0);
+//        faceunity.fuSetExpressionCalibration(2);
+//        faceunity.fuSetMaxFaces(1);//设置多脸，目前最多支持8人。
+//        faceunity.fuSetAsyncTrackFace(0);
     }
 
     /**
@@ -207,28 +244,19 @@ public class FUPTARenderer {
         //计算FPS等数据
         benchmarkFPS();
 
-        if (mFUCore.face_capture > 0) {
+        //获取人脸是否识别，并调用回调接口
+        int isTracking = mFUCore.isTracking();
+        if (mOnTrackingStatusChangedListener != null && mTrackingStatus != isTracking) {
+            mOnTrackingStatusChangedListener.onTrackingStatusChanged(mTrackingStatus = isTracking);
+        }
 
-            //获取人脸是否识别，并调用回调接口
-            int isTracking = mFUCore.isTracking();
-            if (mOnTrackingStatusChangedListener != null && mTrackingStatus != isTracking) {
-                mOnTrackingStatusChangedListener.onTrackingStatusChanged(mTrackingStatus = isTracking);
-            }
-
-            //获取faceunity错误信息，并调用回调接口
-            int error = faceunity.fuGetSystemError();
-            if (error != 0)
-                Log.e(TAG, "fuGetSystemErrorString " + faceunity.fuGetSystemErrorString(error));
-            if (mOnSystemErrorListener != null && error != 0) {
-                mOnSystemErrorListener.onSystemError(error == 0 ? "" : faceunity.fuGetSystemErrorString(error));
-            }
-
-            //获取是否正在表情校准，并调用回调接口
-            final float[] isCalibratingTmp = new float[1];
-            faceunity.fuGetFaceInfo(0, "is_calibrating", isCalibratingTmp);
-            if (mOnCalibratingListener != null && isCalibratingTmp[0] != mIsCalibrating) {
-                mOnCalibratingListener.OnCalibrating(mIsCalibrating = isCalibratingTmp[0]);
-            }
+        //获取faceunity错误信息，并调用回调接口
+        int error = faceunity.fuGetSystemError();
+        if (error != 0 && !TextUtils.isEmpty(faceunity.fuGetSystemErrorString(error))) {
+            Log.e(TAG, "fuGetSystemErrorString " + faceunity.fuGetSystemErrorString(error));
+        }
+        if (mOnSystemErrorListener != null && error != 0) {
+            mOnSystemErrorListener.onSystemError(error == 0 ? "" : faceunity.fuGetSystemErrorString(error));
         }
 
         //queueEvent的Runnable在此处被调用

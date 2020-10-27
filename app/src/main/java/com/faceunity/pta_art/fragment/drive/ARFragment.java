@@ -42,7 +42,6 @@ public class ARFragment extends BaseDriveFragment implements DriveAdapter.OnList
         tv_ar_drive.setSelected(true);
 
         mP2AARCore = new PTAARDriveCore(mActivity, mFUP2ARenderer);
-        mP2AARCore.setFace_capture(mP2ACore.face_capture);
         mP2ACore.unBindPlane();
         mFUP2ARenderer.setFUCore(mP2AARCore);
         mAvatarARHandle = mP2AARCore.createAvatarARHandle(mAvatarHandle.controllerItem);

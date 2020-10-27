@@ -253,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 closeNum = 5;
                 isClose = true;
                 mP2ACore.release();
-                mP2ACore.face_capture = 0;
             }
         });
         destroyCount = new CountDownLatch(1);

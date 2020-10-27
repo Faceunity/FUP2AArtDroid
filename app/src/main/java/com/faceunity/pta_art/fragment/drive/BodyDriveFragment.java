@@ -76,7 +76,6 @@ public class BodyDriveFragment extends BaseDriveFragment implements DriveAdapter
                 }, null);
 
         mP2ABodyCore = new PTABodyCore(mActivity, mFUP2ARenderer);
-        mP2ABodyCore.setFace_capture(mP2ACore.face_capture);
         mP2ACore.unBindAndBindDefault();
         mFUP2ARenderer.setFUCore(mP2ABodyCore);
         mAvatarBodyHandle = mP2ABodyCore.createAvatarBodyHandle(mAvatarHandle.controllerItem);

@@ -161,8 +161,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 public void run() {
                     faceunity.fuUnBindItems(controllerItem, new int[]{hairMask});
                     faceunity.fuItemSetParam(controllerItem, "quit_ar_mode", 1);
-                    //设置close_face_capture，说明启用或者关闭CNN面部追踪，value = 0.0表示开启，value = 1.0表示关闭
-                    faceunity.fuItemSetParam(controllerItem, "close_face_capture", 1.0);
+                    //3.设置enable_face_processor，说明启用或者关闭面部追踪，value = 1.0表示开启，value = 0.0表示关闭
+                    faceunity.fuItemSetParam(controllerItem, "enable_face_processor", 0.0);
                 }
             });
     }
@@ -177,8 +177,8 @@ public class AvatarARDriveHandle extends BasePTAHandle {
                 public void run() {
                     faceunity.fuItemSetParam(controllerItem, "enter_ar_mode", 1);
                     faceunity.fuBindItems(controllerItem, new int[]{hairMask});
-                    //3.设置close_face_capture，说明启用或者关闭CNN面部追踪，value = 0.0表示开启，value = 1.0表示关闭
-                    faceunity.fuItemSetParam(controllerItem, "close_face_capture", 0.0);
+                    //3.设置enable_face_processor，说明启用或者关闭面部追踪，value = 1.0表示开启，value = 0.0表示关闭
+                    faceunity.fuItemSetParam(controllerItem, "enable_face_processor", 1.0);
                 }
             });
 

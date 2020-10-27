@@ -42,6 +42,11 @@ public class PTATextDriveCore extends BaseCore {
         weakReferenceActivity = new WeakReference<>((MainActivity) context);
 
         mItemsArray[ITEM_ARRAYS_FXAA] = fxaaItem = mFUItemHandler.loadFUItem(FilePathFactory.BUNDLE_fxaa);
+
+        Arrays.fill(avatarInfo.mRotation, 0.0f);
+        Arrays.fill(avatarInfo.mExpression, 0.0f);
+        Arrays.fill(avatarInfo.mPupilPos, 0.0f);
+        Arrays.fill(avatarInfo.mRotationMode, 0.0f);
     }
 
     public AvatarTextDriveHandle createAvatarHandle(int controller) {
@@ -103,10 +108,7 @@ public class PTATextDriveCore extends BaseCore {
     @Override
     public int onDrawFrame(byte[] img, int tex, int w, int h, int rotation) {
         if (img == null) return 0;
-        Arrays.fill(avatarInfo.mRotation, 0.0f);
-        Arrays.fill(avatarInfo.mExpression, 0.0f);
-        Arrays.fill(avatarInfo.mPupilPos, 0.0f);
-        Arrays.fill(avatarInfo.mRotationMode, 0.0f);
+
         faceunity.fuItemSetParam(mItemsArray[ITEM_ARRAYS_CONTROLLER], "face_detector_status", 0);
         avatarInfo.mRotationMode[0] = 0;
         avatarInfo.mIsValid = false;

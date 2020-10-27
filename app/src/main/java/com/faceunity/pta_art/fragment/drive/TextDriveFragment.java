@@ -82,7 +82,6 @@ public class TextDriveFragment extends BaseDriveFragment implements DriveAdapter
         initSta();
 
         mPTATextDriveCore = new PTATextDriveCore(mActivity, mFUP2ARenderer);
-        mPTATextDriveCore.setFace_capture(mP2ACore.face_capture);
         mFUP2ARenderer.setFUCore(mPTATextDriveCore);
         mAvatarTextHandle = mPTATextDriveCore.createAvatarHandle(mAvatarHandle.controllerItem);
 

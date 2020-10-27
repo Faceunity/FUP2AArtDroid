@@ -217,11 +217,11 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 faceunity.fuSetInputCameraMatrix(flipX, flipY, videoRenderer.getVideoRotation());
                 if (rotateMode == 0) {
                     mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(videoRenderer.getVideoNV21Byte(), 0, videoRenderer.getVideoWidth(), videoRenderer.getVideoHeight(),
-                                                                               videoRotation);
+                            videoRotation);
                 } else {
                     faceunity.fuRotateImage(mRotatedImage, videoRenderer.getVideoNV21Byte(), NVFormat, videoRenderer.getVideoWidth(), videoRenderer.getVideoHeight(), rotateMode, flipX, flipY);
                     mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mRotatedImage.mData, 0, mRotatedImage.mWidth, mRotatedImage.mHeight,
-                                                                               videoRotation);
+                            videoRotation);
                 }
             } else {
                 if (mCameraNV21Byte == null) {
@@ -241,9 +241,9 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                 if (offlineNum >= 0 && mIsNeedTakePic) {
                     rendWidth = offlineW;
                     rendHeight = offlineH;
-                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(null, 0, rendWidth, rendHeight, -1);
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(null, 0, rendWidth, rendHeight, 0);
                 } else {
-                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mRotatedImage.mData, mCameraTextureId, rendWidth, rendHeight, -1);
+                    mFuTextureId = mOnCameraRendererStatusListener.onDrawFrame(mRotatedImage.mData, mCameraTextureId, rendWidth, rendHeight, 0);
                 }
             }
         }
@@ -252,15 +252,15 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
         if (isShowCamera && mCameraNV21Byte != null) {
             if (!isShowVideo)
                 mFullFrameRectTextureOES.drawFrame(mCameraTextureId, mtx, mvp,
-                                                   mSmallCameraPositionManager.getStartX(),
-                                                   mSmallCameraPositionManager.getStartY(),
-                                                   mSmallCameraPositionManager.getPreviewCameraWidth(),
-                                                   mSmallCameraPositionManager.getPreviewCameraHeight());
+                        mSmallCameraPositionManager.getStartX(),
+                        mSmallCameraPositionManager.getStartY(),
+                        mSmallCameraPositionManager.getPreviewCameraWidth(),
+                        mSmallCameraPositionManager.getPreviewCameraHeight());
             if (isShowLandmarks) {
                 mProgramLandmarks.drawFrame(mSmallCameraPositionManager.getStartX(),
-                                            mSmallCameraPositionManager.getStartY(),
-                                            mSmallCameraPositionManager.getPreviewCameraWidth(),
-                                            mSmallCameraPositionManager.getPreviewCameraHeight());
+                        mSmallCameraPositionManager.getStartY(),
+                        mSmallCameraPositionManager.getPreviewCameraWidth(),
+                        mSmallCameraPositionManager.getPreviewCameraHeight());
             }
         }
 
@@ -314,7 +314,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
             mFullFrameRectTexture2D.drawFrame(mFuTextureId, GlUtil.IDENTITY_MATRIX, mvp);
             //绘制视频buffer
             videoRenderer.drawVideo(videoRenderer.getVideoRotation() == 0 ?
-                                            videoRenderer.getVideoNV21Byte() : mRotatedImage.mData);
+                    videoRenderer.getVideoNV21Byte() : mRotatedImage.mData);
         } else if (mFuTextureId > 0) {
             //纹理矩阵传单位阵接口，因为已经预先把纹理和buffer旋转成竖直的
             mFullFrameRectTexture2D.drawFrame(mFuTextureId, GlUtil.IDENTITY_MATRIX, mvp);
@@ -676,7 +676,7 @@ public class CameraRenderer implements Camera.PreviewCallback, GLSurfaceView.Ren
                         @Override
                         public void run() {
                             ToastUtil.showCenterToast(mActivity,
-                                                      error);
+                                    error);
                         }
                     });
                 }
